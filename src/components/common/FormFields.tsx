@@ -1,6 +1,3 @@
-import { Icon } from '@iconify/react';
-import { useState } from 'react';
-
 interface LoadingButtonProps {
   loading: boolean;
   onClick?: () => void;
@@ -23,12 +20,12 @@ export function LoadingButton({
       type={type}
       onClick={onClick}
       disabled={disabled || loading}
-      className={`btn-regular rounded-lg py-3 px-6 font-medium ${className} ${
+      className={`btn-regular rounded-[var(--radius-medium)] py-3 px-6 font-medium scale-animation ripple ${className} ${
         (disabled || loading) ? 'opacity-50 cursor-not-allowed' : ''
       }`}
     >
       {loading ? (
-        <Icon icon="material-symbols:refresh-rounded" className="animate-spin text-xl" />
+        <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin" />
       ) : (
         children
       )}
@@ -55,8 +52,6 @@ export function InputField({
   onChange,
   required,
 }: InputFieldProps) {
-  const [focused, setFocused] = useState(false);
-
   return (
     <div className="mb-4">
       <label className="block text-75 text-sm font-medium mb-2">
@@ -67,12 +62,10 @@ export function InputField({
         type={type}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        onFocus={() => setFocused(true)}
-        onBlur={() => setFocused(false)}
         placeholder={placeholder}
-        className={`input-base ${error ? 'border-red-500' : ''}`}
+        className={`input-base ${error ? 'border-red-500 focus:border-red-500' : ''}`}
       />
-      {error && focused && (
+      {error && (
         <p className="text-red-500 text-sm mt-1">{error}</p>
       )}
     </div>
@@ -109,7 +102,7 @@ export function TextAreaField({
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
         rows={rows}
-        className={`input-base ${error ? 'border-red-500' : ''}`}
+        className={`input-base resize-none ${error ? 'border-red-500 focus:border-red-500' : ''}`}
       />
       {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
     </div>

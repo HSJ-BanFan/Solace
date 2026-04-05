@@ -8,7 +8,7 @@ export function ThemeToggle() {
   return (
     <button
       onClick={toggleTheme}
-      className="btn-plain scale-animation rounded-lg h-11 w-11 active:scale-90"
+      className="btn-plain scale-animation rounded-lg h-11 w-11"
       aria-label="Toggle theme"
     >
       <Icon

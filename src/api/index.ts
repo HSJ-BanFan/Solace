@@ -1,7 +1,7 @@
 import { ApiClient, OpenAPI } from './generated';
 
-// Configure OpenAPI base URL
-OpenAPI.BASE = '/api/v1';
+// Configure OpenAPI - BASE is now correctly set from swagger.json basePath
+// OpenAPI.BASE = 'http://localhost:8080/api/v1' (auto-generated)
 
 // Token management for authenticated requests
 let currentToken: string | null = null;

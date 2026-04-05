@@ -7,20 +7,11 @@ export function AdminProfilePage() {
   const { data: user } = useCurrentUser();
   const updateMutation = useUpdateUser();
 
-  const [nickname, setNickname] = useState('');
-  const [avatarUrl, setAvatarUrl] = useState('');
-  const [bio, setBio] = useState('');
+  const [nickname, setNickname] = useState(user?.nickname || '');
+  const [avatarUrl, setAvatarUrl] = useState(user?.avatar_url || '');
+  const [bio, setBio] = useState(user?.bio || '');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-
-  // Initialize form
-  useState(() => {
-    if (user) {
-      setNickname(user.nickname || '');
-      setAvatarUrl(user.avatar_url || '');
-      setBio(user.bio || '');
-    }
-  });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,22 +31,27 @@ export function AdminProfilePage() {
   };
 
   return (
-    <div>
+    <div className="space-y-4">
       {/* Header */}
-      <div className="card-base p-6 mb-4">
-        <h1 className="text-90 text-2xl font-bold">Profile</h1>
+      <div className="card-base p-6 fade-in-up">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[var(--klein-blue)] to-[var(--sky-blue)] flex items-center justify-center">
+            <Icon icon="material-symbols:person-outline-rounded" className="text-xl text-white" />
+          </div>
+          <h1 className="text-90 text-xl font-bold">Profile Settings</h1>
+        </div>
       </div>
 
       {/* Form */}
-      <form onSubmit={handleSubmit} className="card-base p-6">
+      <form onSubmit={handleSubmit} className="card-base p-6 fade-in-up" style={{ animationDelay: '0.1s' }}>
         {error && (
-          <div className="bg-red-500/10 text-red-500 rounded-lg p-3 mb-4 text-sm">
+          <div className="bg-red-500/10 text-red-500 rounded-[var(--radius-medium)] p-3 mb-4 text-sm">
             {error}
           </div>
         )}
 
         {success && (
-          <div className="bg-green-500/10 text-green-600 rounded-lg p-3 mb-4 text-sm">
+          <div className="bg-green-500/10 text-green-600 rounded-[var(--radius-medium)] p-3 mb-4 text-sm">
             {success}
           </div>
         )}
@@ -66,11 +62,11 @@ export function AdminProfilePage() {
             <img
               src={avatarUrl}
               alt="Avatar"
-              className="w-20 h-20 rounded-full mx-auto object-cover mb-2"
+              className="w-24 h-24 rounded-full mx-auto object-cover ring-4 ring-[var(--primary)]/20 mb-2 breathing"
             />
           ) : (
-            <div className="w-20 h-20 rounded-full bg-[var(--btn-regular-bg)] mx-auto mb-2 flex items-center justify-center">
-              <Icon icon="material-symbols:person-outline-rounded" className="text-3xl text-50" />
+            <div className="w-24 h-24 rounded-full bg-gradient-to-br from-[var(--klein-blue)] to-[var(--sky-blue)] mx-auto mb-2 flex items-center justify-center breathing">
+              <Icon icon="material-symbols:person-outline-rounded" className="text-4xl text-white" />
             </div>
           )}
         </div>
@@ -99,16 +95,29 @@ export function AdminProfilePage() {
         />
 
         {/* Read-only info */}
-        <div className="border-t border-black/10 dark:border-white/10 pt-4 mt-4">
+        <div className="border-t border-[var(--border-light)] pt-4 mt-4">
           <div className="text-50 text-sm space-y-1">
-            <div>Username: {user?.username}</div>
-            <div>Email: {user?.email}</div>
-            <div>Role: {user?.role}</div>
+            <div className="flex items-center gap-2">
+              <Icon icon="material-symbols:badge-outline-rounded" className="text-base" />
+              Username: <span className="text-75">{user?.username}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Icon icon="material-symbols:mail-outline-rounded" className="text-base" />
+              Email: <span className="text-75">{user?.email}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Icon icon="material-symbols:shield-outline-rounded" className="text-base" />
+              Role: <span className="text-75">{user?.role}</span>
+            </div>
           </div>
         </div>
 
         <div className="mt-6">
-          <LoadingButton type="submit" loading={updateMutation.isPending}>
+          <LoadingButton
+            type="submit"
+            loading={updateMutation.isPending}
+            className="bg-gradient-to-r from-[var(--klein-blue)] to-[var(--klein-blue-light)] text-white"
+          >
             Save Changes
           </LoadingButton>
         </div>

@@ -13,10 +13,10 @@ export class UserService {
    * @returns handler_Response OK
    * @throws ApiError
    */
-  public getApiV1UsersMe(): CancelablePromise<handler_Response> {
+  public getUsersMe(): CancelablePromise<handler_Response> {
     return this.httpRequest.request({
       method: 'GET',
-      url: '/api/v1/users/me',
+      url: '/users/me',
       errors: {
         401: `Unauthorized`,
       },
@@ -28,12 +28,12 @@ export class UserService {
    * @returns handler_Response OK
    * @throws ApiError
    */
-  public putApiV1UsersMe(
+  public putUsersMe(
     request: request_UpdateUserRequest,
   ): CancelablePromise<handler_Response> {
     return this.httpRequest.request({
       method: 'PUT',
-      url: '/api/v1/users/me',
+      url: '/users/me',
       body: request,
       errors: {
         400: `Bad Request`,
@@ -47,12 +47,12 @@ export class UserService {
    * @returns handler_Response OK
    * @throws ApiError
    */
-  public getApiV1Users(
+  public getUsers(
     id: number,
   ): CancelablePromise<handler_Response> {
     return this.httpRequest.request({
       method: 'GET',
-      url: '/api/v1/users/{id}',
+      url: '/users/{id}',
       path: {
         'id': id,
       },

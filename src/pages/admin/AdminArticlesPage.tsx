@@ -30,13 +30,15 @@ export function AdminArticlesPage() {
   };
 
   if (!isAuthenticated || !accessToken) {
-    return null; // Protected by layout
+    return null;
   }
 
   if (error) {
     return (
-      <div className="card-base p-8 text-center">
-        <Icon icon="material-symbols:error-outline-rounded" className="text-4xl text-red-500 mb-4" />
+      <div className="card-base p-8 text-center fade-in-up">
+        <div className="w-16 h-16 rounded-full bg-red-500/10 mx-auto mb-4 flex items-center justify-center">
+          <Icon icon="material-symbols:error-outline-rounded" className="text-3xl text-red-500" />
+        </div>
         <p className="text-75">Failed to load articles</p>
       </div>
     );
@@ -46,20 +48,25 @@ export function AdminArticlesPage() {
   const total = data?.total ?? 0;
 
   return (
-    <div>
+    <div className="space-y-4">
       {/* Header */}
-      <div className="card-base p-6 mb-4">
+      <div className="card-base p-6 fade-in-up">
         <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-90 text-2xl font-bold">Articles</h1>
-            <p className="text-50 text-sm mt-1">{total} articles total</p>
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[var(--klein-blue)] to-[var(--sky-blue)] flex items-center justify-center">
+              <Icon icon="material-symbols:article-outline-rounded" className="text-xl text-white" />
+            </div>
+            <div>
+              <h1 className="text-90 text-xl font-bold">Articles</h1>
+              <p className="text-50 text-sm">{total} articles total</p>
+            </div>
           </div>
           <Link
             to="/admin/articles/new"
-            className="btn-regular rounded-lg py-2 px-4 font-medium"
+            className="btn-regular rounded-[var(--radius-medium)] py-2 px-4 font-medium scale-animation ripple"
           >
             <Icon icon="material-symbols:add-rounded" className="mr-1" />
-            New Article
+            New
           </Link>
         </div>
 
@@ -69,8 +76,10 @@ export function AdminArticlesPage() {
             <button
               key={status}
               onClick={() => setStatusFilter(status)}
-              className={`btn-plain rounded-lg py-2 px-3 text-sm ${
-                statusFilter === status ? 'bg-[var(--primary)]/10 text-[var(--primary)]' : ''
+              className={`rounded-[var(--radius-medium)] py-2 px-3 text-sm font-medium transition-all scale-animation ripple ${
+                statusFilter === status
+                  ? 'bg-gradient-to-r from-[var(--klein-blue)] to-[var(--klein-blue-light)] text-white'
+                  : 'btn-regular'
               }`}
             >
               {status.charAt(0).toUpperCase() + status.slice(1)}
@@ -82,34 +91,34 @@ export function AdminArticlesPage() {
       {/* Article List */}
       {isLoading ? (
         <div className="card-base p-8 text-center">
-          <Icon icon="material-symbols:refresh-rounded" className="animate-spin text-4xl text-50" />
+          <div className="w-12 h-12 rounded-full border-2 border-[var(--primary)] border-t-transparent mx-auto mb-4 animate-spin" />
         </div>
       ) : (
-        <div className="card-base">
+        <div className="card-base fade-in-up" style={{ animationDelay: '0.1s' }}>
           {articles.length === 0 ? (
             <div className="p-8 text-center text-50">
               <Icon icon="material-symbols:article-outline-rounded" className="text-4xl mb-4" />
               <p>No articles found</p>
             </div>
           ) : (
-            <div className="divide-y divide-black/10 dark:divide-white/10">
+            <div className="divide-y divide-[var(--border-light)]">
               {articles.map((article) => (
-                <div key={article.id} className="p-4 flex items-center gap-4">
+                <div key={article.id} className="p-4 flex items-center gap-4 hover:bg-[var(--btn-plain-bg-hover)] transition-colors">
                   {/* Info */}
                   <div className="flex-1 min-w-0">
                     <Link
                       to={`/admin/articles/${article.id}/edit`}
-                      className="text-90 font-bold hover:text-[var(--primary)] transition block mb-1"
+                      className="text-90 font-bold hover:text-[var(--primary)] transition-colors block mb-1"
                     >
                       {article.title}
                     </Link>
                     <div className="flex items-center gap-2 text-50 text-xs">
                       <span>{formatDate(article.created_at)}</span>
                       <span>•</span>
-                      <span className={`px-2 py-0.5 rounded ${
+                      <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${
                         article.status === 'published'
-                          ? 'bg-green-500/20 text-green-600'
-                          : 'bg-yellow-500/20 text-yellow-600'
+                          ? 'bg-green-500/10 text-green-600 dark:text-green-400'
+                          : 'bg-amber-500/10 text-amber-600 dark:text-amber-400'
                       }`}>
                         {article.status}
                       </span>
@@ -119,17 +128,17 @@ export function AdminArticlesPage() {
                   </div>
 
                   {/* Actions */}
-                  <div className="flex items-center gap-2 shrink-0">
+                  <div className="flex items-center gap-1 shrink-0">
                     <Link
                       to={`/articles/${article.slug}`}
-                      className="btn-plain rounded-lg h-9 w-9"
+                      className="btn-plain rounded-[var(--radius-medium)] h-9 w-9 scale-animation ripple"
                       title="View"
                     >
                       <Icon icon="material-symbols:visibility-outline-rounded" className="text-lg" />
                     </Link>
                     <Link
                       to={`/admin/articles/${article.id}/edit`}
-                      className="btn-plain rounded-lg h-9 w-9"
+                      className="btn-plain rounded-[var(--radius-medium)] h-9 w-9 scale-animation ripple"
                       title="Edit"
                     >
                       <Icon icon="material-symbols:edit-outline-rounded" className="text-lg" />
@@ -137,7 +146,7 @@ export function AdminArticlesPage() {
                     <button
                       onClick={() => handleDelete(article.id)}
                       disabled={deleteMutation.isPending}
-                      className="btn-plain rounded-lg h-9 w-9 text-red-500 hover:bg-red-500/10"
+                      className="btn-plain rounded-[var(--radius-medium)] h-9 w-9 text-red-500 hover:bg-red-500/10 scale-animation ripple"
                       title="Delete"
                     >
                       <Icon icon="material-symbols:delete-outline-rounded" className="text-lg" />

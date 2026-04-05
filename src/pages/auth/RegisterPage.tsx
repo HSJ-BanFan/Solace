@@ -43,17 +43,19 @@ export function RegisterPage() {
   };
 
   return (
-    <div className="card-base w-full max-w-md p-6 md:p-8">
+    <div className="card-base card-hover-lift w-full max-w-md p-6 md:p-8 fade-in-up">
       {/* Header */}
       <div className="text-center mb-6">
-        <Icon icon="material-symbols:person-add-rounded" className="text-4xl text-[var(--primary)] mb-4" />
-        <h1 className="text-90 text-2xl font-bold">Register</h1>
-        <p className="text-50 text-sm mt-2">Create your account</p>
+        <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[var(--klein-blue)] to-[var(--sky-blue)] mx-auto mb-4 flex items-center justify-center breathing">
+          <Icon icon="material-symbols:person-add-rounded" className="text-3xl text-white" />
+        </div>
+        <h1 className="text-90 text-2xl font-bold">Create Account</h1>
+        <p className="text-50 text-sm mt-1">Join us today</p>
       </div>
 
       {/* Error */}
       {error && (
-        <div className="bg-red-500/10 text-red-500 rounded-lg p-3 mb-4 text-sm text-center">
+        <div className="bg-red-500/10 text-red-500 rounded-[var(--radius-medium)] p-3 mb-4 text-sm text-center">
           {error}
         </div>
       )}
@@ -98,17 +100,17 @@ export function RegisterPage() {
         <LoadingButton
           type="submit"
           loading={registerMutation.isPending}
-          className="w-full"
+          className="w-full py-3 bg-gradient-to-r from-[var(--klein-blue)] to-[var(--klein-blue-light)] text-white rounded-[var(--radius-medium)] font-medium hover:shadow-lg transition-shadow ripple"
         >
-          Register
+          Create Account
         </LoadingButton>
       </form>
 
       {/* Footer */}
       <div className="text-center mt-6 text-50 text-sm">
         Already have an account?{' '}
-        <Link to="/login" className="text-[var(--primary)] hover:underline">
-          Login
+        <Link to="/login" className="text-[var(--primary)] font-medium hover:underline">
+          Sign in
         </Link>
       </div>
     </div>

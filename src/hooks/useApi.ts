@@ -34,7 +34,7 @@ export function useArticles(params: {
   return useQuery({
     queryKey: ['articles', params],
     queryFn: async () => {
-      const response = await apiClient.article.getApiV1Articles(
+      const response = await apiClient.article.getArticles(
         params.page ?? 1,
         params.pageSize ?? 10,
         params.status,
@@ -76,7 +76,7 @@ export function useArticle(id: number) {
   return useQuery({
     queryKey: ['article', id],
     queryFn: async () => {
-      const response = await apiClient.article.getApiV1Articles1(id);
+      const response = await apiClient.article.getArticles1(id);
       return extractData<{
         id: number;
         title: string;
@@ -109,7 +109,7 @@ export function useArticleBySlug(slug: string) {
   return useQuery({
     queryKey: ['article', slug],
     queryFn: async () => {
-      const response = await apiClient.article.getApiV1ArticlesSlug(slug);
+      const response = await apiClient.article.getArticlesSlug(slug);
       return extractData<{
         id: number;
         title: string;
@@ -142,7 +142,7 @@ export function useCreateArticle() {
 
   return useMutation({
     mutationFn: async (data: request_CreateArticleRequest) => {
-      const response = await apiClient.article.postApiV1Articles(data);
+      const response = await apiClient.article.postArticles(data);
       return extractData(response);
     },
     onSuccess: () => {
@@ -161,7 +161,7 @@ export function useUpdateArticle() {
 
   return useMutation({
     mutationFn: async ({ id, data }: { id: number; data: request_UpdateArticleRequest }) => {
-      const response = await apiClient.article.putApiV1Articles(id, data);
+      const response = await apiClient.article.putArticles(id, data);
       return extractData(response);
     },
     onSuccess: (_, { id }) => {
@@ -181,7 +181,7 @@ export function useDeleteArticle() {
 
   return useMutation({
     mutationFn: async (id: number) => {
-      await apiClient.article.deleteApiV1Articles(id);
+      await apiClient.article.deleteArticles(id);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['articles'] });
@@ -195,7 +195,7 @@ export function useLogin() {
 
   return useMutation({
     mutationFn: async (data: request_LoginRequest) => {
-      const response = await apiClient.auth.postApiV1AuthLogin({
+      const response = await apiClient.auth.postAuthLogin({
         email: data.email,
         password: data.password,
       });
@@ -218,7 +218,7 @@ export function useRegister() {
 
   return useMutation({
     mutationFn: async (data: request_RegisterRequest) => {
-      const response = await apiClient.auth.postApiV1AuthRegister({
+      const response = await apiClient.auth.postAuthRegister({
         username: data.username,
         email: data.email,
         password: data.password,
@@ -243,7 +243,7 @@ export function useLogout() {
   return useMutation({
     mutationFn: async () => {
       if (refreshToken) {
-        await apiClient.auth.postApiV1AuthLogout({ refresh_token: refreshToken });
+        await apiClient.auth.postAuthLogout({ refresh_token: refreshToken });
       }
     },
     onSuccess: () => {
@@ -264,7 +264,7 @@ export function useCurrentUser() {
   return useQuery({
     queryKey: ['currentUser'],
     queryFn: async () => {
-      const response = await apiClient.user.getApiV1UsersMe();
+      const response = await apiClient.user.getUsersMe();
       return extractData<{
         id: number;
         username: string;
@@ -290,7 +290,7 @@ export function useUpdateUser() {
 
   return useMutation({
     mutationFn: async (data: request_UpdateUserRequest) => {
-      const response = await apiClient.user.putApiV1UsersMe(data);
+      const response = await apiClient.user.putUsersMe(data);
       return extractData<{
         id: number;
         username: string;

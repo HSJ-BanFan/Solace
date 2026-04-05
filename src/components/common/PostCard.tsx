@@ -23,104 +23,117 @@ interface Article {
 
 interface PostCardProps {
   article: Article;
+  class?: string;
+  style?: React.CSSProperties;
 }
 
-export function PostCard({ article }: PostCardProps) {
+export function PostCard({ article, class: className, style }: PostCardProps) {
   const hasCover = article.cover_image && article.cover_image !== '';
+  const coverWidth = '28%';
 
   return (
-    <div className="card-base flex flex-col-reverse md:flex-col w-full rounded-[var(--radius-large)] overflow-hidden relative">
-      {/* Content */}
+    <>
       <div
-        className={`pl-6 md:pl-9 pr-6 md:pr-2 pt-6 md:pt-7 pb-6 relative ${
+        className={`card-base flex flex-col-reverse md:flex-col w-full rounded-[var(--radius-large)] overflow-hidden relative ${className || ''}`}
+        style={style}
+      >
+        {/* Content */}
+        <div className={`pl-6 md:pl-9 pr-6 md:pr-2 pt-6 md:pt-7 pb-6 relative ${
           hasCover
             ? 'w-full md:w-[calc(100%-var(--coverWidth)-12px)]'
             : 'w-full md:w-[calc(100%-52px-12px)]'
-        }`}
-      >
-        {/* Title */}
-        <Link
-          to={`/articles/${article.slug}`}
-          className="transition group w-full block font-bold mb-3 text-3xl text-90
-            hover:text-[var(--primary)] dark:hover:text-[var(--primary)]
-            active:text-[var(--primary)]
-            before:w-1 before:h-5 before:rounded-md before:bg-[var(--primary)]
-            before:absolute before:top-[35px] before:left-[18px] before:hidden md:before:block"
-        >
-          {article.title}
-          <Icon
-            icon="material-symbols:chevron-right-rounded"
-            className="inline text-[2rem] text-[var(--primary)] md:hidden translate-y-0.5 absolute"
-          />
-          <Icon
-            icon="material-symbols:chevron-right-rounded"
-            className="text-[var(--primary)] text-[2rem] transition hidden md:inline absolute translate-y-0.5 opacity-0 group-hover:opacity-100 -translate-x-1 group-hover:translate-x-0"
-          />
-        </Link>
-
-        {/* Metadata */}
-        <PostMeta article={article} hideUpdateDate />
-
-        {/* Summary */}
-        <div className="transition text-75 mb-3.5 pr-4 line-clamp-2 md:line-clamp-1">
-          {article.summary || 'No summary available'}
-        </div>
-
-        {/* View count */}
-        <div className="text-sm text-30 flex gap-4 transition">
-          <div>{article.view_count} views</div>
-        </div>
-      </div>
-
-      {/* Cover Image */}
-      {hasCover && (
-        <Link
-          to={`/articles/${article.slug}`}
-          className="group max-h-[20vh] md:max-h-none mx-4 mt-4 -mb-2 md:mb-0 md:mx-0 md:mt-0
-            md:w-[var(--coverWidth)] relative md:absolute md:top-3 md:bottom-3 md:right-3
-            rounded-xl overflow-hidden active:scale-95"
-        >
-          <div className="absolute pointer-events-none z-10 w-full h-full group-hover:bg-black/30 group-active:bg-black/50 transition" />
-          <div className="absolute pointer-events-none z-20 w-full h-full flex items-center justify-center">
+        }`}>
+          {/* Title */}
+          <Link
+            to={`/articles/${article.slug}`}
+            className="transition group w-full block font-bold mb-3 text-3xl text-90
+              hover:text-[var(--primary)] dark:hover:text-[var(--primary)]
+              active:text-[var(--primary)]
+              before:w-1 before:h-5 before:rounded-md before:bg-[var(--primary)]
+              before:absolute before:top-[35px] before:left-[18px] before:hidden md:before:block"
+          >
+            {article.title}
             <Icon
               icon="material-symbols:chevron-right-rounded"
-              className="transition opacity-0 group-hover:opacity-100 scale-50 group-hover:scale-100 text-white text-5xl"
+              className="inline text-[2rem] text-[var(--primary)] md:hidden translate-y-0.5 absolute"
             />
-          </div>
-          <img
-            src={article.cover_image}
-            alt={article.title}
-            className="w-full h-full object-cover"
-          />
-        </Link>
-      )}
+            <Icon
+              icon="material-symbols:chevron-right-rounded"
+              className="text-[var(--primary)] text-[2rem] transition hidden md:inline absolute translate-y-0.5 opacity-0 group-hover:opacity-100 -translate-x-1 group-hover:translate-x-0"
+            />
+          </Link>
 
-      {/* Enter Button (no cover) */}
-      {!hasCover && (
-        <Link
-          to={`/articles/${article.slug}`}
-          className="!hidden md:!flex btn-regular w-[3.25rem] absolute right-3 top-3 bottom-3 rounded-xl bg-[var(--enter-btn-bg)] hover:bg-[var(--enter-btn-bg-hover)] active:bg-[var(--enter-btn-bg-active)] active:scale-95"
-        >
-          <Icon
-            icon="material-symbols:chevron-right-rounded"
-            className="transition text-[var(--primary)] text-4xl mx-auto"
-          />
-        </Link>
-      )}
-    </div>
+          {/* Metadata */}
+          <PostMeta article={article} hideTagsForMobile />
+
+          {/* Summary */}
+          <div className="transition text-75 mb-3.5 pr-4 line-clamp-2 md:line-clamp-1">
+            {article.summary || 'No summary available'}
+          </div>
+
+          {/* View count */}
+          <div className="text-sm text-30 flex gap-4 transition">
+            <div>{article.view_count} views</div>
+          </div>
+        </div>
+
+        {/* Cover Image */}
+        {hasCover && (
+          <Link
+            to={`/articles/${article.slug}`}
+            className="group max-h-[20vh] md:max-h-none mx-4 mt-4 -mb-2 md:mb-0 md:mx-0 md:mt-0
+              md:w-[var(--coverWidth)] relative md:absolute md:top-3 md:bottom-3 md:right-3
+              rounded-xl overflow-hidden active:scale-95"
+          >
+            <div className="absolute pointer-events-none z-10 w-full h-full group-hover:bg-black/30 group-active:bg-black/50 transition" />
+            <div className="absolute pointer-events-none z-20 w-full h-full flex items-center justify-center">
+              <Icon
+                icon="material-symbols:chevron-right-rounded"
+                className="transition opacity-0 group-hover:opacity-100 scale-50 group-hover:scale-100 text-white text-5xl"
+              />
+            </div>
+            <img
+              src={article.cover_image}
+              alt={article.title}
+              className="w-full h-full object-cover"
+            />
+          </Link>
+        )}
+
+        {/* Enter Button (no cover) */}
+        {!hasCover && (
+          <Link
+            to={`/articles/${article.slug}`}
+            className="!hidden md:!flex btn-regular w-[3.25rem] absolute right-3 top-3 bottom-3 rounded-xl bg-[var(--btn-regular-bg)]
+              hover:bg-[var(--btn-regular-bg-hover)] active:bg-[var(--btn-regular-bg-active)] active:scale-95"
+          >
+            <Icon
+              icon="material-symbols:chevron-right-rounded"
+              className="transition text-[var(--primary)] text-4xl mx-auto"
+            />
+          </Link>
+        )}
+      </div>
+
+      {/* Divider (mobile) */}
+      <div className="transition border-t-[1px] border-dashed mx-6 border-[var(--border-medium)] last:border-t-0 md:hidden" />
+
+      <style>{`:root { --coverWidth: ${coverWidth}; }`}</style>
+    </>
   );
 }
 
 interface PostMetaProps {
   article: Article;
   hideUpdateDate?: boolean;
+  hideTagsForMobile?: boolean;
 }
 
-export function PostMeta({ article, hideUpdateDate }: PostMetaProps) {
+export function PostMeta({ article, hideUpdateDate, hideTagsForMobile }: PostMetaProps) {
   const showUpdate = !hideUpdateDate && article.updated_at !== article.created_at;
 
   return (
-    <div className="flex flex-wrap text-50 items-center gap-4 gap-x-4 gap-y-2 mb-4">
+    <div className={`flex flex-wrap text-50 items-center gap-4 gap-x-4 gap-y-2 mb-4 ${hideTagsForMobile ? '' : ''}`}>
       {/* Published Date */}
       <div className="flex items-center">
         <div className="meta-icon">
@@ -149,10 +162,10 @@ export function PostMeta({ article, hideUpdateDate }: PostMetaProps) {
         </div>
       )}
 
-      {/* Status (for admin view) */}
+      {/* Status (draft) */}
       {article.status === 'draft' && (
         <div className="flex items-center">
-          <div className="meta-icon bg-yellow-500/20 text-yellow-600">
+          <div className="meta-icon bg-amber-500/20 text-amber-600">
             <Icon icon="material-symbols:edit-note-rounded" className="text-xl" />
           </div>
           <span className="text-50 text-sm font-medium">Draft</span>

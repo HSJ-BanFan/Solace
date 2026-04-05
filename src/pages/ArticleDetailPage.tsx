@@ -10,8 +10,10 @@ export function ArticleDetailPage() {
 
   if (error) {
     return (
-      <div className="card-base p-8 text-center">
-        <Icon icon="material-symbols:error-outline-rounded" className="text-4xl text-red-500 mb-4" />
+      <div className="card-base p-8 text-center fade-in-up">
+        <div className="w-16 h-16 rounded-full bg-red-500/10 mx-auto mb-4 flex items-center justify-center">
+          <Icon icon="material-symbols:error-outline-rounded" className="text-3xl text-red-500" />
+        </div>
         <p className="text-75">Failed to load article</p>
       </div>
     );
@@ -20,7 +22,7 @@ export function ArticleDetailPage() {
   if (isLoading) {
     return (
       <div className="card-base p-8 text-center">
-        <Icon icon="material-symbols:refresh-rounded" className="animate-spin text-4xl text-50 mb-4" />
+        <div className="w-12 h-12 rounded-full border-2 border-[var(--primary)] border-t-transparent mx-auto mb-4 animate-spin" />
         <p className="text-50">Loading article...</p>
       </div>
     );
@@ -28,30 +30,32 @@ export function ArticleDetailPage() {
 
   if (!article) {
     return (
-      <div className="card-base p-8 text-center">
-        <Icon icon="material-symbols:search-rounded" className="text-4xl text-50 mb-4" />
+      <div className="card-base p-8 text-center fade-in-up">
+        <div className="w-16 h-16 rounded-full bg-[var(--btn-regular-bg)] mx-auto mb-4 flex items-center justify-center">
+          <Icon icon="material-symbols:search-rounded" className="text-3xl text-[var(--primary)]" />
+        </div>
         <p className="text-75">Article not found</p>
       </div>
     );
   }
 
   return (
-    <div>
+    <article className="space-y-4">
       {/* Cover Image */}
       {article.cover_image && (
-        <div className="card-base mb-4 overflow-hidden">
+        <div className="card-base overflow-hidden fade-in-up">
           <img
             src={article.cover_image}
             alt={article.title}
-            className="w-full h-[300px] object-cover"
+            className="w-full h-[280px] md:h-[360px] object-cover"
           />
         </div>
       )}
 
       {/* Article Content */}
-      <article className="card-base p-6 md:p-8">
+      <div className="card-base p-6 md:p-8 fade-in-up" style={{ animationDelay: '0.1s' }}>
         {/* Title */}
-        <h1 className="text-90 text-3xl md:text-4xl font-bold mb-4">{article.title}</h1>
+        <h1 className="text-90 text-2xl md:text-3xl font-bold mb-4">{article.title}</h1>
 
         {/* Meta */}
         <PostMeta article={article} />
@@ -65,24 +69,25 @@ export function ArticleDetailPage() {
 
         {/* Content */}
         <div className="markdown-content mt-6">
-          {/* Simple markdown rendering - for production use a proper markdown parser */}
-          <div className="prose dark:prose-invert max-w-none">
-            {article.content.split('\n').map((paragraph, i) => (
-              <p key={i} className="text-75 leading-relaxed mb-4">
-                {paragraph}
-              </p>
-            ))}
-          </div>
+          {article.content.split('\n').map((paragraph, i) => (
+            <p key={i}>{paragraph}</p>
+          ))}
         </div>
 
         {/* Footer */}
-        <div className="border-t border-black/10 dark:border-white/10 mt-8 pt-4">
+        <div className="border-t border-[var(--border-light)] mt-8 pt-4">
           <div className="flex items-center justify-between text-50 text-sm">
-            <div>Published: {formatDate(article.published_at || article.created_at)}</div>
-            <div>{article.view_count} views</div>
+            <div className="flex items-center gap-2">
+              <Icon icon="material-symbols:calendar-today-outline-rounded" className="text-base" />
+              {formatDate(article.published_at || article.created_at)}
+            </div>
+            <div className="flex items-center gap-2">
+              <Icon icon="material-symbols:visibility-outline-rounded" className="text-base" />
+              {article.view_count} views
+            </div>
           </div>
         </div>
-      </article>
-    </div>
+      </div>
+    </article>
   );
 }

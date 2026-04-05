@@ -72,18 +72,23 @@ export function ArticleEditorPage() {
   };
 
   return (
-    <div>
+    <div className="space-y-4">
       {/* Header */}
-      <div className="card-base p-6 mb-4">
-        <h1 className="text-90 text-2xl font-bold">
-          {isEdit ? 'Edit Article' : 'New Article'}
-        </h1>
+      <div className="card-base p-6 fade-in-up">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[var(--klein-blue)] to-[var(--sky-blue)] flex items-center justify-center">
+            <Icon icon={isEdit ? 'material-symbols:edit-outline-rounded' : 'material-symbols:add-rounded'} className="text-xl text-white" />
+          </div>
+          <h1 className="text-90 text-xl font-bold">
+            {isEdit ? 'Edit Article' : 'New Article'}
+          </h1>
+        </div>
       </div>
 
       {/* Form */}
-      <form onSubmit={handleSubmit} className="card-base p-6">
+      <form onSubmit={handleSubmit} className="card-base p-6 fade-in-up" style={{ animationDelay: '0.1s' }}>
         {error && (
-          <div className="bg-red-500/10 text-red-500 rounded-lg p-3 mb-4 text-sm">
+          <div className="bg-red-500/10 text-red-500 rounded-[var(--radius-medium)] p-3 mb-4 text-sm">
             {error}
           </div>
         )}
@@ -114,7 +119,7 @@ export function ArticleEditorPage() {
         />
 
         {/* Status */}
-        <div className="mb-4">
+        <div className="mb-6">
           <label className="block text-75 text-sm font-medium mb-2">Status</label>
           <div className="flex gap-2">
             {Object.values(request_CreateArticleRequest.status).map((s) => (
@@ -122,10 +127,10 @@ export function ArticleEditorPage() {
                 key={s}
                 type="button"
                 onClick={() => setStatus(s)}
-                className={`btn-plain rounded-lg py-2 px-4 text-sm ${
+                className={`rounded-[var(--radius-medium)] py-2 px-4 text-sm font-medium transition-all scale-animation ripple ${
                   status === s
-                    ? 'bg-[var(--primary)]/10 text-[var(--primary)] font-medium'
-                    : ''
+                    ? 'bg-gradient-to-r from-[var(--klein-blue)] to-[var(--klein-blue-light)] text-white'
+                    : 'btn-regular'
                 }`}
               >
                 <Icon
@@ -143,13 +148,14 @@ export function ArticleEditorPage() {
           <LoadingButton
             type="submit"
             loading={createMutation.isPending || updateMutation.isPending}
+            className="bg-gradient-to-r from-[var(--klein-blue)] to-[var(--klein-blue-light)] text-white"
           >
             {isEdit ? 'Update' : 'Create'}
           </LoadingButton>
           <button
             type="button"
             onClick={() => navigate('/admin')}
-            className="btn-plain rounded-lg py-3 px-6"
+            className="btn-plain rounded-[var(--radius-medium)] py-3 px-6 scale-animation ripple"
           >
             Cancel
           </button>

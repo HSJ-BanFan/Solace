@@ -18,7 +18,7 @@ export class ArticleService {
    * @returns handler_Response OK
    * @throws ApiError
    */
-  public getApiV1Articles(
+  public getArticles(
     page: number = 1,
     pageSize: number = 10,
     status?: string,
@@ -26,7 +26,7 @@ export class ArticleService {
   ): CancelablePromise<handler_Response> {
     return this.httpRequest.request({
       method: 'GET',
-      url: '/api/v1/articles',
+      url: '/articles',
       query: {
         'page': page,
         'pageSize': pageSize,
@@ -41,12 +41,12 @@ export class ArticleService {
    * @returns handler_Response Created
    * @throws ApiError
    */
-  public postApiV1Articles(
+  public postArticles(
     request: request_CreateArticleRequest,
   ): CancelablePromise<handler_Response> {
     return this.httpRequest.request({
       method: 'POST',
-      url: '/api/v1/articles',
+      url: '/articles',
       body: request,
       errors: {
         400: `Bad Request`,
@@ -60,12 +60,12 @@ export class ArticleService {
    * @returns handler_Response OK
    * @throws ApiError
    */
-  public getApiV1ArticlesSlug(
+  public getArticlesSlug(
     slug: string,
   ): CancelablePromise<handler_Response> {
     return this.httpRequest.request({
       method: 'GET',
-      url: '/api/v1/articles/slug/{slug}',
+      url: '/articles/slug/{slug}',
       path: {
         'slug': slug,
       },
@@ -80,12 +80,12 @@ export class ArticleService {
    * @returns handler_Response OK
    * @throws ApiError
    */
-  public getApiV1Articles1(
+  public getArticles1(
     id: number,
   ): CancelablePromise<handler_Response> {
     return this.httpRequest.request({
       method: 'GET',
-      url: '/api/v1/articles/{id}',
+      url: '/articles/{id}',
       path: {
         'id': id,
       },
@@ -101,13 +101,13 @@ export class ArticleService {
    * @returns handler_Response OK
    * @throws ApiError
    */
-  public putApiV1Articles(
+  public putArticles(
     id: number,
     request: request_UpdateArticleRequest,
   ): CancelablePromise<handler_Response> {
     return this.httpRequest.request({
       method: 'PUT',
-      url: '/api/v1/articles/{id}',
+      url: '/articles/{id}',
       path: {
         'id': id,
       },
@@ -125,12 +125,12 @@ export class ArticleService {
    * @returns void
    * @throws ApiError
    */
-  public deleteApiV1Articles(
+  public deleteArticles(
     id: number,
   ): CancelablePromise<void> {
     return this.httpRequest.request({
       method: 'DELETE',
-      url: '/api/v1/articles/{id}',
+      url: '/articles/{id}',
       path: {
         'id': id,
       },

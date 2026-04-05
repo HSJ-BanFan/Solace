@@ -20,7 +20,7 @@ export function AdminLayout() {
       <div className="flex-1 max-w-[var(--page-width)] mx-auto w-full px-4 py-4">
         <div className="flex flex-col md:flex-row gap-4">
           {/* Admin Sidebar */}
-          <aside className="w-full md:w-64 shrink-0">
+          <aside className="w-full md:w-56 shrink-0">
             <div className="card-base p-4 mb-4">
               <div className="text-75 text-sm font-medium mb-2">Admin Dashboard</div>
               {user && (

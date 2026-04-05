@@ -16,8 +16,10 @@ export function ArchivePage() {
 
   if (error) {
     return (
-      <div className="card-base p-8 text-center">
-        <Icon icon="material-symbols:error-outline-rounded" className="text-4xl text-red-500 mb-4" />
+      <div className="card-base p-8 text-center fade-in-up">
+        <div className="w-16 h-16 rounded-full bg-red-500/10 mx-auto mb-4 flex items-center justify-center">
+          <Icon icon="material-symbols:error-outline-rounded" className="text-3xl text-red-500" />
+        </div>
         <p className="text-75">Failed to load archive</p>
       </div>
     );
@@ -26,7 +28,7 @@ export function ArchivePage() {
   if (isLoading) {
     return (
       <div className="card-base p-8 text-center">
-        <Icon icon="material-symbols:refresh-rounded" className="animate-spin text-4xl text-50 mb-4" />
+        <div className="w-12 h-12 rounded-full border-2 border-[var(--primary)] border-t-transparent mx-auto mb-4 animate-spin" />
         <p className="text-50">Loading archive...</p>
       </div>
     );
@@ -48,43 +50,52 @@ export function ArchivePage() {
   const sortedKeys = Object.keys(groupedArticles).sort((a, b) => b.localeCompare(a));
 
   return (
-    <div>
+    <div className="space-y-4">
       {/* Header */}
-      <div className="card-base p-6 mb-4">
-        <div className="flex items-center gap-2">
-          <Icon icon="material-symbols:archive-outline-rounded" className="text-2xl text-[var(--primary)]" />
-          <h1 className="text-90 text-2xl font-bold">Archive</h1>
+      <div className="card-base p-6 fade-in-up">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[var(--klein-blue)] to-[var(--sky-blue)] flex items-center justify-center">
+            <Icon icon="material-symbols:archive-outline-rounded" className="text-xl text-white" />
+          </div>
+          <div>
+            <h1 className="text-90 text-xl font-bold">Archive</h1>
+            <p className="text-50 text-sm">{total} articles total</p>
+          </div>
         </div>
-        <p className="text-50 text-sm mt-2">{total} articles total</p>
       </div>
 
       {/* Timeline */}
-      <div className="card-base p-6">
+      <div className="card-base p-6 fade-in-up" style={{ animationDelay: '0.1s' }}>
         {sortedKeys.map((key) => (
-          <div key={key} className="mb-6 last:mb-0">
-            <div className="text-90 font-bold text-lg mb-3">
-              {key.replace('-', ' / ')}
-              <span className="text-50 text-sm ml-2">
-                ({(groupedArticles[key]?.length ?? 0)} articles)
+          <div key={key} className="mb-8 last:mb-0">
+            {/* Month Header */}
+            <div className="flex items-center gap-2 mb-4">
+              <div className="w-3 h-3 rounded-full bg-gradient-to-br from-[var(--klein-blue)] to-[var(--sky-blue)]" />
+              <h2 className="text-90 font-bold text-lg">
+                {key.replace('-', ' / ')}
+              </h2>
+              <span className="text-50 text-sm ml-auto">
+                {groupedArticles[key]?.length ?? 0} articles
               </span>
             </div>
 
-            <div className="space-y-2">
+            {/* Articles */}
+            <div className="space-y-1 pl-5 border-l-2 border-[var(--border-light)]">
               {(groupedArticles[key] ?? []).map((article) => (
                 <Link
                   key={article.id}
                   to={`/articles/${article.slug}`}
-                  className="flex items-center gap-3 py-2 px-3 rounded-lg hover:bg-[var(--btn-plain-bg-hover)] transition"
+                  className="flex items-center gap-4 py-2 px-3 rounded-[var(--radius-medium)] hover:bg-[var(--btn-plain-bg-hover)] transition-colors duration-[var(--duration-normal)] group"
                 >
                   <span className="text-50 text-sm w-20 shrink-0">
                     {formatDate(article.published_at || article.created_at)}
                   </span>
-                  <span className="text-75 text-sm flex-1 line-clamp-1">
+                  <span className="text-75 text-sm flex-1 line-clamp-1 group-hover:text-[var(--primary)] transition-colors">
                     {article.title}
                   </span>
                   <Icon
                     icon="material-symbols:chevron-right-rounded"
-                    className="text-lg text-50"
+                    className="text-lg text-30 group-hover:text-[var(--primary)] group-hover:translate-x-1 transition-all"
                   />
                 </Link>
               ))}
@@ -103,7 +114,7 @@ export function ArchivePage() {
         {articles.length < total && (
           <button
             onClick={() => setPage(page + 1)}
-            className="btn-regular rounded-lg w-full py-3 mt-4"
+            className="btn-regular rounded-[var(--radius-medium)] w-full py-3 mt-4 scale-animation ripple"
           >
             Load More
           </button>

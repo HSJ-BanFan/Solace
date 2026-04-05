@@ -16,12 +16,12 @@ export class AuthService {
    * @returns handler_Response OK
    * @throws ApiError
    */
-  public postApiV1AuthLogin(
+  public postAuthLogin(
     request: request_LoginRequest,
   ): CancelablePromise<handler_Response> {
     return this.httpRequest.request({
       method: 'POST',
-      url: '/api/v1/auth/login',
+      url: '/auth/login',
       body: request,
       errors: {
         400: `Bad Request`,
@@ -35,12 +35,12 @@ export class AuthService {
    * @returns handler_Response OK
    * @throws ApiError
    */
-  public postApiV1AuthLogout(
+  public postAuthLogout(
     request: request_RefreshTokenRequest,
   ): CancelablePromise<handler_Response> {
     return this.httpRequest.request({
       method: 'POST',
-      url: '/api/v1/auth/logout',
+      url: '/auth/logout',
       body: request,
       errors: {
         400: `Bad Request`,
@@ -53,12 +53,12 @@ export class AuthService {
    * @returns handler_Response OK
    * @throws ApiError
    */
-  public postApiV1AuthRefresh(
+  public postAuthRefresh(
     request: request_RefreshTokenRequest,
   ): CancelablePromise<handler_Response> {
     return this.httpRequest.request({
       method: 'POST',
-      url: '/api/v1/auth/refresh',
+      url: '/auth/refresh',
       body: request,
       errors: {
         400: `Bad Request`,
@@ -72,12 +72,12 @@ export class AuthService {
    * @returns handler_Response Created
    * @throws ApiError
    */
-  public postApiV1AuthRegister(
+  public postAuthRegister(
     request: request_RegisterRequest,
   ): CancelablePromise<handler_Response> {
     return this.httpRequest.request({
       method: 'POST',
-      url: '/api/v1/auth/register',
+      url: '/auth/register',
       body: request,
       errors: {
         400: `Bad Request`,

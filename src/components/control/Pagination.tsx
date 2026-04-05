@@ -26,7 +26,9 @@ export function Pagination({ page, pageSize, total, onPageChange }: PaginationPr
       <button
         onClick={() => onPageChange(page - 1)}
         disabled={page === 1}
-        className={`btn-card rounded-lg h-10 w-10 ${page === 1 ? 'opacity-50 cursor-not-allowed' : ''}`}
+        className={`btn-card rounded-[var(--radius-medium)] h-10 w-10 scale-animation ripple ${
+          page === 1 ? 'opacity-50 cursor-not-allowed' : ''
+        }`}
         aria-label="Previous page"
       >
         <Icon icon="material-symbols:chevron-left-rounded" className="text-xl" />
@@ -37,11 +39,11 @@ export function Pagination({ page, pageSize, total, onPageChange }: PaginationPr
         <>
           <button
             onClick={() => onPageChange(1)}
-            className="btn-card rounded-lg h-10 min-w-[2.5rem] px-3"
+            className="btn-card rounded-[var(--radius-medium)] h-10 min-w-[2.5rem] px-3 scale-animation ripple"
           >
             1
           </button>
-          {start > 2 && <span className="text-30 px-2">...</span>}
+          {start > 2 && <span className="text-30 px-1">...</span>}
         </>
       )}
 
@@ -50,8 +52,10 @@ export function Pagination({ page, pageSize, total, onPageChange }: PaginationPr
         <button
           key={p}
           onClick={() => onPageChange(p)}
-          className={`btn-card rounded-lg h-10 min-w-[2.5rem] px-3 ${
-            p === page ? 'text-[var(--primary)] font-bold bg-[var(--primary)]/10' : ''
+          className={`rounded-[var(--radius-medium)] h-10 min-w-[2.5rem] px-3 scale-animation ripple ${
+            p === page
+              ? 'text-white font-bold bg-gradient-to-r from-[var(--klein-blue)] to-[var(--klein-blue-light)] shadow-lg'
+              : 'btn-card'
           }`}
         >
           {p}
@@ -61,10 +65,10 @@ export function Pagination({ page, pageSize, total, onPageChange }: PaginationPr
       {/* Last page */}
       {end < totalPages && (
         <>
-          {end < totalPages - 1 && <span className="text-30 px-2">...</span>}
+          {end < totalPages - 1 && <span className="text-30 px-1">...</span>}
           <button
             onClick={() => onPageChange(totalPages)}
-            className="btn-card rounded-lg h-10 min-w-[2.5rem] px-3"
+            className="btn-card rounded-[var(--radius-medium)] h-10 min-w-[2.5rem] px-3 scale-animation ripple"
           >
             {totalPages}
           </button>
@@ -75,7 +79,9 @@ export function Pagination({ page, pageSize, total, onPageChange }: PaginationPr
       <button
         onClick={() => onPageChange(page + 1)}
         disabled={page === totalPages}
-        className={`btn-card rounded-lg h-10 w-10 ${page === totalPages ? 'opacity-50 cursor-not-allowed' : ''}`}
+        className={`btn-card rounded-[var(--radius-medium)] h-10 w-10 scale-animation ripple ${
+          page === totalPages ? 'opacity-50 cursor-not-allowed' : ''
+        }`}
         aria-label="Next page"
       >
         <Icon icon="material-symbols:chevron-right-rounded" className="text-xl" />

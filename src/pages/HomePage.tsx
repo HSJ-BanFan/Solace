@@ -5,7 +5,7 @@ import { Icon } from '@iconify/react';
 
 export function HomePage() {
   const [page, setPage] = useState(1);
-  const pageSize = 10;
+  const pageSize = 5;
 
   const { data, isLoading, error } = useArticles({
     page,
@@ -36,7 +36,7 @@ export function HomePage() {
 
   if (articles.length === 0) {
     return (
-      <div className="card-base p-8 text-center">
+      <div className="card-base p-8 text-center onload-animation">
         <Icon icon="material-symbols:article-outline-rounded" className="text-4xl text-50 mb-4" />
         <p className="text-75">No articles yet</p>
       </div>
@@ -44,21 +44,16 @@ export function HomePage() {
   }
 
   return (
-    <div>
-      {/* Page Title */}
-      <div className="card-base p-6 mb-4">
-        <h1 className="text-90 text-2xl font-bold">Recent Posts</h1>
-      </div>
-
-      {/* Article List */}
-      <div className="flex flex-col gap-4">
-        {articles.map((article) => (
-          <PostCard key={article.id} article={article} />
-        ))}
-      </div>
-
-      {/* Pagination */}
+    <>
+      {articles.map((article, index) => (
+        <PostCard
+          key={article.id}
+          article={article}
+          class="onload-animation"
+          style={{ animationDelay: `calc(var(--content-delay) + ${index * 50}ms)` }}
+        />
+      ))}
       <Pagination page={page} pageSize={pageSize} total={total} onPageChange={setPage} />
-    </div>
+    </>
   );
 }
