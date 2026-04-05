@@ -120,7 +120,7 @@ info:
   title: 博客系统 API
   version: "1.0"
 paths:
-  /api/v1/articles:
+  /articles:
     get:
       parameters:
       - default: 1
@@ -179,7 +179,7 @@ paths:
       summary: 创建文章
       tags:
       - article
-  /api/v1/articles/{id}:
+  /articles/{id}:
     delete:
       parameters:
       - description: 文章ID
@@ -263,7 +263,7 @@ paths:
       summary: 更新文章
       tags:
       - article
-  /api/v1/articles/slug/{slug}:
+  /articles/slug/{slug}:
     get:
       parameters:
       - description: 文章 Slug
@@ -285,7 +285,7 @@ paths:
       summary: 根据 Slug 获取文章
       tags:
       - article
-  /api/v1/auth/login:
+  /auth/login:
     post:
       consumes:
       - application/json
@@ -314,7 +314,7 @@ paths:
       summary: 用户登录
       tags:
       - auth
-  /api/v1/auth/logout:
+  /auth/logout:
     post:
       consumes:
       - application/json
@@ -339,7 +339,7 @@ paths:
       summary: 用户登出
       tags:
       - auth
-  /api/v1/auth/refresh:
+  /auth/refresh:
     post:
       consumes:
       - application/json
@@ -368,7 +368,7 @@ paths:
       summary: 刷新访问令牌
       tags:
       - auth
-  /api/v1/auth/register:
+  /auth/register:
     post:
       consumes:
       - application/json
@@ -397,7 +397,7 @@ paths:
       summary: 用户注册
       tags:
       - auth
-  /api/v1/users/{id}:
+  /users/{id}:
     get:
       parameters:
       - description: 用户ID
@@ -419,7 +419,7 @@ paths:
       summary: 根据 ID 获取用户
       tags:
       - user
-  /api/v1/users/me:
+  /users/me:
     get:
       produces:
       - application/json

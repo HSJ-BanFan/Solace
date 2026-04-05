@@ -41,6 +41,7 @@ func (r *Router) Setup(mode string) *gin.Engine {
 	engine := gin.New()
 
 	// 全局中间件
+	engine.Use(middleware.CORS())
 	engine.Use(middleware.RequestID())
 	engine.Use(middleware.Logging())
 	engine.Use(middleware.Recovery())

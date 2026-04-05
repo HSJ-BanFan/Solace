@@ -1,10 +1,10 @@
 package handler
 
 import (
-	"github.com/gin-gonic/gin"
-	apperrors "gin-quickstart/internal/pkg/errors"
 	"gin-quickstart/internal/dto/request"
+	apperrors "gin-quickstart/internal/pkg/errors"
 	"gin-quickstart/internal/service"
+	"github.com/gin-gonic/gin"
 )
 
 // AuthHandler 认证处理器
@@ -26,7 +26,7 @@ func NewAuthHandler(authService service.AuthService) *AuthHandler {
 // @Success 201 {object} Response
 // @Failure 400 {object} Response
 // @Failure 409 {object} Response
-// @Router /api/v1/auth/register [post]
+// @Router /auth/register [post]
 func (h *AuthHandler) Register(c *gin.Context) {
 	var req request.RegisterRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -52,7 +52,7 @@ func (h *AuthHandler) Register(c *gin.Context) {
 // @Success 200 {object} Response
 // @Failure 400 {object} Response
 // @Failure 401 {object} Response
-// @Router /api/v1/auth/login [post]
+// @Router /auth/login [post]
 func (h *AuthHandler) Login(c *gin.Context) {
 	var req request.LoginRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -77,7 +77,7 @@ func (h *AuthHandler) Login(c *gin.Context) {
 // @Param request body request.RefreshTokenRequest true "要撤销的刷新令牌"
 // @Success 200 {object} Response
 // @Failure 400 {object} Response
-// @Router /api/v1/auth/logout [post]
+// @Router /auth/logout [post]
 func (h *AuthHandler) Logout(c *gin.Context) {
 	var req request.RefreshTokenRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -102,7 +102,7 @@ func (h *AuthHandler) Logout(c *gin.Context) {
 // @Success 200 {object} Response
 // @Failure 400 {object} Response
 // @Failure 401 {object} Response
-// @Router /api/v1/auth/refresh [post]
+// @Router /auth/refresh [post]
 func (h *AuthHandler) Refresh(c *gin.Context) {
 	var req request.RefreshTokenRequest
 	if err := c.ShouldBindJSON(&req); err != nil {

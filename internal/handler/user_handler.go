@@ -1,10 +1,10 @@
 package handler
 
 import (
-	"github.com/gin-gonic/gin"
-	apperrors "gin-quickstart/internal/pkg/errors"
 	"gin-quickstart/internal/dto/request"
+	apperrors "gin-quickstart/internal/pkg/errors"
 	"gin-quickstart/internal/service"
+	"github.com/gin-gonic/gin"
 )
 
 // UserHandler 用户处理器
@@ -23,7 +23,7 @@ func NewUserHandler(userService service.UserService) *UserHandler {
 // @Produce json
 // @Success 200 {object} Response
 // @Failure 401 {object} Response
-// @Router /api/v1/users/me [get]
+// @Router /users/me [get]
 func (h *UserHandler) GetMe(c *gin.Context) {
 	userID := c.GetUint("user_id")
 
@@ -45,7 +45,7 @@ func (h *UserHandler) GetMe(c *gin.Context) {
 // @Success 200 {object} Response
 // @Failure 400 {object} Response
 // @Failure 401 {object} Response
-// @Router /api/v1/users/me [put]
+// @Router /users/me [put]
 func (h *UserHandler) UpdateMe(c *gin.Context) {
 	userID := c.GetUint("user_id")
 
@@ -71,7 +71,7 @@ func (h *UserHandler) UpdateMe(c *gin.Context) {
 // @Param id path int true "用户ID"
 // @Success 200 {object} Response
 // @Failure 404 {object} Response
-// @Router /api/v1/users/{id} [get]
+// @Router /users/{id} [get]
 func (h *UserHandler) GetUser(c *gin.Context) {
 	id := c.Param("id")
 	if id == "" {

@@ -24,7 +24,7 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/api/v1/articles": {
+        "/articles": {
             "get": {
                 "produces": [
                     "application/json"
@@ -114,7 +114,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/articles/slug/{slug}": {
+        "/articles/slug/{slug}": {
             "get": {
                 "produces": [
                     "application/json"
@@ -148,7 +148,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/articles/{id}": {
+        "/articles/{id}": {
             "get": {
                 "produces": [
                     "application/json"
@@ -276,7 +276,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/auth/login": {
+        "/auth/login": {
             "post": {
                 "consumes": [
                     "application/json"
@@ -321,7 +321,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/auth/logout": {
+        "/auth/logout": {
             "post": {
                 "consumes": [
                     "application/json"
@@ -360,7 +360,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/auth/refresh": {
+        "/auth/refresh": {
             "post": {
                 "consumes": [
                     "application/json"
@@ -405,7 +405,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/auth/register": {
+        "/auth/register": {
             "post": {
                 "consumes": [
                     "application/json"
@@ -450,7 +450,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/users/me": {
+        "/users/me": {
             "get": {
                 "produces": [
                     "application/json"
@@ -518,7 +518,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/users/{id}": {
+        "/users/{id}": {
             "get": {
                 "produces": [
                     "application/json"

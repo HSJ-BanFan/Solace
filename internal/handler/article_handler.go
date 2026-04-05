@@ -3,10 +3,10 @@ package handler
 import (
 	"strconv"
 
-	"github.com/gin-gonic/gin"
-	apperrors "gin-quickstart/internal/pkg/errors"
 	"gin-quickstart/internal/dto/request"
+	apperrors "gin-quickstart/interna
 	"gin-quickstart/internal/service"
+n
 )
 
 // ArticleHandler 文章处理器
@@ -28,7 +28,7 @@ func NewArticleHandler(articleService service.ArticleService) *ArticleHandler {
 // @Success 201 {object} Response
 // @Failure 400 {object} Response
 // @Failure 401 {object} Response
-// @Router /api/v1/articles [post]
+// @Router /articles [post]
 func (h *ArticleHandler) Create(c *gin.Context) {
 	userID := c.GetUint("user_id")
 
@@ -67,7 +67,7 @@ func (h *ArticleHandler) Create(c *gin.Context) {
 // @Param id path int true "文章ID"
 // @Success 200 {object} Response
 // @Failure 404 {object} Response
-// @Router /api/v1/articles/{id} [get]
+// @Router /articles/{id} [get]
 func (h *ArticleHandler) GetByID(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.ParseUint(idStr, 10, 32)
@@ -92,7 +92,7 @@ func (h *ArticleHandler) GetByID(c *gin.Context) {
 // @Param slug path string true "文章 Slug"
 // @Success 200 {object} Response
 // @Failure 404 {object} Response
-// @Router /api/v1/articles/slug/{slug} [get]
+// @Router /articles/slug/{slug} [get]
 func (h *ArticleHandler) GetBySlug(c *gin.Context) {
 	slug := c.Param("slug")
 	if slug == "" {
@@ -118,7 +118,7 @@ func (h *ArticleHandler) GetBySlug(c *gin.Context) {
 // @Param status query string false "按状态筛选"
 // @Param author_id query int false "按作者ID筛选"
 // @Success 200 {object} Response
-// @Router /api/v1/articles [get]
+// @Router /articles [get]
 func (h *ArticleHandler) GetList(c *gin.Context) {
 	var query request.ArticleListQuery
 	if err := c.ShouldBindQuery(&query); err != nil {
@@ -165,7 +165,7 @@ func (h *ArticleHandler) GetList(c *gin.Context) {
 // @Failure 400 {object} Response
 // @Failure 401 {object} Response
 // @Failure 404 {object} Response
-// @Router /api/v1/articles/{id} [put]
+// @Router /articles/{id} [put]
 func (h *ArticleHandler) Update(c *gin.Context) {
 	userID := c.GetUint("user_id")
 	idStr := c.Param("id")
@@ -208,7 +208,7 @@ func (h *ArticleHandler) Update(c *gin.Context) {
 // @Failure 400 {object} Response
 // @Failure 401 {object} Response
 // @Failure 404 {object} Response
-// @Router /api/v1/articles/{id} [delete]
+// @Router /articles/{id} [delete]
 func (h *ArticleHandler) Delete(c *gin.Context) {
 	userID := c.GetUint("user_id")
 	idStr := c.Param("id")
