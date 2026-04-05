@@ -1,0 +1,164 @@
+package service
+
+import (
+	"context"
+	"errors"
+
+	"gorm.io/gorm"
+
+	"gin-quickstart/internal/dto/response"
+	"gin-quickstart/internal/model"
+	"gin-quickstart/internal/pkg/slug"
+)
+
+// CategoryService 分类业务逻辑接口
+type CategoryService interface {
+	Create(ctx context.Context, name, description string, parentID *uint, sortOrder int) (*response.CategoryResponse, error)
+	GetByID(ctx context.Context, id uint) (*response.CategoryResponse, error)
+	GetBySlug(ctx context.Context, slug string) (*response.CategoryResponse, error)
+	GetList(ctx context.Context) (*response.CategoryListResponse, error)
+	Update(ctx context.Context, id uint, name, description string, parentID *uint, sortOrder int) (*response.CategoryResponse, error)
+	Delete(ctx context.Context, id uint) error
+}
+
+// categoryService 分类服务实现
+type categoryService struct {
+	categoryRepo categoryRepository
+}
+
+// NewCategoryService 创建分类服务
+func NewCategoryService(categoryRepo categoryRepository) CategoryService {
+	return &categoryService{categoryRepo: categoryRepo}
+}
+
+func (s *categoryService) Create(ctx context.Context, name, description string, parentID *uint, sortOrder int) (*response.CategoryResponse, error) {
+	// 生成 slug
+	categorySlug := slug.Generate(name)
+
+	// 检查 slug 唯一性
+	if s.categoryRepo.ExistsBySlug(ctx, categorySlug) {
+		categorySlug = slug.GenerateWithTimestamp(name)
+	}
+
+	category := &model.Category{
+		Name:        name,
+		Slug:        categorySlug,
+		Description: description,
+		ParentID:    parentID,
+		SortOrder:   sortOrder,
+	}
+
+	if err := s.categoryRepo.Create(ctx, category); err != nil {
+		return nil, err
+	}
+
+	return toCategoryResponse(category, 0), nil
+}
+
+func (s *categoryService) GetByID(ctx context.Context, id uint) (*response.CategoryResponse, error) {
+	category, err := s.categoryRepo.FindByID(ctx, id)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, ErrCategoryNotFound
+		}
+		return nil, err
+	}
+
+	articleCount := s.categoryRepo.CountArticles(ctx, id)
+	return toCategoryResponse(category, articleCount), nil
+}
+
+func (s *categoryService) GetBySlug(ctx context.Context, categorySlug string) (*response.CategoryResponse, error) {
+	category, err := s.categoryRepo.FindBySlug(ctx, categorySlug)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, ErrCategoryNotFound
+		}
+		return nil, err
+	}
+
+	articleCount := s.categoryRepo.CountArticles(ctx, category.ID)
+	return toCategoryResponse(category, articleCount), nil
+}
+
+func (s *categoryService) GetList(ctx context.Context) (*response.CategoryListResponse, error) {
+	categories, err := s.categoryRepo.FindAllWithCount(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	items := make([]*response.CategoryResponse, len(categories))
+	for i, c := range categories {
+		items[i] = &response.CategoryResponse{
+			ID:           c.ID,
+			Name:         c.Name,
+			Slug:         c.Slug,
+			Description:  c.Description,
+			ParentID:     c.ParentID,
+			SortOrder:    c.SortOrder,
+			ArticleCount: c.ArticleCount,
+		}
+	}
+
+	return &response.CategoryListResponse{Items: items}, nil
+}
+
+func (s *categoryService) Update(ctx context.Context, id uint, name, description string, parentID *uint, sortOrder int) (*response.CategoryResponse, error) {
+	category, err := s.categoryRepo.FindByID(ctx, id)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, ErrCategoryNotFound
+		}
+		return nil, err
+	}
+
+	// 更新字段
+	if name != "" {
+		category.Name = name
+		// 名称变更时更新 slug
+		newSlug := slug.Generate(name)
+		if newSlug != category.Slug && s.categoryRepo.ExistsBySlug(ctx, newSlug) {
+			newSlug = slug.GenerateWithTimestamp(name)
+		}
+		category.Slug = newSlug
+	}
+	if description != "" {
+		category.Description = description
+	}
+	if parentID != nil {
+		category.ParentID = parentID
+	}
+	if sortOrder >= 0 {
+		category.SortOrder = sortOrder
+	}
+
+	if err := s.categoryRepo.Update(ctx, category); err != nil {
+		return nil, err
+	}
+
+	articleCount := s.categoryRepo.CountArticles(ctx, id)
+	return toCategoryResponse(category, articleCount), nil
+}
+
+func (s *categoryService) Delete(ctx context.Context, id uint) error {
+	// 检查是否存在文章
+	if count := s.categoryRepo.CountArticles(ctx, id); count > 0 {
+		return ErrCategoryHasArticles
+	}
+
+	return s.categoryRepo.Delete(ctx, id)
+}
+
+func toCategoryResponse(category *model.Category, articleCount int) *response.CategoryResponse {
+	return &response.CategoryResponse{
+		ID:           category.ID,
+		Name:         category.Name,
+		Slug:         category.Slug,
+		Description:  category.Description,
+		ParentID:     category.ParentID,
+		SortOrder:    category.SortOrder,
+		ArticleCount: articleCount,
+		CreatedAt:    category.CreatedAt,
+		UpdatedAt:    category.UpdatedAt,
+	}
+}

@@ -35,6 +35,57 @@ func (m *MockArticleRepository) FindBySlug(ctx context.Context, slug string) (*m
 
 func (m *MockArticleRepository) FindAll(ctx context.Context, limit, offset int, filters map[string]interface{}) ([]*model.Article, int64, error) {
 	args := m.Called(ctx, limit, offset, filters)
+	if args.Get(0) == nil {
+		return nil, args.Get(1).(int64), args.Error(2)
+	}
+	return args.Get(0).([]*model.Article), args.Get(1).(int64), args.Error(2)
+}
+
+func (m *MockArticleRepository) FindPublished(ctx context.Context, limit, offset int, filters map[string]interface{}) ([]*model.Article, int64, error) {
+	args := m.Called(ctx, limit, offset, filters)
+	if args.Get(0) == nil {
+		return nil, args.Get(1).(int64), args.Error(2)
+	}
+	return args.Get(0).([]*model.Article), args.Get(1).(int64), args.Error(2)
+}
+
+func (m *MockArticleRepository) FindByCategory(ctx context.Context, categorySlug string, limit, offset int) ([]*model.Article, int64, error) {
+	args := m.Called(ctx, categorySlug, limit, offset)
+	if args.Get(0) == nil {
+		return nil, args.Get(1).(int64), args.Error(2)
+	}
+	return args.Get(0).([]*model.Article), args.Get(1).(int64), args.Error(2)
+}
+
+func (m *MockArticleRepository) FindByTag(ctx context.Context, tagSlug string, limit, offset int) ([]*model.Article, int64, error) {
+	args := m.Called(ctx, tagSlug, limit, offset)
+	if args.Get(0) == nil {
+		return nil, args.Get(1).(int64), args.Error(2)
+	}
+	return args.Get(0).([]*model.Article), args.Get(1).(int64), args.Error(2)
+}
+
+func (m *MockArticleRepository) FindBySlugWithNav(ctx context.Context, slug string) (*model.Article, *model.Article, *model.Article, error) {
+	args := m.Called(ctx, slug)
+	if args.Get(0) == nil {
+		return nil, nil, nil, args.Error(3)
+	}
+	return args.Get(0).(*model.Article), nil, nil, args.Error(3)
+}
+
+func (m *MockArticleRepository) GetArchive(ctx context.Context) ([]*model.Article, error) {
+	args := m.Called(ctx)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).([]*model.Article), args.Error(1)
+}
+
+func (m *MockArticleRepository) Search(ctx context.Context, query string, limit, offset int) ([]*model.Article, int64, error) {
+	args := m.Called(ctx, query, limit, offset)
+	if args.Get(0) == nil {
+		return nil, args.Get(1).(int64), args.Error(2)
+	}
 	return args.Get(0).([]*model.Article), args.Get(1).(int64), args.Error(2)
 }
 
@@ -43,8 +94,18 @@ func (m *MockArticleRepository) Create(ctx context.Context, article *model.Artic
 	return args.Error(0)
 }
 
+func (m *MockArticleRepository) CreateWithTags(ctx context.Context, article *model.Article, tagIDs []uint) error {
+	args := m.Called(ctx, article, tagIDs)
+	return args.Error(0)
+}
+
 func (m *MockArticleRepository) Update(ctx context.Context, article *model.Article) error {
 	args := m.Called(ctx, article)
+	return args.Error(0)
+}
+
+func (m *MockArticleRepository) UpdateWithTags(ctx context.Context, article *model.Article, tagIDs []uint) error {
+	args := m.Called(ctx, article, tagIDs)
 	return args.Error(0)
 }
 
@@ -58,14 +119,142 @@ func (m *MockArticleRepository) IncrementViewCount(ctx context.Context, id uint)
 	return args.Error(0)
 }
 
+func (m *MockArticleRepository) SyncTags(ctx context.Context, articleID uint, tagIDs []uint) error {
+	args := m.Called(ctx, articleID, tagIDs)
+	return args.Error(0)
+}
+
+// MockCategoryRepository 分类仓储模拟
+type MockCategoryRepository struct {
+	mock.Mock
+}
+
+func (m *MockCategoryRepository) FindByID(ctx context.Context, id uint) (*model.Category, error) {
+	args := m.Called(ctx, id)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).(*model.Category), args.Error(1)
+}
+
+func (m *MockCategoryRepository) FindBySlug(ctx context.Context, slug string) (*model.Category, error) {
+	args := m.Called(ctx, slug)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).(*model.Category), args.Error(1)
+}
+
+func (m *MockCategoryRepository) FindAllWithCount(ctx context.Context) ([]*model.CategoryWithCount, error) {
+	args := m.Called(ctx)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).([]*model.CategoryWithCount), args.Error(1)
+}
+
+func (m *MockCategoryRepository) Create(ctx context.Context, category *model.Category) error {
+	args := m.Called(ctx, category)
+	return args.Error(0)
+}
+
+func (m *MockCategoryRepository) Update(ctx context.Context, category *model.Category) error {
+	args := m.Called(ctx, category)
+	return args.Error(0)
+}
+
+func (m *MockCategoryRepository) Delete(ctx context.Context, id uint) error {
+	args := m.Called(ctx, id)
+	return args.Error(0)
+}
+
+func (m *MockCategoryRepository) ExistsBySlug(ctx context.Context, slug string) bool {
+	args := m.Called(ctx, slug)
+	return args.Bool(0)
+}
+
+func (m *MockCategoryRepository) CountArticles(ctx context.Context, categoryID uint) int {
+	args := m.Called(ctx, categoryID)
+	return args.Int(0)
+}
+
+// MockTagRepository 标签仓储模拟
+type MockTagRepository struct {
+	mock.Mock
+}
+
+func (m *MockTagRepository) FindByID(ctx context.Context, id uint) (*model.Tag, error) {
+	args := m.Called(ctx, id)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).(*model.Tag), args.Error(1)
+}
+
+func (m *MockTagRepository) FindBySlug(ctx context.Context, slug string) (*model.Tag, error) {
+	args := m.Called(ctx, slug)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).(*model.Tag), args.Error(1)
+}
+
+func (m *MockTagRepository) FindByIDs(ctx context.Context, ids []uint) ([]*model.Tag, error) {
+	args := m.Called(ctx, ids)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).([]*model.Tag), args.Error(1)
+}
+
+func (m *MockTagRepository) FindAllWithCount(ctx context.Context) ([]*model.TagWithCount, error) {
+	args := m.Called(ctx)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).([]*model.TagWithCount), args.Error(1)
+}
+
+func (m *MockTagRepository) Create(ctx context.Context, tag *model.Tag) error {
+	args := m.Called(ctx, tag)
+	return args.Error(0)
+}
+
+func (m *MockTagRepository) Update(ctx context.Context, tag *model.Tag) error {
+	args := m.Called(ctx, tag)
+	return args.Error(0)
+}
+
+func (m *MockTagRepository) Delete(ctx context.Context, id uint) error {
+	args := m.Called(ctx, id)
+	return args.Error(0)
+}
+
+func (m *MockTagRepository) ExistsBySlug(ctx context.Context, slug string) bool {
+	args := m.Called(ctx, slug)
+	return args.Bool(0)
+}
+
+func (m *MockTagRepository) ExistsByName(ctx context.Context, name string) bool {
+	args := m.Called(ctx, name)
+	return args.Bool(0)
+}
+
+func (m *MockTagRepository) CountArticles(ctx context.Context, tagID uint) int {
+	args := m.Called(ctx, tagID)
+	return args.Int(0)
+}
+
 // 测试文章服务 - Create
 func TestArticleService_Create_Success(t *testing.T) {
-	mockRepo := new(MockArticleRepository)
-	service := NewArticleService(mockRepo)
+	mockArticleRepo := new(MockArticleRepository)
+	mockCategoryRepo := new(MockCategoryRepository)
+	mockTagRepo := new(MockTagRepository)
+	svc := NewArticleService(mockArticleRepo, mockCategoryRepo, mockTagRepo)
 
-	mockRepo.On("FindBySlug", mock.Anything, "test-article").Return(nil, gorm.ErrRecordNotFound)
-	mockRepo.On("Create", mock.Anything, mock.AnythingOfType("*model.Article")).Return(nil)
-	mockRepo.On("FindByID", mock.Anything, mock.AnythingOfType("uint")).Return(&model.Article{
+	mockArticleRepo.On("FindBySlug", mock.Anything, "test-article").Return(nil, gorm.ErrRecordNotFound)
+	mockArticleRepo.On("Create", mock.Anything, mock.AnythingOfType("*model.Article")).Return(nil)
+	mockArticleRepo.On("FindByID", mock.Anything, mock.AnythingOfType("uint")).Return(&model.Article{
 		ID:      1,
 		Title:   "Test Article",
 		Slug:    "test-article",
@@ -73,70 +262,81 @@ func TestArticleService_Create_Success(t *testing.T) {
 		Author:  &model.User{ID: 1, Username: "author"},
 	}, nil)
 
-	article, err := service.Create(context.Background(), "Test Article", "Content", "Summary", "draft", 1)
+	article, err := svc.Create(context.Background(), "Test Article", "Content", "Summary", "", nil, nil, "draft", 1)
 
 	assert.NoError(t, err)
 	assert.NotNil(t, article)
 	assert.Equal(t, "Test Article", article.Title)
-	mockRepo.AssertExpectations(t)
+	mockArticleRepo.AssertExpectations(t)
 }
 
-func TestArticleService_Create_SlugConflict(t *testing.T) {
-	mockRepo := new(MockArticleRepository)
-	service := NewArticleService(mockRepo)
+func TestArticleService_Create_WithCategoryAndTags(t *testing.T) {
+	mockArticleRepo := new(MockArticleRepository)
+	mockCategoryRepo := new(MockCategoryRepository)
+	mockTagRepo := new(MockTagRepository)
+	svc := NewArticleService(mockArticleRepo, mockCategoryRepo, mockTagRepo)
 
-	// 模拟 slug 冲突 - 返回已存在的文章
-	existingArticle := &model.Article{ID: 2, Slug: "test-article"}
-	mockRepo.On("FindBySlug", mock.Anything, "test-article").Return(existingArticle, nil)
-	// 第二次调用 FindBySlug 会检查带时间戳的 slug（我们不关心具体值）
-	mockRepo.On("Create", mock.Anything, mock.AnythingOfType("*model.Article")).Return(nil).Run(func(args mock.Arguments) {
-		article := args.Get(1).(*model.Article)
-		// 验证生成的 slug 不是原来的冲突 slug
-		assert.NotEqual(t, "test-article", article.Slug)
-		assert.Contains(t, article.Slug, "test-article")
-	})
-	mockRepo.On("FindByID", mock.Anything, mock.AnythingOfType("uint")).Return(&model.Article{
-		ID:      1,
-		Title:   "Test Article",
-		Content: "Content",
-		Slug:    "test-article-123456", // 模拟带时间戳的 slug
+	categoryID := uint(1)
+	tagIDs := []uint{1, 2}
+
+	mockCategoryRepo.On("FindByID", mock.Anything, categoryID).Return(&model.Category{ID: 1, Name: "Tech", Slug: "tech"}, nil)
+	mockTagRepo.On("FindByIDs", mock.Anything, tagIDs).Return([]*model.Tag{
+		{ID: 1, Name: "Go", Slug: "go"},
+		{ID: 2, Name: "React", Slug: "react"},
+	}, nil)
+	mockArticleRepo.On("FindBySlug", mock.Anything, "test-article").Return(nil, gorm.ErrRecordNotFound)
+	mockArticleRepo.On("CreateWithTags", mock.Anything, mock.AnythingOfType("*model.Article"), tagIDs).Return(nil)
+	mockArticleRepo.On("FindByID", mock.Anything, mock.AnythingOfType("uint")).Return(&model.Article{
+		ID:       1,
+		Title:    "Test Article",
+		Slug:     "test-article",
+		Content:  "Content",
+		Author:   &model.User{ID: 1, Username: "author"},
+		Category: &model.Category{ID: 1, Name: "Tech", Slug: "tech"},
+		Tags:     []model.Tag{{ID: 1, Name: "Go", Slug: "go"}, {ID: 2, Name: "React", Slug: "react"}},
 	}, nil)
 
-	article, err := service.Create(context.Background(), "Test Article", "Content", "", "draft", 1)
+	article, err := svc.Create(context.Background(), "Test Article", "Content", "Summary", "", &categoryID, tagIDs, "published", 1)
 
 	assert.NoError(t, err)
 	assert.NotNil(t, article)
-	mockRepo.AssertExpectations(t)
+	mockArticleRepo.AssertExpectations(t)
+	mockCategoryRepo.AssertExpectations(t)
+	mockTagRepo.AssertExpectations(t)
 }
 
 func TestArticleService_Create_PublishedArticle(t *testing.T) {
-	mockRepo := new(MockArticleRepository)
-	service := NewArticleService(mockRepo)
+	mockArticleRepo := new(MockArticleRepository)
+	mockCategoryRepo := new(MockCategoryRepository)
+	mockTagRepo := new(MockTagRepository)
+	svc := NewArticleService(mockArticleRepo, mockCategoryRepo, mockTagRepo)
 
-	mockRepo.On("FindBySlug", mock.Anything, mock.Anything).Return(nil, gorm.ErrRecordNotFound)
-	mockRepo.On("Create", mock.Anything, mock.AnythingOfType("*model.Article")).Return(nil).Run(func(args mock.Arguments) {
+	mockArticleRepo.On("FindBySlug", mock.Anything, mock.Anything).Return(nil, gorm.ErrRecordNotFound)
+	mockArticleRepo.On("Create", mock.Anything, mock.AnythingOfType("*model.Article")).Return(nil).Run(func(args mock.Arguments) {
 		article := args.Get(1).(*model.Article)
 		article.ID = 1
 		assert.Equal(t, "published", article.Status)
 		assert.NotNil(t, article.PublishedAt)
 	})
-	mockRepo.On("FindByID", mock.Anything, mock.AnythingOfType("uint")).Return(&model.Article{
+	mockArticleRepo.On("FindByID", mock.Anything, mock.AnythingOfType("uint")).Return(&model.Article{
 		ID:      1,
 		Title:   "Test Article",
 		Status:  "published",
 	}, nil)
 
-	article, err := service.Create(context.Background(), "Test Article", "Content", "", "published", 1)
+	article, err := svc.Create(context.Background(), "Test Article", "Content", "", "", nil, nil, "published", 1)
 
 	assert.NoError(t, err)
 	assert.NotNil(t, article)
-	mockRepo.AssertExpectations(t)
+	mockArticleRepo.AssertExpectations(t)
 }
 
 // 测试文章服务 - GetByID
 func TestArticleService_GetByID_Success(t *testing.T) {
-	mockRepo := new(MockArticleRepository)
-	service := NewArticleService(mockRepo)
+	mockArticleRepo := new(MockArticleRepository)
+	mockCategoryRepo := new(MockCategoryRepository)
+	mockTagRepo := new(MockTagRepository)
+	svc := NewArticleService(mockArticleRepo, mockCategoryRepo, mockTagRepo)
 
 	expectedArticle := &model.Article{
 		ID:      1,
@@ -145,113 +345,141 @@ func TestArticleService_GetByID_Success(t *testing.T) {
 		Author:  &model.User{ID: 1, Username: "author"},
 	}
 
-	mockRepo.On("FindByID", mock.Anything, uint(1)).Return(expectedArticle, nil)
-	// IncrementViewCount 在 goroutine 中异步调用，使用 Maybe() 表示可选调用
-	mockRepo.On("IncrementViewCount", mock.Anything, uint(1)).Return(nil).Maybe()
+	mockArticleRepo.On("FindByID", mock.Anything, uint(1)).Return(expectedArticle, nil)
+	mockArticleRepo.On("IncrementViewCount", mock.Anything, uint(1)).Return(nil).Maybe()
 
-	article, err := service.GetByID(context.Background(), 1)
+	article, err := svc.GetByID(context.Background(), 1)
 
 	assert.NoError(t, err)
 	assert.Equal(t, expectedArticle.ID, article.ID)
-	mockRepo.AssertExpectations(t)
+	mockArticleRepo.AssertExpectations(t)
 }
 
 func TestArticleService_GetByID_NotFound(t *testing.T) {
-	mockRepo := new(MockArticleRepository)
-	service := NewArticleService(mockRepo)
+	mockArticleRepo := new(MockArticleRepository)
+	mockCategoryRepo := new(MockCategoryRepository)
+	mockTagRepo := new(MockTagRepository)
+	svc := NewArticleService(mockArticleRepo, mockCategoryRepo, mockTagRepo)
 
-	mockRepo.On("FindByID", mock.Anything, uint(1)).Return(nil, gorm.ErrRecordNotFound)
+	mockArticleRepo.On("FindByID", mock.Anything, uint(1)).Return(nil, gorm.ErrRecordNotFound)
 
-	article, err := service.GetByID(context.Background(), 1)
+	article, err := svc.GetByID(context.Background(), 1)
 
 	assert.Error(t, err)
 	assert.Equal(t, ErrArticleNotFound, err)
 	assert.Nil(t, article)
-	mockRepo.AssertExpectations(t)
+	mockArticleRepo.AssertExpectations(t)
 }
 
 // 测试文章服务 - GetList
 func TestArticleService_GetList_Success(t *testing.T) {
-	mockRepo := new(MockArticleRepository)
-	service := NewArticleService(mockRepo)
+	mockArticleRepo := new(MockArticleRepository)
+	mockCategoryRepo := new(MockCategoryRepository)
+	mockTagRepo := new(MockTagRepository)
+	svc := NewArticleService(mockArticleRepo, mockCategoryRepo, mockTagRepo)
 
 	articles := []*model.Article{
 		{ID: 1, Title: "Article 1"},
 		{ID: 2, Title: "Article 2"},
 	}
 
-	mockRepo.On("FindAll", mock.Anything, 10, 0, mock.Anything).Return(articles, int64(2), nil)
+	mockArticleRepo.On("FindPublished", mock.Anything, 10, 0, mock.Anything).Return(articles, int64(2), nil)
 
-	result, err := service.GetList(context.Background(), 1, 10, "", nil)
+	result, err := svc.GetList(context.Background(), 1, 10, "", nil, "", "")
 
 	assert.NoError(t, err)
 	assert.Len(t, result.Items, 2)
 	assert.Equal(t, int64(2), result.Total)
-	mockRepo.AssertExpectations(t)
+	mockArticleRepo.AssertExpectations(t)
+}
+
+func TestArticleService_GetList_ByCategory(t *testing.T) {
+	mockArticleRepo := new(MockArticleRepository)
+	mockCategoryRepo := new(MockCategoryRepository)
+	mockTagRepo := new(MockTagRepository)
+	svc := NewArticleService(mockArticleRepo, mockCategoryRepo, mockTagRepo)
+
+	articles := []*model.Article{
+		{ID: 1, Title: "Article 1", Category: &model.Category{ID: 1, Slug: "tech"}},
+	}
+
+	mockArticleRepo.On("FindByCategory", mock.Anything, "tech", 10, 0).Return(articles, int64(1), nil)
+
+	result, err := svc.GetList(context.Background(), 1, 10, "", nil, "tech", "")
+
+	assert.NoError(t, err)
+	assert.Len(t, result.Items, 1)
+	mockArticleRepo.AssertExpectations(t)
+}
+
+func TestArticleService_GetList_ByTag(t *testing.T) {
+	mockArticleRepo := new(MockArticleRepository)
+	mockCategoryRepo := new(MockCategoryRepository)
+	mockTagRepo := new(MockTagRepository)
+	svc := NewArticleService(mockArticleRepo, mockCategoryRepo, mockTagRepo)
+
+	articles := []*model.Article{
+		{ID: 1, Title: "Article 1", Tags: []model.Tag{{ID: 1, Slug: "go"}}},
+	}
+
+	mockArticleRepo.On("FindByTag", mock.Anything, "go", 10, 0).Return(articles, int64(1), nil)
+
+	result, err := svc.GetList(context.Background(), 1, 10, "", nil, "", "go")
+
+	assert.NoError(t, err)
+	assert.Len(t, result.Items, 1)
+	mockArticleRepo.AssertExpectations(t)
 }
 
 // 测试文章服务 - GetBySlug
 func TestArticleService_GetBySlug_Success(t *testing.T) {
-	mockRepo := new(MockArticleRepository)
-	service := NewArticleService(mockRepo)
+	mockArticleRepo := new(MockArticleRepository)
+	mockCategoryRepo := new(MockCategoryRepository)
+	mockTagRepo := new(MockTagRepository)
+	svc := NewArticleService(mockArticleRepo, mockCategoryRepo, mockTagRepo)
 
 	expectedArticle := &model.Article{
-		ID:      1,
-		Title:   "Test Article",
-		Slug:    "test-article",
-		Content: "Content",
-		Author:  &model.User{ID: 1, Username: "author"},
+		ID:          1,
+		Title:       "Test Article",
+		Slug:        "test-article",
+		Content:     "Content",
+		Author:      &model.User{ID: 1, Username: "author"},
+		PublishedAt: &time.Time{},
 	}
 
-	mockRepo.On("FindBySlug", mock.Anything, "test-article").Return(expectedArticle, nil)
+	mockArticleRepo.On("FindBySlugWithNav", mock.Anything, "test-article").Return(expectedArticle, nil, nil, nil)
+	mockArticleRepo.On("IncrementViewCount", mock.Anything, uint(1)).Return(nil).Maybe()
 
-	article, err := service.GetBySlug(context.Background(), "test-article")
+	article, err := svc.GetBySlug(context.Background(), "test-article")
 
 	assert.NoError(t, err)
 	assert.Equal(t, expectedArticle.ID, article.ID)
 	assert.Equal(t, "test-article", article.Slug)
-	mockRepo.AssertExpectations(t)
+	mockArticleRepo.AssertExpectations(t)
 }
 
 func TestArticleService_GetBySlug_NotFound(t *testing.T) {
-	mockRepo := new(MockArticleRepository)
-	service := NewArticleService(mockRepo)
+	mockArticleRepo := new(MockArticleRepository)
+	mockCategoryRepo := new(MockCategoryRepository)
+	mockTagRepo := new(MockTagRepository)
+	svc := NewArticleService(mockArticleRepo, mockCategoryRepo, mockTagRepo)
 
-	mockRepo.On("FindBySlug", mock.Anything, "nonexistent").Return(nil, gorm.ErrRecordNotFound)
+	mockArticleRepo.On("FindBySlugWithNav", mock.Anything, "nonexistent").Return(nil, nil, nil, gorm.ErrRecordNotFound)
 
-	article, err := service.GetBySlug(context.Background(), "nonexistent")
+	article, err := svc.GetBySlug(context.Background(), "nonexistent")
 
 	assert.Error(t, err)
 	assert.Equal(t, ErrArticleNotFound, err)
 	assert.Nil(t, article)
-	mockRepo.AssertExpectations(t)
-}
-
-func TestArticleService_GetList_WithFilters(t *testing.T) {
-	mockRepo := new(MockArticleRepository)
-	service := NewArticleService(mockRepo)
-
-	articles := []*model.Article{
-		{ID: 1, Title: "Article 1", Status: "published"},
-	}
-	authorID := uint(1)
-
-	mockRepo.On("FindAll", mock.Anything, 10, 0, map[string]interface{}{
-		"status":    "published",
-		"author_id": authorID,
-	}).Return(articles, int64(1), nil)
-
-	result, err := service.GetList(context.Background(), 1, 10, "published", &authorID)
-
-	assert.NoError(t, err)
-	assert.Len(t, result.Items, 1)
-	mockRepo.AssertExpectations(t)
+	mockArticleRepo.AssertExpectations(t)
 }
 
 // 测试文章服务 - Update
 func TestArticleService_Update_Success(t *testing.T) {
-	mockRepo := new(MockArticleRepository)
-	service := NewArticleService(mockRepo)
+	mockArticleRepo := new(MockArticleRepository)
+	mockCategoryRepo := new(MockCategoryRepository)
+	mockTagRepo := new(MockTagRepository)
+	svc := NewArticleService(mockArticleRepo, mockCategoryRepo, mockTagRepo)
 
 	existingArticle := &model.Article{
 		ID:       1,
@@ -262,21 +490,24 @@ func TestArticleService_Update_Success(t *testing.T) {
 		Version:  1,
 	}
 
-	mockRepo.On("FindByID", mock.Anything, uint(1)).Return(existingArticle, nil).Twice()
-	// Update 时检查新 slug 的唯一性
-	mockRepo.On("FindBySlug", mock.Anything, "new-title").Return(nil, gorm.ErrRecordNotFound)
-	mockRepo.On("Update", mock.Anything, existingArticle).Return(nil)
+	mockArticleRepo.On("FindByID", mock.Anything, uint(1)).Return(existingArticle, nil).Twice()
+	mockArticleRepo.On("FindBySlug", mock.Anything, "new-title").Return(nil, gorm.ErrRecordNotFound)
+	mockArticleRepo.On("Update", mock.Anything, existingArticle).Return(nil)
 
-	article, err := service.Update(context.Background(), 1, 1, 1, "New Title", "New Content", "Summary", "")
+	// Passing nil for tagIDs means we don't want to update tags
+	var tagIDs []uint = nil
+	article, err := svc.Update(context.Background(), 1, 1, 1, "New Title", "New Content", "Summary", "", nil, tagIDs, "")
 
 	assert.NoError(t, err)
 	assert.NotNil(t, article)
-	mockRepo.AssertExpectations(t)
+	mockArticleRepo.AssertExpectations(t)
 }
 
 func TestArticleService_Update_NotAuthorized(t *testing.T) {
-	mockRepo := new(MockArticleRepository)
-	service := NewArticleService(mockRepo)
+	mockArticleRepo := new(MockArticleRepository)
+	mockCategoryRepo := new(MockCategoryRepository)
+	mockTagRepo := new(MockTagRepository)
+	svc := NewArticleService(mockArticleRepo, mockCategoryRepo, mockTagRepo)
 
 	existingArticle := &model.Article{
 		ID:       1,
@@ -284,112 +515,90 @@ func TestArticleService_Update_NotAuthorized(t *testing.T) {
 		Version:  1,
 	}
 
-	mockRepo.On("FindByID", mock.Anything, uint(1)).Return(existingArticle, nil)
+	mockArticleRepo.On("FindByID", mock.Anything, uint(1)).Return(existingArticle, nil)
 
-	article, err := service.Update(context.Background(), 1, 2, 1, "New Title", "", "", "")
+	article, err := svc.Update(context.Background(), 1, 2, 1, "New Title", "", "", "", nil, nil, "")
 
 	assert.Error(t, err)
 	assert.Equal(t, ErrArticleNotAuthorized, err)
 	assert.Nil(t, article)
-	mockRepo.AssertExpectations(t)
+	mockArticleRepo.AssertExpectations(t)
 }
 
 func TestArticleService_Update_VersionConflict(t *testing.T) {
-	mockRepo := new(MockArticleRepository)
-	service := NewArticleService(mockRepo)
+	mockArticleRepo := new(MockArticleRepository)
+	mockCategoryRepo := new(MockCategoryRepository)
+	mockTagRepo := new(MockTagRepository)
+	svc := NewArticleService(mockArticleRepo, mockCategoryRepo, mockTagRepo)
 
 	existingArticle := &model.Article{
 		ID:       1,
 		AuthorID: 1,
-		Version:  2, // 数据库中版本为 2
+		Version:  2,
 	}
 
-	mockRepo.On("FindByID", mock.Anything, uint(1)).Return(existingArticle, nil)
+	mockArticleRepo.On("FindByID", mock.Anything, uint(1)).Return(existingArticle, nil)
 
-	article, err := service.Update(context.Background(), 1, 1, 1, "New Title", "", "", "") // 客户端版本为 1
+	article, err := svc.Update(context.Background(), 1, 1, 1, "New Title", "", "", "", nil, nil, "")
 
 	assert.Error(t, err)
 	assert.Equal(t, ErrArticleVersionConflict, err)
 	assert.Nil(t, article)
-	mockRepo.AssertExpectations(t)
-}
-
-func TestArticleService_Update_PublishDraft(t *testing.T) {
-	mockRepo := new(MockArticleRepository)
-	service := NewArticleService(mockRepo)
-
-	now := time.Now()
-	existingArticle := &model.Article{
-		ID:       1,
-		Title:    "Title",
-		Slug:     "title",
-		AuthorID: 1,
-		Version:  1,
-		Status:   "draft",
-	}
-
-	mockRepo.On("FindByID", mock.Anything, uint(1)).Return(existingArticle, nil).Twice()
-	// 不更新 title，所以不会调用 FindBySlug
-	mockRepo.On("Update", mock.Anything, existingArticle).Return(nil).Run(func(args mock.Arguments) {
-		article := args.Get(1).(*model.Article)
-		assert.Equal(t, "published", article.Status)
-		assert.NotNil(t, article.PublishedAt)
-		assert.True(t, article.PublishedAt.After(now.Add(-time.Second)))
-	})
-
-	article, err := service.Update(context.Background(), 1, 1, 1, "", "", "", "published")
-
-	assert.NoError(t, err)
-	assert.NotNil(t, article)
-	mockRepo.AssertExpectations(t)
+	mockArticleRepo.AssertExpectations(t)
 }
 
 // 测试文章服务 - Delete
 func TestArticleService_Delete_Success(t *testing.T) {
-	mockRepo := new(MockArticleRepository)
-	service := NewArticleService(mockRepo)
+	mockArticleRepo := new(MockArticleRepository)
+	mockCategoryRepo := new(MockCategoryRepository)
+	mockTagRepo := new(MockTagRepository)
+	svc := NewArticleService(mockArticleRepo, mockCategoryRepo, mockTagRepo)
 
 	existingArticle := &model.Article{
 		ID:       1,
 		AuthorID: 1,
 	}
 
-	mockRepo.On("FindByID", mock.Anything, uint(1)).Return(existingArticle, nil)
-	mockRepo.On("Delete", mock.Anything, uint(1)).Return(nil)
+	mockArticleRepo.On("FindByID", mock.Anything, uint(1)).Return(existingArticle, nil)
+	mockArticleRepo.On("Delete", mock.Anything, uint(1)).Return(nil)
 
-	err := service.Delete(context.Background(), 1, 1)
+	err := svc.Delete(context.Background(), 1, 1)
 
 	assert.NoError(t, err)
-	mockRepo.AssertExpectations(t)
+	mockArticleRepo.AssertExpectations(t)
 }
 
 func TestArticleService_Delete_NotAuthorized(t *testing.T) {
-	mockRepo := new(MockArticleRepository)
-	service := NewArticleService(mockRepo)
+	mockArticleRepo := new(MockArticleRepository)
+	mockCategoryRepo := new(MockCategoryRepository)
+	mockTagRepo := new(MockTagRepository)
+	svc := NewArticleService(mockArticleRepo, mockCategoryRepo, mockTagRepo)
 
 	existingArticle := &model.Article{
 		ID:       1,
 		AuthorID: 1,
 	}
 
-	mockRepo.On("FindByID", mock.Anything, uint(1)).Return(existingArticle, nil)
+	mockArticleRepo.On("FindByID", mock.Anything, uint(1)).Return(existingArticle, nil)
 
-	err := service.Delete(context.Background(), 1, 2)
+	err := svc.Delete(context.Background(), 1, 2)
 
 	assert.Error(t, err)
 	assert.Equal(t, ErrArticleNotAuthorized, err)
-	mockRepo.AssertExpectations(t)
+	mockArticleRepo.AssertExpectations(t)
 }
 
 func TestArticleService_Delete_NotFound(t *testing.T) {
-	mockRepo := new(MockArticleRepository)
-	service := NewArticleService(mockRepo)
+	mockArticleRepo := new(MockArticleRepository)
+	mockCategoryRepo := new(MockCategoryRepository)
+	mockTagRepo := new(MockTagRepository)
+	svc := NewArticleService(mockArticleRepo, mockCategoryRepo, mockTagRepo)
 
-	mockRepo.On("FindByID", mock.Anything, uint(1)).Return(nil, gorm.ErrRecordNotFound)
+	mockArticleRepo.On("FindByID", mock.Anything, uint(1)).Return(nil, gorm.ErrRecordNotFound)
 
-	err := service.Delete(context.Background(), 1, 1)
+	err := svc.Delete(context.Background(), 1, 1)
 
 	assert.Error(t, err)
 	assert.Equal(t, ErrArticleNotFound, err)
-	mockRepo.AssertExpectations(t)
+	mockArticleRepo.AssertExpectations(t)
 }

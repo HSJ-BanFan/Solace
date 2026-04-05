@@ -62,6 +62,8 @@ func main() {
 	userRepo := repository.NewUserRepository(db)
 	refreshTokenRepo := repository.NewRefreshTokenRepository(db)
 	articleRepo := repository.NewArticleRepository(db)
+	categoryRepo := repository.NewCategoryRepository(db)
+	tagRepo := repository.NewTagRepository(db)
 
 	// 初始化 JWT 管理器
 	jwtManager := jwt.NewJWTManager(
@@ -78,15 +80,26 @@ func main() {
 		cfg.JWTAccessDuration,
 	)
 	userService := service.NewUserService(userRepo)
-	articleService := service.NewArticleService(articleRepo)
+	articleService := service.NewArticleService(articleRepo, categoryRepo, tagRepo)
+	categoryService := service.NewCategoryService(categoryRepo)
+	tagService := service.NewTagService(tagRepo)
 
 	// 初始化处理器
 	authHandler := handler.NewAuthHandler(authService)
 	userHandler := handler.NewUserHandler(userService)
 	articleHandler := handler.NewArticleHandler(articleService)
+	categoryHandler := handler.NewCategoryHandler(categoryService)
+	tagHandler := handler.NewTagHandler(tagService)
 
 	// 设置路由
-	appRouter := router.NewRouter(authHandler, userHandler, articleHandler, authService)
+	appRouter := router.NewRouter(
+		authHandler,
+		userHandler,
+		articleHandler,
+		categoryHandler,
+		tagHandler,
+		authService,
+	)
 	r := appRouter.Setup(cfg.ServerMode)
 
 	// 创建 HTTP 服务器

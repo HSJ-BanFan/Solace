@@ -3,10 +3,11 @@ package handler
 import (
 	"strconv"
 
+	"github.com/gin-gonic/gin"
+
 	"gin-quickstart/internal/dto/request"
-	apperrors "gin-quickstart/interna
+	apperrors "gin-quickstart/internal/pkg/errors"
 	"gin-quickstart/internal/service"
-n
 )
 
 // ArticleHandler 文章处理器
@@ -49,6 +50,9 @@ func (h *ArticleHandler) Create(c *gin.Context) {
 		req.Title,
 		req.Content,
 		req.Summary,
+		req.CoverImage,
+		req.CategoryID,
+		req.TagIDs,
 		status,
 		userID,
 	)
@@ -117,6 +121,8 @@ func (h *ArticleHandler) GetBySlug(c *gin.Context) {
 // @Param pageSize query int false "每页数量" default(10)
 // @Param status query string false "按状态筛选"
 // @Param author_id query int false "按作者ID筛选"
+// @Param category query string false "按分类slug筛选"
+// @Param tag query string false "按标签slug筛选"
 // @Success 200 {object} Response
 // @Router /articles [get]
 func (h *ArticleHandler) GetList(c *gin.Context) {
@@ -145,7 +151,60 @@ func (h *ArticleHandler) GetList(c *gin.Context) {
 		query.PageSize,
 		query.Status,
 		authorID,
+		query.Category,
+		query.Tag,
 	)
+	if err != nil {
+		RespondWithError(c, err)
+		return
+	}
+
+	RespondWithPaged(c, resp.Items, resp.Page, resp.PageSize, resp.Total)
+}
+
+// GetArchive 获取归档列表
+// @Summary 获取归档列表
+// @Tags article
+// @Produce json
+// @Success 200 {object} Response
+// @Router /articles/archive [get]
+func (h *ArticleHandler) GetArchive(c *gin.Context) {
+	resp, err := h.articleService.GetArchive(c.Request.Context())
+	if err != nil {
+		RespondWithError(c, err)
+		return
+	}
+
+	RespondWithSuccess(c, resp.Groups)
+}
+
+// Search 搜索文章
+// @Summary 搜索文章
+// @Tags article
+// @Produce json
+// @Param q query string true "搜索关键词"
+// @Param page query int false "页码" default(1)
+// @Param pageSize query int false "每页数量" default(10)
+// @Success 200 {object} Response
+// @Router /articles/search [get]
+func (h *ArticleHandler) Search(c *gin.Context) {
+	query := c.Query("q")
+	if query == "" {
+		RespondWithError(c, apperrors.NewBadRequest("搜索关键词不能为空", nil))
+		return
+	}
+
+	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
+	pageSize, _ := strconv.Atoi(c.DefaultQuery("pageSize", "10"))
+
+	if page < 1 {
+		page = 1
+	}
+	if pageSize < 1 || pageSize > 100 {
+		pageSize = 10
+	}
+
+	resp, err := h.articleService.Search(c.Request.Context(), query, page, pageSize)
 	if err != nil {
 		RespondWithError(c, err)
 		return
@@ -190,6 +249,9 @@ func (h *ArticleHandler) Update(c *gin.Context) {
 		req.Title,
 		req.Content,
 		req.Summary,
+		req.CoverImage,
+		req.CategoryID,
+		req.TagIDs,
 		req.Status,
 	)
 	if err != nil {

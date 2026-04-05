@@ -18,8 +18,13 @@ definitions:
     type: object
   request.CreateArticleRequest:
     properties:
+      category_id:
+        type: integer
       content:
         minLength: 1
+        type: string
+      cover_image:
+        maxLength: 500
         type: string
       status:
         enum:
@@ -29,6 +34,10 @@ definitions:
       summary:
         maxLength: 500
         type: string
+      tag_ids:
+        items:
+          type: integer
+        type: array
       title:
         maxLength: 200
         minLength: 1
@@ -36,6 +45,32 @@ definitions:
     required:
     - content
     - title
+    type: object
+  request.CreateCategoryRequest:
+    properties:
+      description:
+        maxLength: 500
+        type: string
+      name:
+        maxLength: 100
+        minLength: 1
+        type: string
+      parent_id:
+        type: integer
+      sort_order:
+        minimum: 0
+        type: integer
+    required:
+    - name
+    type: object
+  request.CreateTagRequest:
+    properties:
+      name:
+        maxLength: 50
+        minLength: 1
+        type: string
+    required:
+    - name
     type: object
   request.LoginRequest:
     properties:
@@ -73,8 +108,13 @@ definitions:
     type: object
   request.UpdateArticleRequest:
     properties:
+      category_id:
+        type: integer
       content:
         minLength: 1
+        type: string
+      cover_image:
+        maxLength: 500
         type: string
       status:
         enum:
@@ -84,6 +124,10 @@ definitions:
       summary:
         maxLength: 500
         type: string
+      tag_ids:
+        items:
+          type: integer
+        type: array
       title:
         maxLength: 200
         minLength: 1
@@ -93,6 +137,28 @@ definitions:
         type: integer
     required:
     - version
+    type: object
+  request.UpdateCategoryRequest:
+    properties:
+      description:
+        maxLength: 500
+        type: string
+      name:
+        maxLength: 100
+        minLength: 1
+        type: string
+      parent_id:
+        type: integer
+      sort_order:
+        minimum: 0
+        type: integer
+    type: object
+  request.UpdateTagRequest:
+    properties:
+      name:
+        maxLength: 50
+        minLength: 1
+        type: string
     type: object
   request.UpdateUserRequest:
     properties:
@@ -141,6 +207,14 @@ paths:
         in: query
         name: author_id
         type: integer
+      - description: 按分类slug筛选
+        in: query
+        name: category
+        type: string
+      - description: 按标签slug筛选
+        in: query
+        name: tag
+        type: string
       produces:
       - application/json
       responses:
@@ -261,6 +335,46 @@ paths:
           schema:
             $ref: '#/definitions/handler.Response'
       summary: 更新文章
+      tags:
+      - article
+  /articles/archive:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.Response'
+      summary: 获取归档列表
+      tags:
+      - article
+  /articles/search:
+    get:
+      parameters:
+      - description: 搜索关键词
+        in: query
+        name: q
+        required: true
+        type: string
+      - default: 1
+        description: 页码
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: 每页数量
+        in: query
+        name: pageSize
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.Response'
+      summary: 搜索文章
       tags:
       - article
   /articles/slug/{slug}:
@@ -397,6 +511,298 @@ paths:
       summary: 用户注册
       tags:
       - auth
+  /categories:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.Response'
+      summary: 获取分类列表
+      tags:
+      - category
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: 分类数据
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.CreateCategoryRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/handler.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handler.Response'
+      summary: 创建分类
+      tags:
+      - category
+  /categories/{id}:
+    delete:
+      parameters:
+      - description: 分类ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "204":
+          description: 无内容
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handler.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.Response'
+      summary: 删除分类
+      tags:
+      - category
+    get:
+      parameters:
+      - description: 分类ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.Response'
+      summary: 根据ID获取分类
+      tags:
+      - category
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: 分类ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: 分类数据
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.UpdateCategoryRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handler.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.Response'
+      summary: 更新分类
+      tags:
+      - category
+  /categories/slug/{slug}:
+    get:
+      parameters:
+      - description: 分类Slug
+        in: path
+        name: slug
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.Response'
+      summary: 根据Slug获取分类
+      tags:
+      - category
+  /tags:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.Response'
+      summary: 获取标签列表
+      tags:
+      - tag
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: 标签数据
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.CreateTagRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/handler.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handler.Response'
+      summary: 创建标签
+      tags:
+      - tag
+  /tags/{id}:
+    delete:
+      parameters:
+      - description: 标签ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "204":
+          description: 无内容
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handler.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.Response'
+      summary: 删除标签
+      tags:
+      - tag
+    get:
+      parameters:
+      - description: 标签ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.Response'
+      summary: 根据ID获取标签
+      tags:
+      - tag
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: 标签ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: 标签数据
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.UpdateTagRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handler.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.Response'
+      summary: 更新标签
+      tags:
+      - tag
+  /tags/slug/{slug}:
+    get:
+      parameters:
+      - description: 标签Slug
+        in: path
+        name: slug
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.Response'
+      summary: 根据Slug获取标签
+      tags:
+      - tag
   /users/{id}:
     get:
       parameters:
