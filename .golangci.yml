@@ -1,0 +1,35 @@
+run:
+  timeout: 5m
+  skip-dirs:
+    - migrations
+
+linters:
+  enable:
+    - gofmt
+    - goimports
+    - govet
+    - errcheck
+    - staticcheck
+    - ineffassign
+    - typecheck
+    - gosimple
+    - goconst
+    - gocyclo
+    - dupl
+    - misspell
+
+linters-settings:
+  gocyclo:
+    min-complexity: 15
+  goconst:
+    min-len: 3
+    min-occurrences: 3
+  dupl:
+    threshold: 100
+
+issues:
+  exclude-rules:
+    # Exclude test files from some checks
+    - path: _test\.go
+      linters:
+        - dupl
