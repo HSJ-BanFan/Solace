@@ -1,43 +1,289 @@
 /* ========================================
-   Markdown 内容样式
+   Markdown 内容样式 (参考 Fuwari)
    ======================================== */
 
-.markdown-content h1,
-.markdown-content h2,
-.markdown-content h3 {
-  @apply font-bold mt-6 mb-3;
+/* === 基础排版 === */
+.custom-md {
+  font-size: 1rem;
+  line-height: 1.75;
 }
 
-.markdown-content h1 { @apply text-2xl; }
-.markdown-content h2 { @apply text-xl; }
-.markdown-content h3 { @apply text-lg; }
-
-.markdown-content p {
-  @apply mb-4 leading-relaxed;
-  color: var(--text-75);
+.custom-md > *:first-child {
+  margin-top: 0;
 }
 
-.markdown-content a {
+.custom-md > *:last-child {
+  margin-bottom: 0;
+}
+
+/* === 代码块样式 === */
+.custom-md .expressive-code {
+  position: relative;
+  margin: 1.5rem 0;
+  border-radius: var(--radius-large);
+  overflow: hidden;
+}
+
+.custom-md pre {
+  background: var(--codeblock-bg);
+  padding: 1.25rem 1.5rem;
+  overflow-x: auto;
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+  font-size: 0.875rem;
+  line-height: 1.7;
+}
+
+.custom-md pre code {
+  background: transparent;
+  padding: 0;
+  color: oklch(0.85 0.02 var(--hue));
+}
+
+/* === 行内代码 === */
+.custom-md code:not(.hljs) {
+  background: var(--inline-code-bg);
+  color: var(--inline-code-color);
+  padding: 0.125rem 0.375rem;
+  border-radius: var(--radius-small);
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.875em;
+}
+
+/* === 引用块 === */
+.custom-md blockquote {
+  position: relative;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  margin: 1.5rem 0;
+  font-style: normal;
+  background: var(--btn-regular-bg);
+  border-radius: var(--radius-medium);
+  border-left: 3px solid var(--primary);
+}
+
+.custom-md blockquote p:last-child {
+  margin-bottom: 0;
+}
+
+/* === 列表样式 === */
+.custom-md ul,
+.custom-md ol {
+  margin: 1rem 0;
+  padding-left: 1.5rem;
+}
+
+.custom-md ul {
+  list-style-type: disc;
+}
+
+.custom-md ol {
+  list-style-type: decimal;
+}
+
+.custom-md li {
+  margin: 0.5rem 0;
+}
+
+.custom-md li::marker {
+  color: var(--primary);
+}
+
+.custom-md ul ul,
+.custom-md ol ol,
+.custom-md ul ol,
+.custom-md ol ul {
+  margin: 0.5rem 0;
+}
+
+/* === 链接样式 === */
+.custom-md a {
   color: var(--primary);
   text-decoration: underline;
-  text-underline-offset: 0.2rem;
+  text-decoration-color: var(--link-underline);
+  text-decoration-style: dashed;
+  text-underline-offset: 0.25rem;
+  transition: all 0.2s ease;
 }
 
-.markdown-content pre {
-  background: var(--codeblock-bg);
+.custom-md a:hover {
+  background: var(--btn-plain-bg-hover);
+  text-decoration: none;
+  border-radius: 0.125rem;
+}
+
+/* === 图片样式 === */
+.custom-md img {
+  max-width: 100%;
+  height: auto;
   border-radius: var(--radius-large);
-  padding: 1rem;
-  overflow-x: auto;
-  @apply mb-4;
+  margin: 1.5rem auto;
+  display: block;
 }
 
-.markdown-content code {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.875rem;
-  color: var(--primary-light);
+/* === 表格样式 === */
+.custom-md table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.5rem 0;
+  font-size: 0.9375rem;
 }
 
-.markdown-content img {
-  border-radius: var(--radius-large);
-  @apply max-w-full h-auto mb-4;
+.custom-md th {
+  background: var(--btn-regular-bg);
+  font-weight: 600;
+  text-align: left;
+  padding: 0.75rem 1rem;
+  border-bottom: 2px solid var(--border-medium);
+}
+
+.custom-md td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.custom-md tr:hover td {
+  background: var(--btn-plain-bg-hover);
+}
+
+/* === 分隔线 === */
+.custom-md hr {
+  border: none;
+  border-top: 1px dashed var(--border-medium);
+  margin: 2rem 0;
+}
+
+/* === 删除线 === */
+.custom-md del {
+  opacity: 0.6;
+}
+
+/* === 强调 === */
+.custom-md strong {
+  font-weight: 600;
+  color: var(--text-90);
+}
+
+.custom-md em {
+  font-style: italic;
+}
+
+/* === 任务列表 === */
+.custom-md input[type="checkbox"] {
+  appearance: none;
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid var(--primary);
+  border-radius: var(--radius-small);
+  margin-right: 0.5rem;
+  vertical-align: middle;
+  cursor: pointer;
+  position: relative;
+}
+
+.custom-md input[type="checkbox"]:checked {
+  background: var(--primary);
+}
+
+.custom-md input[type="checkbox"]:checked::after {
+  content: '';
+  position: absolute;
+  left: 0.25rem;
+  top: 0.125rem;
+  width: 0.375rem;
+  height: 0.5rem;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+/* ========================================
+   Highlight.js 代码高亮主题 (自定义配色)
+   ======================================== */
+
+.hljs {
+  color: oklch(0.85 0.02 var(--hue));
+  background: transparent;
+}
+
+/* 关键字 */
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-built_in,
+.hljs-name,
+.hljs-tag {
+  color: oklch(0.75 0.15 280); /* 紫色 */
+}
+
+/* 字串 */
+.hljs-string,
+.hljs-title,
+.hljs-attr,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-addition,
+.hljs-variable,
+.hljs-template-tag,
+.hljs-template-variable {
+  color: oklch(0.7 0.12 150); /* 绿色 */
+}
+
+/* 注释 */
+.hljs-comment,
+.hljs-quote,
+.hljs-deletion,
+.hljs-meta {
+  color: oklch(0.5 0.02 var(--hue));
+  font-style: italic;
+}
+
+/* 数字、函数 */
+.hljs-number,
+.hljs-link,
+.hljs-params {
+  color: oklch(0.75 0.12 50); /* 橙色 */
+}
+
+/* 类型、类名 */
+.hljs-type,
+.hljs-class,
+.hljs-function {
+  color: oklch(0.8 0.1 200); /* 蓝色 */
+}
+
+/* 属性 */
+.hljs-attribute {
+  color: oklch(0.7 0.1 30); /* 黄色 */
+}
+
+/* 正则、运算符 */
+.hljs-regexp,
+.hljs-literal,
+.hljs-selector-attr,
+.hljs-selector-pseudo {
+  color: oklch(0.65 0.12 30);
+}
+
+/* 深色模式调整 */
+.dark .hljs {
+  color: oklch(0.8 0.03 var(--hue));
+}
+
+.dark .hljs-keyword,
+.dark .hljs-selector-tag,
+.dark .hljs-built_in,
+.dark .hljs-name,
+.dark .hljs-tag {
+  color: oklch(0.8 0.18 280);
+}
+
+.dark .hljs-string,
+.dark .hljs-title,
+.dark .hljs-attr,
+.dark .hljs-symbol {
+  color: oklch(0.75 0.14 150);
+}
+
+.dark .hljs-comment,
+.dark .hljs-quote {
+  color: oklch(0.45 0.02 var(--hue));
 }

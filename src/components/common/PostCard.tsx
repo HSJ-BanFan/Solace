@@ -34,7 +34,7 @@ export function PostCard({ article, class: className, style }: PostCardProps) {
   return (
     <>
       <div
-        className={`card-base flex flex-col-reverse md:flex-col w-full rounded-[var(--radius-large)] overflow-hidden relative ${className || ''}`}
+        className={`card-base card-hover flex flex-col-reverse md:flex-col w-full rounded-[var(--radius-large)] overflow-hidden relative ${className || ''}`}
         style={style}
       >
         {/* 内容区域 */}
@@ -46,7 +46,7 @@ export function PostCard({ article, class: className, style }: PostCardProps) {
           {/* 标题 */}
           <Link
             to={`/articles/${article.slug}`}
-            className="transition group w-full block font-bold mb-3 text-3xl text-90
+            className="transition-smooth group w-full block font-bold mb-3 text-3xl text-90
               hover:text-[var(--primary)] dark:hover:text-[var(--primary)]
               active:text-[var(--primary)]
               before:w-1 before:h-5 before:rounded-md before:bg-[var(--primary)]
@@ -59,7 +59,7 @@ export function PostCard({ article, class: className, style }: PostCardProps) {
             />
             <Icon
               icon="material-symbols:chevron-right-rounded"
-              className="text-[var(--primary)] text-[2rem] transition hidden md:inline absolute translate-y-0.5 opacity-0 group-hover:opacity-100 -translate-x-1 group-hover:translate-x-0"
+              className="text-[var(--primary)] text-[2rem] transition-bounce hidden md:inline absolute translate-y-0.5 opacity-0 group-hover:opacity-100 -translate-x-1 group-hover:translate-x-0"
             />
           </Link>
 
@@ -67,12 +67,12 @@ export function PostCard({ article, class: className, style }: PostCardProps) {
           <PostMeta article={article} hideTagsForMobile />
 
           {/* 摘要 */}
-          <div className="transition text-75 mb-3.5 pr-4 line-clamp-2 md:line-clamp-1">
+          <div className="transition-smooth text-75 mb-3.5 pr-4 line-clamp-2 md:line-clamp-1">
             {article.summary || '暂无摘要'}
           </div>
 
           {/* 浏览量 */}
-          <div className="text-sm text-30 flex gap-4 transition">
+          <div className="text-sm text-30 flex gap-4 transition-smooth">
             <div>{article.view_count} 次浏览</div>
           </div>
         </div>
@@ -85,17 +85,17 @@ export function PostCard({ article, class: className, style }: PostCardProps) {
               md:w-[var(--coverWidth)] relative md:absolute md:top-3 md:bottom-3 md:right-3
               rounded-xl overflow-hidden active:scale-95"
           >
-            <div className="absolute pointer-events-none z-10 w-full h-full group-hover:bg-black/30 group-active:bg-black/50 transition" />
+            <div className="absolute pointer-events-none z-10 w-full h-full group-hover:bg-black/30 group-active:bg-black/50 transition-smooth" />
             <div className="absolute pointer-events-none z-20 w-full h-full flex items-center justify-center">
               <Icon
                 icon="material-symbols:chevron-right-rounded"
-                className="transition opacity-0 group-hover:opacity-100 scale-50 group-hover:scale-100 text-white text-5xl"
+                className="transition-bounce opacity-0 group-hover:opacity-100 scale-50 group-hover:scale-100 text-white text-5xl"
               />
             </div>
             <img
               src={article.cover_image}
               alt={article.title}
-              className="w-full h-full object-cover"
+              className="w-full h-full object-cover transition-smooth group-hover:scale-105"
             />
           </Link>
         )}
@@ -105,18 +105,18 @@ export function PostCard({ article, class: className, style }: PostCardProps) {
           <Link
             to={`/articles/${article.slug}`}
             className="!hidden md:!flex btn-regular w-[3.25rem] absolute right-3 top-3 bottom-3 rounded-xl bg-[var(--btn-regular-bg)]
-              hover:bg-[var(--btn-regular-bg-hover)] active:bg-[var(--btn-regular-bg-active)] active:scale-95"
+              hover:bg-[var(--btn-regular-bg-hover)] active:bg-[var(--btn-regular-bg-active)] active:scale-95 transition-smooth"
           >
             <Icon
               icon="material-symbols:chevron-right-rounded"
-              className="transition text-[var(--primary)] text-4xl mx-auto"
+              className="transition-bounce text-[var(--primary)] text-4xl mx-auto"
             />
           </Link>
         )}
       </div>
 
       {/* 分隔线（移动端） */}
-      <div className="transition border-t-[1px] border-dashed mx-6 border-[var(--border-medium)] last:border-t-0 md:hidden" />
+      <div className="transition-smooth border-t-[1px] border-dashed mx-6 border-[var(--border-medium)] last:border-t-0 md:hidden" />
 
       <style>{`:root { --coverWidth: ${coverWidth}; }`}</style>
     </>
@@ -135,8 +135,8 @@ export function PostMeta({ article, hideUpdateDate, hideTagsForMobile }: PostMet
   return (
     <div className={`flex flex-wrap text-50 items-center gap-4 gap-x-4 gap-y-2 mb-4 ${hideTagsForMobile ? '' : ''}`}>
       {/* 发布日期 */}
-      <div className="flex items-center">
-        <div className="meta-icon">
+      <div className="flex items-center transition-smooth hover:text-[var(--primary)]">
+        <div className="meta-icon transition-smooth group-hover:bg-[var(--btn-regular-bg-hover)]">
           <Icon icon="material-symbols:calendar-today-outline-rounded" className="text-xl" />
         </div>
         <span className="text-50 text-sm font-medium">{formatDate(article.published_at || article.created_at)}</span>
@@ -144,8 +144,8 @@ export function PostMeta({ article, hideUpdateDate, hideTagsForMobile }: PostMet
 
       {/* 更新日期 */}
       {showUpdate && (
-        <div className="flex items-center">
-          <div className="meta-icon">
+        <div className="flex items-center transition-smooth hover:text-[var(--primary)]">
+          <div className="meta-icon transition-smooth">
             <Icon icon="material-symbols:edit-calendar-outline-rounded" className="text-xl" />
           </div>
           <span className="text-50 text-sm font-medium">{formatDate(article.updated_at)}</span>
@@ -154,8 +154,8 @@ export function PostMeta({ article, hideUpdateDate, hideTagsForMobile }: PostMet
 
       {/* 作者 */}
       {article.author && (
-        <div className="flex items-center">
-          <div className="meta-icon">
+        <div className="flex items-center transition-smooth hover:text-[var(--primary)]">
+          <div className="meta-icon transition-smooth">
             <Icon icon="material-symbols:person-outline-rounded" className="text-xl" />
           </div>
           <span className="text-50 text-sm font-medium">{article.author.nickname || article.author.username}</span>

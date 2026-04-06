@@ -15,11 +15,11 @@ function formatTag(tags: { id: number; name: string }[] | undefined) {
 }
 
 export function ArchivePage() {
-  const { data: groups, isLoading, error } = useArchive();
+  const { data: groups, isLoading, isFetching, error } = useArchive();
 
   if (error) {
     return (
-      <div className="card-base p-8 text-center fade-in-up">
+      <div className="card-base p-8 text-center onload-animation">
         <p className="text-75">加载归档失败</p>
       </div>
     );
@@ -27,9 +27,41 @@ export function ArchivePage() {
 
   if (isLoading) {
     return (
-      <div className="card-base p-8 text-center">
-        <div className="w-12 h-12 rounded-full border-2 border-[var(--primary)] border-t-transparent mx-auto mb-4 animate-spin" />
-        <p className="text-50">正在加载...</p>
+      <div className="space-y-4">
+        {/* Header Skeleton */}
+        <div className="card-base p-6 animate-pulse">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-700"></div>
+            <div className="flex-1">
+              <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-24 mb-2"></div>
+              <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-32"></div>
+            </div>
+          </div>
+        </div>
+
+        {/* Timeline Skeleton */}
+        <div className="card-base px-8 py-6 animate-pulse">
+          {[...Array(5)].map((_, index) => (
+            <div key={index} className="mb-6 last:mb-0">
+              <div className="flex flex-row w-full items-center h-[3.75rem]">
+                <div className="w-[15%] md:w-[10%] h-6 bg-gray-200 dark:bg-gray-700 rounded"></div>
+                <div className="w-[15%] md:w-[10%] flex justify-center">
+                  <div className="h-3 w-3 rounded-full bg-gray-200 dark:bg-gray-700"></div>
+                </div>
+                <div className="w-[70%] md:w-[80%] h-4 bg-gray-200 dark:bg-gray-700 rounded"></div>
+              </div>
+              {[...Array(2)].map((_, postIndex) => (
+                <div key={postIndex} className="flex flex-row justify-start items-center h-10 mb-2">
+                  <div className="w-[15%] md:w-[10%] h-4 bg-gray-200 dark:bg-gray-700 rounded"></div>
+                  <div className="w-[15%] md:w-[10%] flex justify-center">
+                    <div className="w-1 h-1 rounded-full bg-gray-200 dark:bg-gray-700"></div>
+                  </div>
+                  <div className="w-[70%] md:w-[65%] h-4 bg-gray-200 dark:bg-gray-700 rounded"></div>
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
       </div>
     );
   }
@@ -38,8 +70,15 @@ export function ArchivePage() {
 
   return (
     <div className="space-y-4">
+      {/* 后台刷新时显示加载指示器 */}
+      {isFetching && !isLoading && (
+        <div className="flex justify-center py-2">
+          <div className="animate-spin w-5 h-5 border-2 border-primary border-t-transparent rounded-full"></div>
+        </div>
+      )}
+
       {/* Header */}
-      <div className="card-base p-6 fade-in-up">
+      <div className="card-base p-6 onload-animation">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[var(--klein-blue)] to-[var(--sky-blue)] flex items-center justify-center">
             <span className="text-xl text-white font-bold">归档</span>
@@ -52,7 +91,7 @@ export function ArchivePage() {
       </div>
 
       {/* Timeline - 完全匹配 Fuwari ArchivePanel.svelte */}
-      <div className="card-base px-8 py-6 fade-in-up" style={{ animationDelay: '0.1s' }}>
+      <div className="card-base px-8 py-6 onload-animation" style={{ animationDelay: '50ms' }}>
         {groups && groups.length > 0 ? (
           groups.map((group) => (
             <div key={group.year}>

@@ -11,13 +11,17 @@ export function Categories({ className, style }: CategoriesProps) {
 
   if (isLoading) {
     return (
-      <div className={`card-base pb-4 onload-animation ${className || ''}`} style={style}>
+      <div className={`card-base pb-4 ${className || ''}`} style={style}>
         <div className="font-bold text-lg text-90 relative ml-8 mt-4 mb-2
           before:w-1 before:h-4 before:rounded-md before:bg-[var(--primary)]
           before:absolute before:-left-4 before:top-[5.5px]">
           Categories
         </div>
-        <div className="px-4 py-4 text-50 text-sm">Loading...</div>
+        <div className="px-4 py-4 space-y-2">
+          {[...Array(4)].map((_, index) => (
+            <div key={index} className="h-10 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+          ))}
+        </div>
       </div>
     );
   }

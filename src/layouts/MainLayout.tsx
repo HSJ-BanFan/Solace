@@ -1,15 +1,18 @@
 import { Outlet } from 'react-router-dom';
 import { Navbar, Footer } from '@/components/common';
-import { SideBar } from '@/components/widget';
+import { SideBar, TableOfContents } from '@/components/widget';
+import { useTocStore } from '@/stores';
 
 export function MainLayout() {
+  const { headings } = useTocStore();
+
   return (
     <div className="min-h-screen flex flex-col">
       {/* 导航栏 */}
       <Navbar />
 
       {/* 主内容区 */}
-      <div className="flex-1 max-w-[var(--page-width)] mx-auto w-full px-0 md:px-4 py-4">
+      <div className="flex-1 max-w-[var(--page-width)] mx-auto w-full px-0 md:px-4 py-4 relative">
         <div className="grid grid-cols-1 lg:grid-cols-[17.5rem_1fr] gap-4">
           {/* 侧边栏 - 桌面端显示在左侧 */}
           <aside className="hidden lg:block">
@@ -27,6 +30,15 @@ export function MainLayout() {
             </div>
           </main>
         </div>
+
+        {/* TOC - 绝对定位在内容区右侧 */}
+        {headings.length > 0 && (
+          <div className="hidden 2xl:block absolute top-0 -right-[var(--toc-width)] w-[var(--toc-width)] h-full">
+            <div className="sticky top-20">
+              <TableOfContents headings={headings} className="bg-transparent" />
+            </div>
+          </div>
+        )}
 
         {/* 移动端页脚 */}
         <div className="block lg:hidden mt-4">

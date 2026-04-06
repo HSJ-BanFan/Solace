@@ -1,0 +1,24 @@
+import { create } from 'zustand';
+import type { TocHeading } from '@/components/widget/TableOfContents';
+
+interface TocState {
+  headings: TocHeading[];
+  setHeadings: (headings: TocHeading[]) => void;
+  clearHeadings: () => void;
+}
+
+export const useTocStore = create<TocState>((set, get) => ({
+  headings: [],
+  setHeadings: (newHeadings) => {
+    const currentHeadings = get().headings;
+    // 简单的深度比较，防止无限循环
+    if (JSON.stringify(currentHeadings) !== JSON.stringify(newHeadings)) {
+      set({ headings: newHeadings });
+    }
+  },
+  clearHeadings: () => {
+    if (get().headings.length > 0) {
+      set({ headings: [] });
+    }
+  },
+}));

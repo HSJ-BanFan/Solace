@@ -21,7 +21,7 @@ export function Profile() {
   const displayAvatar = user?.avatar_url || profileConfig.avatar;
 
   return (
-    <div className="card-base p-3">
+    <div className="card-base p-3 onload-animation">
       {/* 头像 */}
       <Link
         to="/about"

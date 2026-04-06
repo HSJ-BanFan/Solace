@@ -1,12 +1,26 @@
 import { useParams } from 'react-router-dom';
 import { useArticleBySlug } from '@/hooks';
-import { PostMeta } from '@/components';
+import { PostMeta, MarkdownRenderer } from '@/components';
+import { type TocHeading } from '@/components/widget/TableOfContents';
 import { Icon } from '@iconify/react';
 import { formatDate } from '@/utils';
+import { useEffect, useCallback } from 'react';
+import { useTocStore } from '@/stores';
 
 export function ArticleDetailPage() {
   const { slug } = useParams<{ slug: string }>();
   const { data: article, isLoading, error } = useArticleBySlug(slug ?? '');
+  const { setHeadings, clearHeadings } = useTocStore();
+
+  useEffect(() => {
+    return () => {
+      clearHeadings();
+    };
+  }, [clearHeadings]);
+
+  const handleHeadingsExtracted = useCallback((extractedHeadings: TocHeading[]) => {
+    setHeadings(extractedHeadings);
+  }, [setHeadings]);
 
   if (error) {
     return (
@@ -21,10 +35,47 @@ export function ArticleDetailPage() {
 
   if (isLoading) {
     return (
-      <div className="card-base p-8 text-center">
-        <div className="w-12 h-12 rounded-full border-2 border-[var(--primary)] border-t-transparent mx-auto mb-4 animate-spin" />
-        <p className="text-50">正在加载文章...</p>
-      </div>
+      <article className="space-y-4">
+        {/* Cover Image Skeleton */}
+        <div className="card-base overflow-hidden">
+          <div className="skeleton w-full h-[280px] md:h-[360px]" />
+        </div>
+
+        {/* Content Skeleton */}
+        <div className="card-base p-6 md:p-8 content-appear" style={{ animationDelay: '50ms' }}>
+          <div className="skeleton h-9 rounded w-3/4 mb-4" />
+
+          {/* Meta Info Skeleton */}
+          <div className="flex gap-4 mb-4">
+            <div className="skeleton h-5 rounded w-24" />
+            <div className="skeleton h-5 rounded w-24" />
+            <div className="skeleton h-5 rounded w-24" />
+          </div>
+
+          {/* Summary Skeleton */}
+          <div className="border-l-2 border-[var(--primary)] pl-4 mb-6">
+            <div className="space-y-2">
+              <div className="skeleton h-4 rounded w-full" />
+              <div className="skeleton h-4 rounded w-5/6" />
+            </div>
+          </div>
+
+          {/* Content Skeleton */}
+          <div className="mt-6 space-y-3">
+            <div className="skeleton h-4 rounded w-full" />
+            <div className="skeleton h-4 rounded w-full" />
+            <div className="skeleton h-4 rounded w-11/12" />
+            <div className="skeleton h-4 rounded w-full" />
+            <div className="skeleton h-4 rounded w-4/5" />
+          </div>
+
+          {/* Footer Skeleton */}
+          <div className="border-t border-[var(--border-light)] mt-8 pt-4 flex justify-between">
+            <div className="skeleton h-4 rounded w-24" />
+            <div className="skeleton h-4 rounded w-24" />
+          </div>
+        </div>
+      </article>
     );
   }
 
@@ -40,7 +91,7 @@ export function ArticleDetailPage() {
   }
 
   return (
-    <article className="space-y-4">
+    <article className="flex-1 min-w-0 space-y-4">
       {/* 封面图片 */}
       {article.cover_image && (
         <div className="card-base overflow-hidden fade-in-up">
@@ -53,7 +104,7 @@ export function ArticleDetailPage() {
       )}
 
       {/* 文章内容 */}
-      <div className="card-base p-6 md:p-8 fade-in-up" style={{ animationDelay: '0.1s' }}>
+      <div className="card-base p-6 md:p-8 fade-in-up" style={{ animationDelay: '50ms' }}>
         {/* 标题 */}
         <h1 className="text-90 text-2xl md:text-3xl font-bold mb-4">{article.title}</h1>
 
@@ -62,17 +113,17 @@ export function ArticleDetailPage() {
 
         {/* 摘要 */}
         {article.summary && (
-          <div className="text-50 border-l-2 border-[var(--primary)] pl-4 mb-6 italic">
+          <div className="text-50 border-l-2 border-[var(--primary)] pl-4 mb-6 bg-[var(--btn-regular-bg)] rounded-r-[var(--radius-medium)] py-2 italic">
             {article.summary}
           </div>
         )}
 
-        {/* 正文内容 */}
-        <div className="markdown-content mt-6">
-          {article.content.split('\n').map((paragraph, i) => (
-            <p key={i}>{paragraph}</p>
-          ))}
-        </div>
+        {/* 正文内容 - Markdown 渲染 */}
+        <MarkdownRenderer
+          content={article.content}
+          className="mt-6"
+          onHeadingsExtracted={handleHeadingsExtracted}
+        />
 
         {/* 底部信息 */}
         <div className="border-t border-[var(--border-light)] mt-8 pt-4">
