@@ -17,176 +17,189 @@ export const TableOfContents = memo(function TableOfContents({ headings, classNa
   const tocRef = useRef<HTMLDivElement>(null);
   const observerRef = useRef<IntersectionObserver | null>(null);
 
-  // 找到最小深度用于缩进计算
   const minDepth = headings.length > 0 ? Math.min(...headings.map(h => h.depth)) : 1;
 
-  // 点击处理
   const handleClick = useCallback((e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
     e.preventDefault();
     const element = document.getElementById(id);
     if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
+      const offset = 80;
+      const bodyRect = document.body.getBoundingClientRect().top;
+      const elementRect = element.getBoundingClientRect().top;
+      const elementPosition = elementRect - bodyRect;
+      const offsetPosition = elementPosition - offset;
+
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: 'smooth'
+      });
+
       setActiveId(id);
-      // 更新 URL hash
       window.history.pushState(null, '', `#${id}`);
     }
   }, []);
 
-  // 设置 IntersectionObserver
   useEffect(() => {
     if (headings.length === 0) return;
 
-    // 清理旧的 observer
-    if (observerRef.current) {
-      observerRef.current.disconnect();
-    }
+    if (observerRef.current) observerRef.current.disconnect();
 
-    // 创建新的 observer
     observerRef.current = new IntersectionObserver(
       (entries) => {
-        const visible = new Set<string>();
+        const visible = new Set<string>(visibleHeadings);
         entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            visible.add(entry.target.id);
-          }
+          if (entry.isIntersecting) visible.add(entry.target.id);
+          else visible.delete(entry.target.id);
         });
 
-        // 如果没有可见的，找到最接近顶部的
-        if (visible.size === 0) {
-          const scrollPosition = window.scrollY + 100;
-          let closestId: string | null = null;
-          let closestDistance = Infinity;
-
-          headings.forEach((heading) => {
-            const element = document.getElementById(heading.id);
-            if (element) {
-              const distance = Math.abs(element.offsetTop - scrollPosition);
-              if (distance < closestDistance) {
-                closestId = heading.id;
-                closestDistance = distance;
-              }
-            }
-          });
-
-          if (closestId) {
-            visible.add(closestId);
-          }
-        }
-
-        setVisibleHeadings(visible);
+        setVisibleHeadings(new Set(visible));
         if (visible.size > 0) {
-          // 取最上面的一个作为当前活动
-          const firstVisible = Array.from(visible)[0];
+          const visibleIds = Array.from(visible);
+          const firstVisible = headings.find(h => visibleIds.includes(h.id))?.id || visibleIds[0];
           if (firstVisible) {
             setActiveId(firstVisible);
           }
         }
       },
-      {
-        rootMargin: '-80px 0px -70% 0px',
-        threshold: 0,
-      }
+      { rootMargin: '-15% 0px -60% 0px', threshold: [0, 1] }
     );
 
-    // 观察所有标题
-    headings.forEach((heading) => {
-      const element = document.getElementById(heading.id);
-      if (element && observerRef.current) {
-        observerRef.current.observe(element);
-      }
+    headings.forEach((h) => {
+      const el = document.getElementById(h.id);
+      if (el) observerRef.current?.observe(el);
     });
 
-    return () => {
-      if (observerRef.current) {
-        observerRef.current.disconnect();
-      }
-    };
-  }, [headings]);
+    return () => observerRef.current?.disconnect();
+  }, [headings, visibleHeadings]);
 
-  // 从 URL hash 初始化活动状态
   useEffect(() => {
-    const hash = window.location.hash.slice(1);
-    if (hash) {
-      setActiveId(decodeURIComponent(hash));
-    }
-  }, []);
+    let scrollTimeout: ReturnType<typeof setTimeout>;
+    
+    const handleScroll = () => {
+      if (scrollTimeout) clearTimeout(scrollTimeout);
+      
+      scrollTimeout = setTimeout(() => {
+        if (headings.length === 0) return;
+        
+        const scrollPosition = window.scrollY + 100;
+        
+        let currentId = headings[0]?.id;
+        let minDistance = Infinity;
 
-  // 滚动 TOC 使活动项可见
+        headings.forEach(h => {
+          const el = document.getElementById(h.id);
+          if (el) {
+            const distance = scrollPosition - el.offsetTop;
+            if (distance >= 0 && distance < minDistance) {
+              minDistance = distance;
+              currentId = h.id;
+            }
+          }
+        });
+
+        if (visibleHeadings.size === 0 && currentId && currentId !== activeId) {
+             setActiveId(currentId);
+        }
+      }, 50);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      if (scrollTimeout) clearTimeout(scrollTimeout);
+    };
+  }, [headings, activeId, visibleHeadings.size]);
+
+  const [indicatorStyle, setIndicatorStyle] = useState({ top: 0, height: 0, opacity: 0 });
+  
   useEffect(() => {
     if (!activeId || !tocRef.current) return;
+    
+    requestAnimationFrame(() => {
+        if (!tocRef.current) return;
+        
+        const activeElement = tocRef.current.querySelector(`[data-id="${activeId}"]`) as HTMLElement;
+        const navElement = tocRef.current.querySelector('nav') as HTMLElement;
+        
+        if (activeElement && navElement) {
+          const navRect = navElement.getBoundingClientRect();
+          const activeRect = activeElement.getBoundingClientRect();
+          
+          setIndicatorStyle({
+            top: activeRect.top - navRect.top,
+            height: activeRect.height,
+            opacity: 1
+          });
+          
+          const container = tocRef.current.parentElement;
+          if (container) {
+            const { offsetTop, offsetHeight } = activeElement;
+            const { scrollTop, clientHeight } = container;
+            
+            if (offsetTop < scrollTop || offsetTop + offsetHeight > scrollTop + clientHeight) {
+              container.scrollTo({
+                top: offsetTop - clientHeight / 2 + offsetHeight / 2,
+                behavior: 'smooth'
+              });
+            }
+          }
+        } else {
+           setIndicatorStyle(prev => ({ ...prev, opacity: 0 }));
+        }
+    });
+  }, [activeId, headings]);
 
-    const activeElement = tocRef.current.querySelector(`[href="#${activeId}"]`);
-    if (activeElement) {
-      const container = tocRef.current;
-      const elementRect = activeElement.getBoundingClientRect();
-      const containerRect = container.getBoundingClientRect();
-
-      if (elementRect.top < containerRect.top || elementRect.bottom > containerRect.bottom) {
-        activeElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }
-    }
-  }, [activeId]);
-
-  if (headings.length === 0) {
-    return null;
-  }
-
-  // 计算一级标题计数
-  let h1Count = 0;
+  if (headings.length === 0) return null;
 
   return (
-    <div
-      ref={tocRef}
-      className={`toc-container ${className}`}
-    >
-      <div className="text-sm font-medium text-50 mb-3 px-2">目录</div>
-      <nav className="space-y-1">
-        {headings.map((heading) => {
-          const isActive = visibleHeadings.has(heading.id);
-          const indentLevel = heading.depth - minDepth;
+    <div ref={tocRef} className={`toc-container select-none relative ${className}`}>
+      <div className="flex items-center gap-3 text-xs font-bold uppercase tracking-widest text-90 mb-5 px-4 opacity-80">
+        <div className="w-1.5 h-4 bg-[var(--primary)] rounded-full shadow-[0_0_8px_var(--primary)]" style={{ '--tw-shadow-color': 'var(--primary)', '--tw-shadow': '0 0 8px var(--tw-shadow-color)' } as any}></div>
+        TABLE OF CONTENTS
+      </div>
 
-          // 为一级标题计数
-          const showNumber = heading.depth === minDepth;
-          if (showNumber) h1Count++;
+      <nav className="relative flex flex-col pl-1 py-2">
+        <div className="absolute left-[1.125rem] top-2 bottom-2 w-[2px] bg-[var(--border-light)] z-0 rounded-full"></div>
+
+        <div 
+          className="absolute left-[1.125rem] w-[2px] bg-[var(--primary)] z-10 transition-all duration-300 ease-out rounded-full shadow-[0_0_8px_var(--primary)]"
+          style={{ 
+            top: `${indicatorStyle.top}px`, 
+            height: `${indicatorStyle.height}px`,
+            opacity: indicatorStyle.opacity,
+            transform: 'translateX(-50%)',
+            '--tw-shadow-color': 'var(--primary)',
+            '--tw-shadow': '0 0 8px var(--tw-shadow-color)'
+          } as any}
+        ></div>
+
+        {headings.map((heading) => {
+          const isActive = activeId === heading.id;
+          const indentLevel = heading.depth - minDepth;
 
           return (
             <a
               key={heading.id}
+              data-id={heading.id}
               href={`#${heading.id}`}
               onClick={(e) => handleClick(e, heading.id)}
-              className={`toc-item group flex items-center gap-2 px-2 py-2 rounded-lg transition-smooth
-                hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)]
-                ${isActive ? 'bg-[var(--toc-btn-hover)] text-[var(--primary)]' : 'text-50'}`}
-              style={{
-                paddingLeft: `${0.5 + indentLevel * 1}rem`,
+              className={`
+                group relative flex items-center py-2 px-4 transition-all duration-300 ease-out rounded-lg mx-2
+                ${isActive 
+                  ? 'text-[var(--primary)]' 
+                  : 'text-50 hover:text-75 hover:bg-[var(--btn-plain-bg-hover)]'}
+              `}
+              style={{ 
+                paddingLeft: `${0.75 + indentLevel * 0.8}rem`,
+                marginLeft: '0.5rem',
+                backgroundColor: isActive ? 'color-mix(in srgb, var(--primary) 10%, transparent)' : undefined
               }}
             >
-              {/* 前缀图标/数字 */}
-              <span
-                className={`flex-shrink-0 w-5 h-5 rounded flex items-center justify-center text-xs font-bold
-                  ${heading.depth === minDepth
-                    ? 'bg-[var(--toc-badge-bg)] text-[var(--btn-content)]'
-                    : heading.depth === minDepth + 1
-                      ? 'bg-[var(--toc-badge-bg)]/50'
-                      : 'bg-black/5 dark:bg-white/10'
-                  }`}
-              >
-                {heading.depth === minDepth && h1Count}
-                {heading.depth === minDepth + 1 && (
-                  <span className="w-1.5 h-1.5 rounded-sm bg-[var(--toc-badge-bg)]" />
-                )}
-                {heading.depth >= minDepth + 2 && (
-                  <span className="w-1 h-1 rounded-sm bg-black/20 dark:bg-white/20" />
-                )}
-              </span>
-
-              {/* 标题文本 */}
-              <span
-                className={`text-sm truncate transition-smooth
-                  ${heading.depth >= minDepth + 2 ? 'text-30' : 'text-50'}
-                  ${isActive ? 'text-[var(--primary)] font-medium' : ''}
-                  group-hover:text-[var(--primary)]`}
-              >
+              <span className={`
+                text-sm leading-snug transition-all duration-300 w-full line-clamp-2
+                ${isActive ? 'font-bold' : 'font-medium'}
+                ${heading.depth > minDepth ? 'text-[0.825rem] opacity-90' : 'text-[0.9rem]'}
+              `}>
                 {heading.text}
               </span>
             </a>

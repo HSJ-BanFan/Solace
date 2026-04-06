@@ -16,27 +16,19 @@
   margin-bottom: 0;
 }
 
-/* === 代码块样式 === */
-.custom-md .expressive-code {
-  position: relative;
-  margin: 1.5rem 0;
-  border-radius: var(--radius-large);
-  overflow: hidden;
+/* === CodeBlock 组件样式 === */
+.code-block {
+  width: 100%;
 }
 
-.custom-md pre {
-  background: var(--codeblock-bg);
-  padding: 1.25rem 1.5rem;
+.code-block pre {
+  margin: 0 !important;
+  width: 100%;
   overflow-x: auto;
-  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
-  font-size: 0.875rem;
-  line-height: 1.7;
 }
 
-.custom-md pre code {
-  background: transparent;
-  padding: 0;
-  color: oklch(0.85 0.02 var(--hue));
+.code-block code {
+  font-family: 'JetBrains Mono Variable', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace !important;
 }
 
 /* === 行内代码 === */
@@ -194,96 +186,4 @@
   border: solid white;
   border-width: 0 2px 2px 0;
   transform: rotate(45deg);
-}
-
-/* ========================================
-   Highlight.js 代码高亮主题 (自定义配色)
-   ======================================== */
-
-.hljs {
-  color: oklch(0.85 0.02 var(--hue));
-  background: transparent;
-}
-
-/* 关键字 */
-.hljs-keyword,
-.hljs-selector-tag,
-.hljs-built_in,
-.hljs-name,
-.hljs-tag {
-  color: oklch(0.75 0.15 280); /* 紫色 */
-}
-
-/* 字串 */
-.hljs-string,
-.hljs-title,
-.hljs-attr,
-.hljs-symbol,
-.hljs-bullet,
-.hljs-addition,
-.hljs-variable,
-.hljs-template-tag,
-.hljs-template-variable {
-  color: oklch(0.7 0.12 150); /* 绿色 */
-}
-
-/* 注释 */
-.hljs-comment,
-.hljs-quote,
-.hljs-deletion,
-.hljs-meta {
-  color: oklch(0.5 0.02 var(--hue));
-  font-style: italic;
-}
-
-/* 数字、函数 */
-.hljs-number,
-.hljs-link,
-.hljs-params {
-  color: oklch(0.75 0.12 50); /* 橙色 */
-}
-
-/* 类型、类名 */
-.hljs-type,
-.hljs-class,
-.hljs-function {
-  color: oklch(0.8 0.1 200); /* 蓝色 */
-}
-
-/* 属性 */
-.hljs-attribute {
-  color: oklch(0.7 0.1 30); /* 黄色 */
-}
-
-/* 正则、运算符 */
-.hljs-regexp,
-.hljs-literal,
-.hljs-selector-attr,
-.hljs-selector-pseudo {
-  color: oklch(0.65 0.12 30);
-}
-
-/* 深色模式调整 */
-.dark .hljs {
-  color: oklch(0.8 0.03 var(--hue));
-}
-
-.dark .hljs-keyword,
-.dark .hljs-selector-tag,
-.dark .hljs-built_in,
-.dark .hljs-name,
-.dark .hljs-tag {
-  color: oklch(0.8 0.18 280);
-}
-
-.dark .hljs-string,
-.dark .hljs-title,
-.dark .hljs-attr,
-.dark .hljs-symbol {
-  color: oklch(0.75 0.14 150);
-}
-
-.dark .hljs-comment,
-.dark .hljs-quote {
-  color: oklch(0.45 0.02 var(--hue));
 }

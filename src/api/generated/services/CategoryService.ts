@@ -1,7 +1,7 @@
 /* generated using openapi-typescript-codegen -- do not edit */
 /* istanbul ignore file */
 /* tslint:disable */
-/* eslint-disable */
+ 
 import type { handler_Response } from '../models/handler_Response';
 import type { request_CreateCategoryRequest } from '../models/request_CreateCategoryRequest';
 import type { request_UpdateCategoryRequest } from '../models/request_UpdateCategoryRequest';

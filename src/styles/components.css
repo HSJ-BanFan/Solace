@@ -1,5 +1,5 @@
 /* ========================================
-   组件样式
+   组件样式 (Fuwari-style 优化)
    ======================================== */
 
 @tailwind components;
@@ -9,56 +9,59 @@
   .card-base {
     background: var(--card-bg);
     border-radius: var(--radius-large);
-    @apply overflow-hidden transition-all duration-200;
+    @apply overflow-hidden transition-all duration-300;
   }
 
   .card-shadow {
-    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.005));
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+  }
+  .dark .card-shadow {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
   }
 
   /* === 文字层级 === */
   .text-90 { color: var(--text-90); }
-  .text-75 { color: var(--text-75); }
-  .text-50 { color: var(--text-50); }
+  .text-75 { color: var(--text-75); font-weight: 400; }
+  .text-50 { color: var(--text-50); font-weight: 400; }
   .text-30 { color: var(--text-30); }
 
   /* === 按钮动画 (Fuwari expand-animation) === */
   .expand-animation {
-    @apply relative before:ease-out before:transition z-0;
+    @apply relative before:ease-out before:transition-all before:duration-300 z-0;
   }
 
   .expand-animation::before {
     content: '';
-    @apply absolute rounded-[inherit] inset-0 scale-[0.85] -z-10;
-    background: transparent;
+    @apply absolute rounded-[inherit] inset-0 scale-[0.85] opacity-0 -z-10;
+    background: var(--btn-plain-bg-hover);
   }
 
   .expand-animation:hover::before {
-    background: var(--btn-plain-bg-hover);
-    @apply scale-100;
+    @apply scale-100 opacity-100;
   }
 
   .expand-animation:active::before {
     background: var(--btn-plain-bg-active);
+    @apply scale-95;
   }
 
   /* === 按钮样式 === */
   .btn-plain {
-    @apply transition relative flex items-center justify-center bg-none;
+    @apply transition-colors duration-200 relative flex items-center justify-center bg-transparent cursor-pointer select-none;
     color: var(--text-75);
-    &:hover {
-      color: var(--primary);
-    }
-    &:not(.scale-animation) {
-      @apply hover:bg-[var(--btn-plain-bg-hover)] active:bg-[var(--btn-plain-bg-active)];
-    }
-    &.scale-animation {
-      @apply expand-animation;
-    }
+  }
+  .btn-plain:hover {
+    color: var(--primary);
+  }
+  .btn-plain:not(.scale-animation) {
+    @apply hover:bg-[var(--btn-plain-bg-hover)] active:bg-[var(--btn-plain-bg-active)];
+  }
+  .btn-plain.scale-animation {
+    @apply expand-animation;
   }
 
   .btn-regular {
-    @apply flex items-center justify-center transition;
+    @apply flex items-center justify-center transition-all duration-200 cursor-pointer select-none font-medium;
     background: var(--btn-regular-bg);
     color: var(--btn-content);
     border-radius: var(--radius-medium);
@@ -66,14 +69,16 @@
 
   .btn-regular:hover {
     background: var(--btn-regular-bg-hover);
+    color: var(--primary);
   }
 
   .btn-regular:active {
     background: var(--btn-regular-bg-active);
+    transform: scale(0.96);
   }
 
   .btn-card {
-    @apply flex items-center justify-center transition;
+    @apply flex items-center justify-center transition-all duration-200 cursor-pointer select-none;
     background: var(--card-bg);
   }
 
@@ -83,17 +88,20 @@
 
   .btn-card:active {
     background: var(--btn-card-bg-active);
+    transform: scale(0.96);
   }
 
   /* === 链接样式 === */
   .link-underline {
-    @apply transition underline decoration-2 decoration-dashed;
+    @apply transition-colors duration-200 underline decoration-2 decoration-dashed cursor-pointer;
     text-decoration-color: var(--link-underline);
-    text-underline-offset: 0.25rem;
+    text-underline-offset: 0.3em;
   }
 
   .link-underline:hover {
-    text-decoration-color: var(--link-hover);
+    text-decoration-color: var(--primary);
+    color: var(--primary);
+    text-decoration-style: solid;
   }
 
   .link-underline:active {
@@ -102,23 +110,22 @@
 
   /* === 图标徽章 === */
   .meta-icon {
-    @apply flex items-center justify-center transition;
-    width: 2rem;
-    height: 2rem;
+    @apply flex items-center justify-center transition-colors duration-200;
+    width: 2.25rem;
+    height: 2.25rem;
     border-radius: var(--radius-small);
     background: var(--btn-regular-bg);
     color: var(--btn-content);
-    margin-right: 0.5rem;
+    margin-right: 0.75rem;
   }
 
   /* === 分隔符 === */
   .with-divider::before {
-    content: '/';
-    margin-left: 0.375rem;
-    margin-right: 0.375rem;
+    content: '·'; /* 使用中间点代替斜杠更优雅 */
+    margin-left: 0.5rem;
+    margin-right: 0.5rem;
     color: var(--meta-divider);
-    font-size: 0.875rem;
-    font-weight: 500;
+    font-weight: 700;
   }
 
   .with-divider:first-of-type::before {
@@ -129,26 +136,28 @@
   .float-panel {
     background: var(--float-panel-bg);
     border-radius: var(--radius-large);
-    @apply overflow-hidden transition shadow-xl;
+    @apply overflow-hidden transition-all duration-300;
+    box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.1);
+    border: 1px solid var(--border-light);
   }
 
   .dark .float-panel {
-    @apply shadow-none;
+    box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.5);
   }
 
   .float-panel-closed {
-    @apply -translate-y-1 opacity-0 pointer-events-none;
+    @apply -translate-y-2 opacity-0 pointer-events-none scale-95;
   }
 
   /* === 输入框 === */
   .input-base {
-    @apply w-full transition;
-    padding: 0.5rem 1rem;
+    @apply w-full transition-all duration-200;
+    padding: 0.625rem 1.25rem;
     border-radius: var(--radius-medium);
     background: var(--card-bg);
-    border: none;
+    border: 1px solid var(--border-light);
     color: var(--text-90);
-    box-shadow: none;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02) inset;
   }
 
   .input-base::placeholder {
@@ -157,7 +166,8 @@
 
   .input-base:focus {
     outline: none;
-    @apply ring-0;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px oklch(0.70 0.14 var(--hue) / 0.15); /* Primary color with opacity */
   }
 
   /* === 滚动条隐藏 === */
