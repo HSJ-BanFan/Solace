@@ -1,0 +1,172 @@
+/* ========================================
+   组件样式
+   ======================================== */
+
+@tailwind components;
+
+@layer components {
+  /* === 卡片 === */
+  .card-base {
+    background: var(--card-bg);
+    border-radius: var(--radius-large);
+    @apply overflow-hidden transition-all duration-200;
+  }
+
+  .card-shadow {
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.005));
+  }
+
+  /* === 文字层级 === */
+  .text-90 { color: var(--text-90); }
+  .text-75 { color: var(--text-75); }
+  .text-50 { color: var(--text-50); }
+  .text-30 { color: var(--text-30); }
+
+  /* === 按钮动画 (Fuwari expand-animation) === */
+  .expand-animation {
+    @apply relative before:ease-out before:transition z-0;
+  }
+
+  .expand-animation::before {
+    content: '';
+    @apply absolute rounded-[inherit] inset-0 scale-[0.85] -z-10;
+    background: transparent;
+  }
+
+  .expand-animation:hover::before {
+    background: var(--btn-plain-bg-hover);
+    @apply scale-100;
+  }
+
+  .expand-animation:active::before {
+    background: var(--btn-plain-bg-active);
+  }
+
+  /* === 按钮样式 === */
+  .btn-plain {
+    @apply transition relative flex items-center justify-center bg-none;
+    color: var(--text-75);
+    &:hover {
+      color: var(--primary);
+    }
+    &:not(.scale-animation) {
+      @apply hover:bg-[var(--btn-plain-bg-hover)] active:bg-[var(--btn-plain-bg-active)];
+    }
+    &.scale-animation {
+      @apply expand-animation;
+    }
+  }
+
+  .btn-regular {
+    @apply flex items-center justify-center transition;
+    background: var(--btn-regular-bg);
+    color: var(--btn-content);
+    border-radius: var(--radius-medium);
+  }
+
+  .btn-regular:hover {
+    background: var(--btn-regular-bg-hover);
+  }
+
+  .btn-regular:active {
+    background: var(--btn-regular-bg-active);
+  }
+
+  .btn-card {
+    @apply flex items-center justify-center transition;
+    background: var(--card-bg);
+  }
+
+  .btn-card:hover {
+    background: var(--btn-card-bg-hover);
+  }
+
+  .btn-card:active {
+    background: var(--btn-card-bg-active);
+  }
+
+  /* === 链接样式 === */
+  .link-underline {
+    @apply transition underline decoration-2 decoration-dashed;
+    text-decoration-color: var(--link-underline);
+    text-underline-offset: 0.25rem;
+  }
+
+  .link-underline:hover {
+    text-decoration-color: var(--link-hover);
+  }
+
+  .link-underline:active {
+    text-decoration-color: var(--link-active);
+  }
+
+  /* === 图标徽章 === */
+  .meta-icon {
+    @apply flex items-center justify-center transition;
+    width: 2rem;
+    height: 2rem;
+    border-radius: var(--radius-small);
+    background: var(--btn-regular-bg);
+    color: var(--btn-content);
+    margin-right: 0.5rem;
+  }
+
+  /* === 分隔符 === */
+  .with-divider::before {
+    content: '/';
+    margin-left: 0.375rem;
+    margin-right: 0.375rem;
+    color: var(--meta-divider);
+    font-size: 0.875rem;
+    font-weight: 500;
+  }
+
+  .with-divider:first-of-type::before {
+    display: none;
+  }
+
+  /* === 浮动面板 === */
+  .float-panel {
+    background: var(--float-panel-bg);
+    border-radius: var(--radius-large);
+    @apply overflow-hidden transition shadow-xl;
+  }
+
+  .dark .float-panel {
+    @apply shadow-none;
+  }
+
+  .float-panel-closed {
+    @apply -translate-y-1 opacity-0 pointer-events-none;
+  }
+
+  /* === 输入框 === */
+  .input-base {
+    @apply w-full transition;
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius-medium);
+    background: var(--card-bg);
+    border: none;
+    color: var(--text-90);
+    box-shadow: none;
+  }
+
+  .input-base::placeholder {
+    color: var(--text-50);
+  }
+
+  .input-base:focus {
+    outline: none;
+    @apply ring-0;
+  }
+
+  /* === 滚动条隐藏 === */
+  .hide-scrollbar {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+}

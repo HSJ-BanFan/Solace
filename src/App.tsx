@@ -14,6 +14,7 @@ import {
   AdminProfilePage,
 } from '@/pages';
 import { useAuthStore, useThemeStore } from '@/stores';
+import { useCurrentUser } from '@/hooks';
 import { useEffect } from 'react';
 
 // 受保护路由包装器
@@ -42,6 +43,20 @@ function ThemeInitializer() {
   return null;
 }
 
+// 初始化用户信息（刷新页面后更新头像等数据）
+function UserInitializer() {
+  const { isAuthenticated, setUser } = useAuthStore();
+  const { data: user } = useCurrentUser();
+
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      setUser(user);
+    }
+  }, [isAuthenticated, user, setUser]);
+
+  return null;
+}
+
 // 查询客户端
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -57,6 +72,7 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
         <ThemeInitializer />
+        <UserInitializer />
         <Routes>
           {/* 公开路由 */}
           <Route element={<MainLayout />}>

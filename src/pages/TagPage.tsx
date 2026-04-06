@@ -36,10 +36,10 @@ export function TagPage() {
       {/* Articles List */}
       {isLoading ? (
         <div className="card-base p-8 text-center text-50">Loading...</div>
-      ) : articlesData?.items && articlesData.items.length > 0 ? (
+      ) : articlesData?.data && articlesData.data.length > 0 ? (
         <>
           <div className="space-y-0">
-            {articlesData.items.map((article) => (
+            {articlesData.data.map((article) => (
               <PostCard
                 key={article.id}
                 article={toPostCardArticle(article)}

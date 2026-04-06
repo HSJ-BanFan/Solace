@@ -1,0 +1,43 @@
+/* ========================================
+   Markdown 内容样式
+   ======================================== */
+
+.markdown-content h1,
+.markdown-content h2,
+.markdown-content h3 {
+  @apply font-bold mt-6 mb-3;
+}
+
+.markdown-content h1 { @apply text-2xl; }
+.markdown-content h2 { @apply text-xl; }
+.markdown-content h3 { @apply text-lg; }
+
+.markdown-content p {
+  @apply mb-4 leading-relaxed;
+  color: var(--text-75);
+}
+
+.markdown-content a {
+  color: var(--primary);
+  text-decoration: underline;
+  text-underline-offset: 0.2rem;
+}
+
+.markdown-content pre {
+  background: var(--codeblock-bg);
+  border-radius: var(--radius-large);
+  padding: 1rem;
+  overflow-x: auto;
+  @apply mb-4;
+}
+
+.markdown-content code {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.875rem;
+  color: var(--primary-light);
+}
+
+.markdown-content img {
+  border-radius: var(--radius-large);
+  @apply max-w-full h-auto mb-4;
+}

@@ -25,6 +25,28 @@ function extractData<T>(response: { success?: boolean; data?: T; error?: { messa
   return response.data as T;
 }
 
+// 从分页 API 响应中提取数据的辅助函数
+function extractPagedData<T>(response: {
+  success?: boolean;
+  data?: T[];
+  page?: number;
+  pageSize?: number;
+  total?: number;
+  totalPages?: number;
+  error?: { message?: string };
+}): PagedResponse<T> {
+  if (!response.success) {
+    throw new Error(response.error?.message || 'API请求失败');
+  }
+  return {
+    data: response.data ?? [],
+    page: response.page ?? 1,
+    pageSize: response.pageSize ?? 10,
+    total: response.total ?? 0,
+    totalPages: response.totalPages ?? 0,
+  };
+}
+
 // ============ 文章相关钩子 ============
 
 export function useArticles(params: {
@@ -46,7 +68,7 @@ export function useArticles(params: {
         params.category,
         params.tag
       );
-      return extractData<PagedResponse<ArticleSummary>>(response);
+      return extractPagedData<ArticleSummary>(response as any);
     },
   });
 }
@@ -89,7 +111,7 @@ export function useSearch(query: string, page = 1, pageSize = 10) {
     queryKey: ['search', query, page, pageSize],
     queryFn: async () => {
       const response = await apiClient.article.getArticlesSearch(query, page, pageSize);
-      return extractData<PagedResponse<ArticleSummary>>(response);
+      return extractPagedData<ArticleSummary>(response as any);
     },
     enabled: query.length >= 2,
   });
@@ -202,7 +224,15 @@ export function useLogin() {
         access_token: string;
         refresh_token: string;
         expires_in: number;
-        user: { id: number; username: string; email: string; nickname?: string; role: string };
+        user: {
+          id: number;
+          username: string;
+          email: string;
+          nickname?: string;
+          avatar_url?: string;
+          bio?: string;
+          role: string;
+        };
       }>(response);
     },
     onSuccess: (response) => {
@@ -225,7 +255,15 @@ export function useRegister() {
         access_token: string;
         refresh_token: string;
         expires_in: number;
-        user: { id: number; username: string; email: string; nickname?: string; role: string };
+        user: {
+          id: number;
+          username: string;
+          email: string;
+          nickname?: string;
+          avatar_url?: string;
+          bio?: string;
+          role: string;
+        };
       }>(response);
     },
     onSuccess: (response) => {
@@ -256,17 +294,23 @@ export function useCurrentUser() {
   return useQuery({
     queryKey: ['currentUser'],
     queryFn: async () => {
-      const response = await apiClient.user.getUsersMe();
-      return extractData<{
-        id: number;
-        username: string;
-        email: string;
-        nickname?: string;
-        avatar_url?: string;
-        bio?: string;
-        role: string;
-        created_at: string;
-      }>(response);
+      try {
+        const response = await apiClient.user.getUsersMe();
+        return extractData<{
+          id: number;
+          username: string;
+          email: string;
+          nickname?: string;
+          avatar_url?: string;
+          bio?: string;
+          role: string;
+          created_at: string;
+        }>(response);
+      } catch (error) {
+        // 如果认证失败，返回 null 而不是抛出错误
+        console.error('Failed to fetch current user:', error);
+        return null;
+      }
     },
     enabled: isAuthenticated && !!accessToken,
   });

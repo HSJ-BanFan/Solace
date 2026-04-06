@@ -95,16 +95,16 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
 
         {/* Results */}
         <div className="max-h-[60vh] overflow-y-auto">
-          {query.trim() && !isLoading && searchResults?.items?.length === 0 && (
+          {query.trim() && !isLoading && searchResults?.data?.length === 0 && (
             <div className="p-8 text-center text-50">
               <Icon icon="material-symbols:search-off-rounded" className="text-4xl mb-2" />
               <p>No results found for "{query}"</p>
             </div>
           )}
 
-          {searchResults?.items && searchResults.items.length > 0 && (
+          {searchResults?.data && searchResults.data.length > 0 && (
             <div className="p-2">
-              {searchResults.items.map((article) => (
+              {searchResults.data.map((article) => (
                 <button
                   key={article.id}
                   onClick={() => handleSelect(article.slug)}

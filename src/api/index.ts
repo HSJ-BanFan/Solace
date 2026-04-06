@@ -51,10 +51,14 @@ function updateStoredTokens(accessToken: string, refreshToken: string) {
   }
 }
 
-// Clear auth storage
+// Clear auth storage and redirect to login
 export function clearAuthStorage() {
   localStorage.removeItem('auth-storage');
   window.dispatchEvent(new CustomEvent('auth:logout'));
+  // 重定向到登录页
+  if (window.location.pathname !== '/login' && window.location.pathname !== '/register') {
+    window.location.href = '/login';
+  }
 }
 
 // Refresh token API call
@@ -155,6 +159,11 @@ window.fetch = async (input: RequestInfo | URL, init?: RequestInit): Promise<Res
     } else {
       // Clear auth and redirect to login
       clearAuthStorage();
+      // 返回一个新的错误响应，避免原始 401 响应被处理
+      return new Response(JSON.stringify({ success: false, error: { code: 'SESSION_EXPIRED', message: '会话已过期，请重新登录' } }), {
+        status: 401,
+        headers: { 'Content-Type': 'application/json' },
+      });
     }
   }
 

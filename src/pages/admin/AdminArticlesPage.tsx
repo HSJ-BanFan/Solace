@@ -44,7 +44,7 @@ export function AdminArticlesPage() {
     );
   }
 
-  const articles = data?.items ?? [];
+  const articles = data?.data ?? [];
   const total = data?.total ?? 0;
 
   return (

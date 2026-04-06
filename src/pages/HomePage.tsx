@@ -32,7 +32,7 @@ export function HomePage() {
     );
   }
 
-  const articles = data?.items ?? [];
+  const articles = data?.data ?? [];
   const total = data?.total ?? 0;
 
   if (articles.length === 0) {

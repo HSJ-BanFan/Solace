@@ -10,10 +10,11 @@ export interface ApiResponse<T> {
 }
 
 export interface PagedResponse<T> {
-  items: T[];
+  data: T[];
   page: number;
   pageSize: number;
   total: number;
+  totalPages: number;
 }
 
 // User Types
@@ -97,17 +98,11 @@ export interface ArticleSummary {
   created_at: string;
 }
 
-// Archive Types
-export interface ArchiveMonth {
-  month: number;
-  count: number;
-  articles: ArticleSummary[];
-}
-
+// Archive Types (按年份分组)
 export interface ArchiveGroup {
   year: number;
   count: number;
-  months: ArchiveMonth[];
+  posts: ArticleSummary[];
 }
 
 // Component Props Types
