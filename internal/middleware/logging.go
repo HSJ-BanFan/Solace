@@ -3,8 +3,8 @@ package middleware
 import (
 	"time"
 
-	"github.com/gin-gonic/gin"
 	"gin-quickstart/internal/pkg/logger"
+	"github.com/gin-gonic/gin"
 )
 
 // Logging 请求日志中间件

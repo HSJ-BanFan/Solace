@@ -1,7 +1,6 @@
 package errors
 
 import (
-	"fmt"
 	"net/http"
 )
 
@@ -39,12 +38,6 @@ func (e *appError) Details() interface{} {
 
 // 常用预定义错误
 var (
-	ErrBadRequest = &appError{
-		code:       "BAD_REQUEST",
-		message:    "无效的请求",
-		httpStatus: http.StatusBadRequest,
-	}
-
 	ErrUnauthorized = &appError{
 		code:       "UNAUTHORIZED",
 		message:    "需要身份验证",
@@ -55,24 +48,6 @@ var (
 		code:       "FORBIDDEN",
 		message:    "访问被拒绝",
 		httpStatus: http.StatusForbidden,
-	}
-
-	ErrNotFound = &appError{
-		code:       "NOT_FOUND",
-		message:    "资源未找到",
-		httpStatus: http.StatusNotFound,
-	}
-
-	ErrConflict = &appError{
-		code:       "CONFLICT",
-		message:    "资源已存在",
-		httpStatus: http.StatusConflict,
-	}
-
-	ErrInternal = &appError{
-		code:       "INTERNAL_ERROR",
-		message:    "服务器内部错误",
-		httpStatus: http.StatusInternalServerError,
 	}
 )
 
@@ -86,24 +61,6 @@ func NewBadRequest(message string, details interface{}) AppError {
 	}
 }
 
-// NewNotFound 创建未找到错误
-func NewNotFound(resource string) AppError {
-	return &appError{
-		code:       "NOT_FOUND",
-		message:    resource + " 未找到",
-		httpStatus: http.StatusNotFound,
-	}
-}
-
-// NewConflict 创建冲突错误
-func NewConflict(message string) AppError {
-	return &appError{
-		code:       "CONFLICT",
-		message:    message,
-		httpStatus: http.StatusConflict,
-	}
-}
-
 // NewUnauthorized 创建未授权错误
 func NewUnauthorized(message string) AppError {
 	return &appError{
@@ -111,20 +68,6 @@ func NewUnauthorized(message string) AppError {
 		message:    message,
 		httpStatus: http.StatusUnauthorized,
 	}
-}
-
-// NewForbidden 创建禁止访问错误
-func NewForbidden(message string) AppError {
-	return &appError{
-		code:       "FORBIDDEN",
-		message:    message,
-		httpStatus: http.StatusForbidden,
-	}
-}
-
-// Wrap 包装错误并添加上下文
-func Wrap(err error, message string) error {
-	return fmt.Errorf("%s: %w", message, err)
 }
 
 // IsAppError 检查错误是否为 AppError 类型

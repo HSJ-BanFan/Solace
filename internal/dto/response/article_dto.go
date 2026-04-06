@@ -59,18 +59,11 @@ type ArticleListResponse struct {
 	Total    int64             `json:"total"`
 }
 
-// ArchiveGroup 归档分组
+// ArchiveGroup 归档分组（按年份）
 type ArchiveGroup struct {
-	Year   int            `json:"year"`
-	Count  int            `json:"count"`
-	Months []ArchiveMonth `json:"months"`
-}
-
-// ArchiveMonth 月度归档
-type ArchiveMonth struct {
-	Month    int               `json:"month"`
-	Count    int               `json:"count"`
-	Articles []*ArticleSummary `json:"articles"`
+	Year  int               `json:"year"`
+	Count int               `json:"count"`
+	Posts []*ArticleSummary `json:"posts"`
 }
 
 // ArchiveResponse 归档响应

@@ -45,12 +45,3 @@ func GenerateWithTimestamp(s string) string {
 	timestamp := time.Now().Unix()
 	return fmt.Sprintf("%s-%d", slug, timestamp)
 }
-
-// GenerateUnique 通过追加后缀生成唯一 slug
-func GenerateUnique(base string, suffix string) string {
-	slug := Generate(base)
-	if suffix != "" {
-		return fmt.Sprintf("%s-%s", slug, suffix)
-	}
-	return slug
-}

@@ -4,8 +4,8 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/gin-gonic/gin"
 	apperrors "gin-quickstart/internal/pkg/errors"
+	"github.com/gin-gonic/gin"
 )
 
 // Response 标准 API 响应结构
@@ -51,7 +51,7 @@ func RespondWithCreated(c *gin.Context, data interface{}) {
 // RespondWithPaged 发送分页响应
 func RespondWithPaged(c *gin.Context, data interface{}, page, pageSize int, total int64) {
 	totalPages := int(total) / pageSize
-	if int(total) % pageSize > 0 {
+	if int(total)%pageSize > 0 {
 		totalPages++
 	}
 

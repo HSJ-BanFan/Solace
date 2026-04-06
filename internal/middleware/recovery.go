@@ -4,8 +4,8 @@ import (
 	"net/http"
 	"runtime/debug"
 
-	"github.com/gin-gonic/gin"
 	"gin-quickstart/internal/pkg/logger"
+	"github.com/gin-gonic/gin"
 )
 
 // Recovery 异常恢复中间件，捕获 panic 并返回 500 错误

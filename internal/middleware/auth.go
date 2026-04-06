@@ -3,11 +3,11 @@ package middleware
 import (
 	"strings"
 
-	"github.com/gin-gonic/gin"
 	apperrors "gin-quickstart/internal/pkg/errors"
 	"gin-quickstart/internal/pkg/jwt"
 	"gin-quickstart/internal/pkg/logger"
 	"gin-quickstart/internal/service"
+	"github.com/gin-gonic/gin"
 )
 
 // Auth JWT 认证中间件

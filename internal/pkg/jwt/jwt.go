@@ -1,7 +1,10 @@
 package jwt
 
 import (
+	"crypto/rand"
+	"encoding/hex"
 	"errors"
+	"strconv"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -61,8 +64,16 @@ func (j *JWTManager) GenerateRefreshToken(userID uint) (string, time.Time, error
 	now := time.Now()
 	expiresAt := now.Add(j.refreshDuration)
 
+	// 生成随机 ID 确保每次 token 都不同
+	randomBytes := make([]byte, 8)
+	if _, err := rand.Read(randomBytes); err != nil {
+		return "", time.Time{}, err
+	}
+	randomID := hex.EncodeToString(randomBytes)
+
 	claims := jwt.RegisteredClaims{
-		Subject:   string(rune(userID)),
+		ID:        randomID,
+		Subject:   strconv.FormatUint(uint64(userID), 10),
 		ExpiresAt: jwt.NewNumericDate(expiresAt),
 		IssuedAt:  jwt.NewNumericDate(now),
 		NotBefore: jwt.NewNumericDate(now),

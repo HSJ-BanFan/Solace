@@ -52,7 +52,6 @@ func parseLevel(level string) zerolog.Level {
 }
 
 // 辅助函数
-func Debug() *zerolog.Event { return Log.Debug() }
 func Info() *zerolog.Event  { return Log.Info() }
 func Warn() *zerolog.Event  { return Log.Warn() }
 func Error() *zerolog.Event { return Log.Error() }

@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"errors"
+	"sort"
 	"strings"
 	"time"
 
@@ -245,9 +246,8 @@ func (s *articleService) GetArchive(ctx context.Context) (*response.ArchiveRespo
 		return nil, err
 	}
 
-	// 按年份和月份分组
+	// 按年份分组
 	yearMap := make(map[int]*response.ArchiveGroup)
-	monthMap := make(map[string]*response.ArchiveMonth) // key: "year-month"
 
 	for _, article := range articles {
 		if article.PublishedAt == nil {
@@ -255,39 +255,30 @@ func (s *articleService) GetArchive(ctx context.Context) (*response.ArchiveRespo
 		}
 
 		year := article.PublishedAt.Year()
-		month := int(article.PublishedAt.Month())
-		key := string(rune(year)) + "-" + string(rune(month))
 
 		// 初始化年份组
 		if _, ok := yearMap[year]; !ok {
 			yearMap[year] = &response.ArchiveGroup{
-				Year:   year,
-				Count:  0,
-				Months: []response.ArchiveMonth{},
+				Year:  year,
+				Count: 0,
+				Posts: []*response.ArticleSummary{},
 			}
-		}
-
-		// 初始化月份组
-		if _, ok := monthMap[key]; !ok {
-			monthMap[key] = &response.ArchiveMonth{
-				Month:    month,
-				Count:    0,
-				Articles: []*response.ArticleSummary{},
-			}
-			yearMap[year].Months = append(yearMap[year].Months, *monthMap[key])
 		}
 
 		// 添加文章
-		monthMap[key].Articles = append(monthMap[key].Articles, toArticleSummary(article))
-		monthMap[key].Count++
+		yearMap[year].Posts = append(yearMap[year].Posts, toArticleSummary(article))
 		yearMap[year].Count++
 	}
 
-	// 转换为响应格式
+	// 转换为响应格式（按年份降序）
 	groups := make([]*response.ArchiveGroup, 0, len(yearMap))
 	for _, yearGroup := range yearMap {
 		groups = append(groups, yearGroup)
 	}
+	// 按年份降序排序
+	sort.Slice(groups, func(i, j int) bool {
+		return groups[i].Year > groups[j].Year
+	})
 
 	return &response.ArchiveResponse{Groups: groups}, nil
 }
@@ -440,22 +431,22 @@ func toArticleResponse(article *model.Article, prev, next *model.Article) *respo
 	readTime := calculateReadTime(wordCount)
 
 	resp := &response.ArticleResponse{
-		ID:        article.ID,
-		Title:     article.Title,
-		Slug:      article.Slug,
-		Content:   article.Content,
-		Summary:   article.Summary,
-		CoverImage: article.CoverImage,
-		AuthorID:  article.AuthorID,
-		Status:    article.Status,
-		ViewCount: article.ViewCount,
-		IsTop:     article.IsTop,
-		Version:   article.Version,
-		WordCount: wordCount,
-		ReadTime:  readTime,
+		ID:          article.ID,
+		Title:       article.Title,
+		Slug:        article.Slug,
+		Content:     article.Content,
+		Summary:     article.Summary,
+		CoverImage:  article.CoverImage,
+		AuthorID:    article.AuthorID,
+		Status:      article.Status,
+		ViewCount:   article.ViewCount,
+		IsTop:       article.IsTop,
+		Version:     article.Version,
+		WordCount:   wordCount,
+		ReadTime:    readTime,
 		PublishedAt: article.PublishedAt,
-		CreatedAt: article.CreatedAt,
-		UpdatedAt: article.UpdatedAt,
+		CreatedAt:   article.CreatedAt,
+		UpdatedAt:   article.UpdatedAt,
 	}
 
 	if article.Author != nil {
