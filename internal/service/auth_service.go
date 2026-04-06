@@ -15,14 +15,12 @@ import (
 
 var (
 	ErrInvalidCredentials = errors.New("邮箱或密码错误")
-	ErrUserAlreadyExists  = errors.New("该邮箱或用户名已被注册")
 	ErrTokenExpired       = errors.New("令牌已过期")
 	ErrTokenRevoked       = errors.New("令牌已被撤销")
 )
 
 // AuthService 认证业务逻辑接口
 type AuthService interface {
-	Register(ctx context.Context, req *request.RegisterRequest) (*response.AuthResponse, error)
 	Login(ctx context.Context, req *request.LoginRequest) (*response.AuthResponse, error)
 	Logout(ctx context.Context, refreshToken string) error
 	Refresh(ctx context.Context, req *request.RefreshTokenRequest) (*response.RefreshResponse, error)
@@ -50,37 +48,6 @@ func NewAuthService(
 		jwtManager:       jwtManager,
 		accessDuration:   accessDuration,
 	}
-}
-
-func (s *authService) Register(ctx context.Context, req *request.RegisterRequest) (*response.AuthResponse, error) {
-	// 检查用户是否已存在
-	if s.userRepo.ExistsByEmail(ctx, req.Email) {
-		return nil, ErrUserAlreadyExists
-	}
-	if s.userRepo.ExistsByUsername(ctx, req.Username) {
-		return nil, ErrUserAlreadyExists
-	}
-
-	// 哈希密码
-	passwordHash, err := hash.HashPassword(req.Password)
-	if err != nil {
-		return nil, err
-	}
-
-	// 创建用户
-	user := &model.User{
-		Username:     req.Username,
-		Email:        req.Email,
-		PasswordHash: passwordHash,
-		Role:         model.RoleUser,
-	}
-
-	if err := s.userRepo.Create(ctx, user); err != nil {
-		return nil, err
-	}
-
-	// 生成令牌
-	return s.generateTokens(ctx, user)
 }
 
 func (s *authService) Login(ctx context.Context, req *request.LoginRequest) (*response.AuthResponse, error) {
@@ -210,6 +177,7 @@ func toUserResponse(user *model.User) *response.UserResponse {
 		Nickname:  user.Nickname,
 		AvatarURL: user.AvatarURL,
 		Bio:       user.Bio,
+		GitHubURL: user.GitHubURL,
 		Role:      user.Role,
 		CreatedAt: user.CreatedAt,
 	}

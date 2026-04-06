@@ -13,6 +13,7 @@ import (
 	"gin-quickstart/internal/config"
 	_ "gin-quickstart/internal/docs" // swagger docs
 	"gin-quickstart/internal/handler"
+	"gin-quickstart/internal/model"
 	"gin-quickstart/internal/pkg/database"
 	"gin-quickstart/internal/pkg/jwt"
 	"gin-quickstart/internal/pkg/logger"
@@ -58,6 +59,16 @@ func main() {
 		logger.Fatal().Err(err).Msg("数据库连接失败")
 	}
 
+	// 自动迁移数据库表结构（只添加新字段，不修改现有索引）
+	// 手动添加 github_url 字段
+	if db.Migrator().HasColumn(&model.User{}, "github_url") == false {
+		if err := db.Exec("ALTER TABLE users ADD COLUMN github_url VARCHAR(500)").Error; err != nil {
+			logger.Warn().Err(err).Msg("添加 github_url 字段失败（可能已存在）")
+		} else {
+			logger.Info().Msg("成功添加 github_url 字段")
+		}
+	}
+
 	// 初始化仓储
 	userRepo := repository.NewUserRepository(db)
 	refreshTokenRepo := repository.NewRefreshTokenRepository(db)
@@ -80,13 +91,30 @@ func main() {
 		cfg.JWTAccessDuration,
 	)
 	userService := service.NewUserService(userRepo)
+	ownerService := service.NewOwnerService(userRepo)
 	articleService := service.NewArticleService(articleRepo, categoryRepo, tagRepo)
 	categoryService := service.NewCategoryService(categoryRepo)
 	tagService := service.NewTagService(tagRepo)
 
+	// 初始化管理员用户
+	if err := service.InitAdminUser(userRepo, service.AdminConfig{
+		Username:  cfg.AdminUsername,
+		Email:     cfg.AdminEmail,
+		Password:  cfg.AdminPassword,
+		Nickname:  cfg.AdminNickname,
+		AvatarURL: cfg.AdminAvatarURL,
+		Bio:       cfg.AdminBio,
+		GitHubURL: cfg.AdminGitHub,
+	}); err != nil {
+		logger.Warn().Err(err).Msg("初始化管理员用户失败（可能已存在）")
+	} else {
+		logger.Info().Msg("管理员用户初始化成功")
+	}
+
 	// 初始化处理器
 	authHandler := handler.NewAuthHandler(authService)
 	userHandler := handler.NewUserHandler(userService)
+	ownerHandler := handler.NewOwnerHandler(ownerService)
 	articleHandler := handler.NewArticleHandler(articleService)
 	categoryHandler := handler.NewCategoryHandler(categoryService)
 	tagHandler := handler.NewTagHandler(tagService)
@@ -98,6 +126,7 @@ func main() {
 		articleHandler,
 		categoryHandler,
 		tagHandler,
+		ownerHandler,
 		authService,
 	)
 	r := appRouter.Setup(cfg.ServerMode)

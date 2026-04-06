@@ -15,6 +15,7 @@ type User struct {
 	Nickname     string         `gorm:"type:varchar(100)" json:"nickname,omitempty"`
 	AvatarURL    string         `gorm:"type:varchar(500)" json:"avatar_url,omitempty"`
 	Bio          string         `gorm:"type:text" json:"bio,omitempty"`
+	GitHubURL    string         `gorm:"type:varchar(500);column:github_url" json:"github_url,omitempty"`
 	Role         string         `gorm:"type:varchar(20);default:user" json:"role"`
 	CreatedAt    time.Time      `json:"created_at"`
 	UpdatedAt    time.Time      `json:"updated_at"`

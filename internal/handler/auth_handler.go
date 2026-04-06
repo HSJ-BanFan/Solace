@@ -17,32 +17,6 @@ func NewAuthHandler(authService service.AuthService) *AuthHandler {
 	return &AuthHandler{authService: authService}
 }
 
-// Register 用户注册
-// @Summary 用户注册
-// @Tags auth
-// @Accept json
-// @Produce json
-// @Param request body request.RegisterRequest true "注册数据"
-// @Success 201 {object} Response
-// @Failure 400 {object} Response
-// @Failure 409 {object} Response
-// @Router /auth/register [post]
-func (h *AuthHandler) Register(c *gin.Context) {
-	var req request.RegisterRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
-		RespondWithError(c, apperrors.NewBadRequest("无效的请求体", nil))
-		return
-	}
-
-	resp, err := h.authService.Register(c.Request.Context(), &req)
-	if err != nil {
-		RespondWithError(c, err)
-		return
-	}
-
-	RespondWithCreated(c, resp)
-}
-
 // Login 用户登录
 // @Summary 用户登录
 // @Tags auth

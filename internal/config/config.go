@@ -33,6 +33,15 @@ type Config struct {
 
 	// Migration 迁移配置
 	MigrationPath string
+
+	// Admin 管理员（站长）配置
+	AdminUsername  string
+	AdminEmail     string
+	AdminPassword  string
+	AdminNickname  string
+	AdminAvatarURL string
+	AdminBio       string
+	AdminGitHub    string
 }
 
 // Load 从环境变量加载配置
@@ -59,6 +68,15 @@ func Load() *Config {
 		LogEnv:   getEnv("LOG_ENV", "development"),
 
 		MigrationPath: getEnv("MIGRATION_PATH", "migrations"),
+
+		// Admin 配置
+		AdminUsername:  getEnv("ADMIN_USERNAME", "admin"),
+		AdminEmail:     getEnv("ADMIN_EMAIL", "admin@example.com"),
+		AdminPassword:  getEnv("ADMIN_PASSWORD", "admin123"),
+		AdminNickname:  getEnv("ADMIN_NICKNAME", "博主"),
+		AdminAvatarURL: getEnv("ADMIN_AVATAR_URL", ""),
+		AdminBio:       getEnv("ADMIN_BIO", "欢迎来到我的博客"),
+		AdminGitHub:    getEnv("ADMIN_GITHUB", ""),
 	}
 }
 

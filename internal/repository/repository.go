@@ -12,6 +12,7 @@ type UserRepository interface {
 	FindByID(ctx context.Context, id uint) (*model.User, error)
 	FindByEmail(ctx context.Context, email string) (*model.User, error)
 	FindByUsername(ctx context.Context, username string) (*model.User, error)
+	FindAll(ctx context.Context) ([]*model.User, error)
 	Create(ctx context.Context, user *model.User) error
 	Update(ctx context.Context, user *model.User) error
 	Delete(ctx context.Context, id uint) error
@@ -115,6 +116,15 @@ func (r *userRepo) FindByUsername(ctx context.Context, username string) (*model.
 		return nil, err
 	}
 	return &user, nil
+}
+
+func (r *userRepo) FindAll(ctx context.Context) ([]*model.User, error) {
+	var users []*model.User
+	err := r.db.WithContext(ctx).Find(&users).Error
+	if err != nil {
+		return nil, err
+	}
+	return users, nil
 }
 
 func (r *userRepo) Create(ctx context.Context, user *model.User) error {

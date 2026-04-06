@@ -17,6 +17,7 @@ type Router struct {
 	articleHandler *handler.ArticleHandler
 	categoryHandler *handler.CategoryHandler
 	tagHandler     *handler.TagHandler
+	ownerHandler   *handler.OwnerHandler
 	authService    service.AuthService
 }
 
@@ -27,6 +28,7 @@ func NewRouter(
 	articleHandler *handler.ArticleHandler,
 	categoryHandler *handler.CategoryHandler,
 	tagHandler *handler.TagHandler,
+	ownerHandler *handler.OwnerHandler,
 	authService service.AuthService,
 ) *Router {
 	return &Router{
@@ -35,6 +37,7 @@ func NewRouter(
 		articleHandler: articleHandler,
 		categoryHandler: categoryHandler,
 		tagHandler:     tagHandler,
+		ownerHandler:   ownerHandler,
 		authService:    authService,
 	}
 }
@@ -61,10 +64,12 @@ func (r *Router) Setup(mode string) *gin.Engine {
 		// 健康检查
 		v1.GET("/health", handler.HealthCheck)
 
-		// 认证路由（公开）
+		// 站长信息（公开）
+		v1.GET("/owner", r.ownerHandler.GetOwner)
+
+		// 认证路由（公开）- 移除注册
 		auth := v1.Group("/auth")
 		{
-			auth.POST("/register", r.authHandler.Register)
 			auth.POST("/login", r.authHandler.Login)
 			auth.POST("/refresh", r.authHandler.Refresh)
 			auth.POST("/logout", r.authHandler.Logout)

@@ -18,6 +18,7 @@ type UserResponse struct {
 	Nickname  string    `json:"nickname,omitempty"`
 	AvatarURL string    `json:"avatar_url,omitempty"`
 	Bio       string    `json:"bio,omitempty"`
+	GitHubURL string    `json:"github_url,omitempty"`
 	Role      string    `json:"role"`
 	CreatedAt time.Time `json:"created_at"`
 }
