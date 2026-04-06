@@ -1,7 +1,7 @@
 /* generated using openapi-typescript-codegen -- do not edit */
 /* istanbul ignore file */
 /* tslint:disable */
- 
+/* eslint-disable */
 import type { handler_Response } from '../models/handler_Response';
 import type { request_CreateTagRequest } from '../models/request_CreateTagRequest';
 import type { request_UpdateTagRequest } from '../models/request_UpdateTagRequest';

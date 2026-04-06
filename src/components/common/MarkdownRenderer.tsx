@@ -3,6 +3,7 @@ import remarkGfm from 'remark-gfm';
 import React, { memo, useEffect, useMemo } from 'react';
 import type { TocHeading } from '@/components/widget/TableOfContents';
 import { CodeBlock } from './CodeBlock';
+import { LazyImage } from './LazyImage';
 
 interface MarkdownRendererProps {
   content: string;
@@ -171,11 +172,11 @@ export const MarkdownRenderer = memo(function MarkdownRenderer({ content, classN
 
     // 图片
     img: ({ src, alt }: { src?: string; alt?: string }) => (
-      <img
-        src={src}
+      <LazyImage
+        src={src || ''}
         alt={alt}
         className="max-w-full h-auto rounded-[var(--radius-large)] my-4 mx-auto"
-        loading="lazy"
+        effect="blur"
       />
     ),
 

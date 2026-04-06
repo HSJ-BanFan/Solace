@@ -1,4 +1,4 @@
-import { Outlet } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
 import { Navbar, Footer } from '@/components/common';
 import { Icon } from '@iconify/react';
 import { Link } from 'react-router-dom';
@@ -6,12 +6,21 @@ import { useAuthStore } from '@/stores';
 
 export function AdminLayout() {
   const { user } = useAuthStore();
+  const location = useLocation();
 
   const navItems = [
     { name: '文章管理', path: '/admin', icon: 'material-symbols:article-outline-rounded' },
     { name: '新建文章', path: '/admin/articles/new', icon: 'material-symbols:add-rounded' },
-    { name: '个人资料', path: '/admin/profile', icon: 'material-symbols:person-outline-rounded' },
+    { name: '分类管理', path: '/admin/categories', icon: 'material-symbols:category-outline-rounded' },
+    { name: '标签管理', path: '/admin/tags', icon: 'material-symbols:label-outline-rounded' },
   ];
+
+  const isActive = (path: string) => {
+    if (path === '/admin') {
+      return location.pathname === '/admin' || location.pathname.startsWith('/admin/articles');
+    }
+    return location.pathname === path;
+  };
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -36,7 +45,11 @@ export function AdminLayout() {
                   <Link
                     key={item.path}
                     to={item.path}
-                    className="btn-plain rounded-lg py-2 px-3 text-sm"
+                    className={`rounded-lg py-2 px-3 text-sm transition-colors ${
+                      isActive(item.path)
+                        ? 'bg-[var(--btn-regular-bg)] text-[var(--primary)] font-medium'
+                        : 'btn-plain'
+                    }`}
                   >
                     <Icon icon={item.icon} className="mr-2 text-lg" />
                     {item.name}

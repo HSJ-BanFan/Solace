@@ -8,10 +8,10 @@ import {
   CategoryPage,
   TagPage,
   LoginPage,
-  RegisterPage,
   AdminArticlesPage,
   ArticleEditorPage,
-  AdminProfilePage,
+  AdminCategoriesPage,
+  AdminTagsPage,
 } from '@/pages';
 import { useAuthStore, useThemeStore } from '@/stores';
 import { useCurrentUser } from '@/hooks';
@@ -86,7 +86,6 @@ function App() {
           {/* 认证路由 */}
           <Route element={<AuthLayout />}>
             <Route path="/login" element={<LoginPage />} />
-            <Route path="/register" element={<RegisterPage />} />
           </Route>
 
           {/* 管理后台路由（受保护） */}
@@ -100,7 +99,8 @@ function App() {
             <Route path="/admin" element={<AdminArticlesPage />} />
             <Route path="/admin/articles/new" element={<ArticleEditorPage />} />
             <Route path="/admin/articles/:id/edit" element={<ArticleEditorPage />} />
-            <Route path="/admin/profile" element={<AdminProfilePage />} />
+            <Route path="/admin/categories" element={<AdminCategoriesPage />} />
+            <Route path="/admin/tags" element={<AdminTagsPage />} />
           </Route>
 
           {/* 回退路由 */}

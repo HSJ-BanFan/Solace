@@ -25,9 +25,18 @@ export interface User {
   nickname?: string;
   avatar_url?: string;
   bio?: string;
+  github_url?: string;
   role: string;
   created_at: string;
   updated_at: string;
+}
+
+// Owner Types (站长公开信息)
+export interface Owner {
+  nickname?: string;
+  avatar_url?: string;
+  bio?: string;
+  github_url?: string;
 }
 
 // Category Types

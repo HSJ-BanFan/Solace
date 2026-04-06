@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useArticle, useCreateArticle, useUpdateArticle } from '@/hooks';
+import { useArticle, useCreateArticle, useUpdateArticle, useCategories, useTags } from '@/hooks';
 import { LoadingButton, InputField, TextAreaField } from '@/components';
 import { Icon } from '@iconify/react';
 import { request_CreateArticleRequest } from '@/api';
@@ -11,12 +11,17 @@ export function ArticleEditorPage() {
   const isEdit = Boolean(id);
 
   const { data: existingArticle } = useArticle(Number(id) || 0);
+  const { data: categories } = useCategories();
+  const { data: tags } = useTags();
   const createMutation = useCreateArticle();
   const updateMutation = useUpdateArticle();
 
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [summary, setSummary] = useState('');
+  const [coverImage, setCoverImage] = useState('');
+  const [categoryId, setCategoryId] = useState<number | undefined>(undefined);
+  const [selectedTagIds, setSelectedTagIds] = useState<number[]>([]);
   const [status, setStatus] = useState<request_CreateArticleRequest.status>(request_CreateArticleRequest.status.DRAFT);
   const [error, setError] = useState('');
 
@@ -26,9 +31,20 @@ export function ArticleEditorPage() {
       setTitle(existingArticle.title);
       setContent(existingArticle.content);
       setSummary(existingArticle.summary || '');
+      setCoverImage(existingArticle.cover_image || '');
+      setCategoryId(existingArticle.category?.id);
+      setSelectedTagIds(existingArticle.tags?.map(t => t.id) || []);
       setStatus(existingArticle.status as request_CreateArticleRequest.status);
     }
   }, [existingArticle]);
+
+  const toggleTag = (tagId: number) => {
+    setSelectedTagIds(prev =>
+      prev.includes(tagId)
+        ? prev.filter(id => id !== tagId)
+        : [...prev, tagId]
+    );
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -45,25 +61,27 @@ export function ArticleEditorPage() {
     }
 
     try {
+      const articleData = {
+        title,
+        content,
+        summary,
+        cover_image: coverImage || undefined,
+        category_id: categoryId,
+        tag_ids: selectedTagIds.length > 0 ? selectedTagIds : undefined,
+        status,
+      };
+
       if (isEdit && id) {
         await updateMutation.mutateAsync({
           id: Number(id),
           data: {
-            title,
-            content,
-            summary,
-            status,
+            ...articleData,
             version: existingArticle?.version || 1,
           },
         });
         navigate('/admin');
       } else {
-        await createMutation.mutateAsync({
-          title,
-          content,
-          summary,
-          status,
-        });
+        await createMutation.mutateAsync(articleData);
         navigate('/admin');
       }
     } catch (err) {
@@ -101,6 +119,14 @@ export function ArticleEditorPage() {
           required
         />
 
+        <InputField
+          label="封面图片"
+          value={coverImage}
+          onChange={setCoverImage}
+          placeholder="https://example.com/cover.jpg"
+          type="url"
+        />
+
         <TextAreaField
           label="摘要"
           value={summary}
@@ -108,6 +134,47 @@ export function ArticleEditorPage() {
           placeholder="文章简要摘要"
           rows={2}
         />
+
+        {/* 分类选择 */}
+        <div className="mb-4">
+          <label className="block text-75 text-sm font-medium mb-2">分类</label>
+          <select
+            value={categoryId || ''}
+            onChange={(e) => setCategoryId(e.target.value ? Number(e.target.value) : undefined)}
+            className="input-base"
+          >
+            <option value="">无分类</option>
+            {categories?.map((cat) => (
+              <option key={cat.id} value={cat.id}>
+                {cat.name}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* 标签选择 */}
+        <div className="mb-4">
+          <label className="block text-75 text-sm font-medium mb-2">标签</label>
+          <div className="flex flex-wrap gap-2">
+            {tags?.map((tag) => (
+              <button
+                key={tag.id}
+                type="button"
+                onClick={() => toggleTag(tag.id)}
+                className={`rounded-full py-1.5 px-3 text-sm font-medium transition-all scale-animation ripple ${
+                  selectedTagIds.includes(tag.id)
+                    ? 'bg-gradient-to-r from-[var(--klein-blue)] to-[var(--klein-blue-light)] text-white'
+                    : 'btn-regular'
+                }`}
+              >
+                {tag.name}
+              </button>
+            ))}
+            {(!tags || tags.length === 0) && (
+              <span className="text-50 text-sm">暂无标签，请先创建标签</span>
+            )}
+          </div>
+        </div>
 
         <TextAreaField
           label="内容"

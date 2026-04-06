@@ -39,13 +39,13 @@ function getLanguageName(lang: string): string {
   return LANGUAGE_NAMES[normalized] || normalized.toUpperCase();
 }
 
-// 模拟 Mac 窗口控制按钮
+// 模拟 Mac 窗口控制按钮（更小的尺寸）
 const WindowControls = memo(function WindowControls() {
   return (
-    <div className="flex items-center gap-1.5 ml-1">
-      <div className="w-3 h-3 rounded-full bg-[#ff5f56] border border-[#e0443e] shadow-sm"></div>
-      <div className="w-3 h-3 rounded-full bg-[#ffbd2e] border border-[#dea123] shadow-sm"></div>
-      <div className="w-3 h-3 rounded-full bg-[#27c93f] border border-[#1aab29] shadow-sm"></div>
+    <div className="flex items-center gap-1">
+      <div className="w-2.5 h-2.5 rounded-full bg-[#ff5f56] border border-[#e0443e]"></div>
+      <div className="w-2.5 h-2.5 rounded-full bg-[#ffbd2e] border border-[#dea123]"></div>
+      <div className="w-2.5 h-2.5 rounded-full bg-[#27c93f] border border-[#1aab29]"></div>
     </div>
   );
 });
@@ -114,14 +114,14 @@ export const CodeBlock = memo(function CodeBlock({ children, language, className
     <div className="code-block group my-6 rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300" style={{ border: `1px solid ${theme.border}`, backgroundColor: theme.bg }}>
       {/* 头部：Mac 按钮 + 语言标识 + 复制按钮 */}
       <div
-        className="flex items-center justify-between px-4 py-2.5 relative"
+        className="flex items-center justify-between px-3 py-1 relative"
         style={{ backgroundColor: theme.headerBg, borderBottom: `1px solid ${theme.border}` }}
       >
         <WindowControls />
 
         {/* 语言显示居中 */}
         <span
-          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-xs font-medium tracking-wider"
+          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-[0.7rem] font-medium tracking-wider"
           style={{ color: 'var(--codeblock-lang-color, #888)', fontFamily: "'JetBrains Mono Variable', monospace" }}
         >
           {langDisplay}
@@ -130,7 +130,7 @@ export const CodeBlock = memo(function CodeBlock({ children, language, className
         {/* 复制按钮 */}
         <button
           onClick={handleCopy}
-          className="flex items-center justify-center w-7 h-7 rounded-md transition-all duration-200 opacity-0 group-hover:opacity-100"
+          className="flex items-center justify-center w-6 h-6 rounded transition-all duration-200 opacity-0 group-hover:opacity-100"
           style={{ backgroundColor: theme.btnBg, color: theme.text }}
           aria-label="Copy code"
           title="Copy code"
@@ -138,9 +138,9 @@ export const CodeBlock = memo(function CodeBlock({ children, language, className
           onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = theme.btnBg)}
         >
           {copied ? (
-            <Icon icon="lucide:check" className="w-4 h-4 text-green-500" />
+            <Icon icon="lucide:check" className="w-3.5 h-3.5 text-green-500" />
           ) : (
-            <Icon icon="lucide:copy" className="w-4 h-4" />
+            <Icon icon="lucide:copy" className="w-3.5 h-3.5" />
           )}
         </button>
       </div>
@@ -149,17 +149,17 @@ export const CodeBlock = memo(function CodeBlock({ children, language, className
       <div className="flex relative">
         {/* 行号列 */}
         <div
-          className="flex-shrink-0 py-[1rem] pr-3 pl-4 text-right select-none border-r"
+          className="flex-shrink-0 py-[0.75rem] pr-2 pl-2.5 text-right select-none border-r"
           style={{
             backgroundColor: theme.lineNumBg,
             borderColor: theme.border,
-            minWidth: '3.5rem',
+            minWidth: '2.5rem',
           }}
         >
           {Array.from({ length: lineCount }, (_, i) => (
             <div
               key={i}
-              className="text-[0.9rem] leading-[1.6]"
+              className="text-[0.85rem] leading-[1.6]"
               style={{ color: theme.lineNumColor, fontFamily: "'JetBrains Mono Variable', monospace" }}
             >
               {i + 1}
@@ -175,9 +175,9 @@ export const CodeBlock = memo(function CodeBlock({ children, language, className
             style={isDark ? oneDark : oneLight}
             customStyle={{
               margin: 0,
-              padding: '1rem',
+              padding: '0.75rem',
               background: 'transparent', // 确保无底色
-              fontSize: '0.9rem',
+              fontSize: '0.85rem',
               lineHeight: '1.6',
               fontFamily: "'JetBrains Mono Variable', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace",
             }}

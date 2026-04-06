@@ -1,6 +1,7 @@
 import { Icon } from '@iconify/react';
 import { Link } from 'react-router-dom';
 import { formatDate } from '@/utils/date';
+import { LazyImage } from './LazyImage';
 
 // 文章类型（匹配 API 响应）
 interface Article {
@@ -92,10 +93,12 @@ export function PostCard({ article, class: className, style }: PostCardProps) {
                 className="transition-bounce opacity-0 group-hover:opacity-100 scale-50 group-hover:scale-100 text-white text-5xl"
               />
             </div>
-            <img
-              src={article.cover_image}
+            <LazyImage
+              src={article.cover_image || ''}
               alt={article.title}
               className="w-full h-full object-cover transition-smooth group-hover:scale-105"
+              wrapperClassName="w-full h-full"
+              effect="blur"
             />
           </Link>
         )}

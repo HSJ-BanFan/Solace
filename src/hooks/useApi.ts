@@ -5,8 +5,11 @@ import type {
   request_CreateArticleRequest,
   request_UpdateArticleRequest,
   request_LoginRequest,
-  request_RegisterRequest,
   request_UpdateUserRequest,
+  request_CreateCategoryRequest,
+  request_UpdateCategoryRequest,
+  request_CreateTagRequest,
+  request_UpdateTagRequest,
 } from '@/api';
 import type {
   Article,
@@ -15,6 +18,7 @@ import type {
   Tag,
   ArchiveGroup,
   PagedResponse,
+  Owner,
 } from '@/types';
 
 // 从 API 响应中提取数据的辅助函数
@@ -210,6 +214,19 @@ export function useTagBySlug(slug: string) {
   });
 }
 
+// ============ 站长信息钩子 ============
+
+export function useOwner() {
+  return useQuery({
+    queryKey: ['owner'],
+    queryFn: async () => {
+      const response = await apiClient.owner.getOwner();
+      return extractData<Owner>(response);
+    },
+    staleTime: 30 * 60 * 1000, // 30 minutes
+  });
+}
+
 // ============ 认证相关钩子 ============
 export function useLogin() {
   const { login } = useAuthStore();
@@ -231,37 +248,7 @@ export function useLogin() {
           nickname?: string;
           avatar_url?: string;
           bio?: string;
-          role: string;
-        };
-      }>(response);
-    },
-    onSuccess: (response) => {
-      login(response.access_token, response.refresh_token, response.user);
-    },
-  });
-}
-
-export function useRegister() {
-  const { login } = useAuthStore();
-
-  return useMutation({
-    mutationFn: async (data: request_RegisterRequest) => {
-      const response = await apiClient.auth.postAuthRegister({
-        username: data.username,
-        email: data.email,
-        password: data.password,
-      });
-      return extractData<{
-        access_token: string;
-        refresh_token: string;
-        expires_in: number;
-        user: {
-          id: number;
-          username: string;
-          email: string;
-          nickname?: string;
-          avatar_url?: string;
-          bio?: string;
+          github_url?: string;
           role: string;
         };
       }>(response);
@@ -336,6 +323,92 @@ export function useUpdateUser() {
     onSuccess: (user) => {
       setUser(user as any);
       queryClient.invalidateQueries({ queryKey: ['currentUser'] });
+    },
+  });
+}
+
+// ============ 分类管理钩子 ============
+
+export function useCreateCategory() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (data: request_CreateCategoryRequest) => {
+      const response = await apiClient.category.postCategories(data);
+      return extractData<Category>(response);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['categories'] });
+    },
+  });
+}
+
+export function useUpdateCategory() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ id, data }: { id: number; data: request_UpdateCategoryRequest }) => {
+      const response = await apiClient.category.putCategories(id, data);
+      return extractData<Category>(response);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['categories'] });
+    },
+  });
+}
+
+export function useDeleteCategory() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (id: number) => {
+      await apiClient.category.deleteCategories(id);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['categories'] });
+    },
+  });
+}
+
+// ============ 标签管理钩子 ============
+
+export function useCreateTag() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (data: request_CreateTagRequest) => {
+      const response = await apiClient.tag.postTags(data);
+      return extractData<Tag>(response);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tags'] });
+    },
+  });
+}
+
+export function useUpdateTag() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ id, data }: { id: number; data: request_UpdateTagRequest }) => {
+      const response = await apiClient.tag.putTags(id, data);
+      return extractData<Tag>(response);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tags'] });
+    },
+  });
+}
+
+export function useDeleteTag() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (id: number) => {
+      await apiClient.tag.deleteTags(id);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tags'] });
     },
   });
 }

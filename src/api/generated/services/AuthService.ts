@@ -1,11 +1,10 @@
 /* generated using openapi-typescript-codegen -- do not edit */
 /* istanbul ignore file */
 /* tslint:disable */
- 
+/* eslint-disable */
 import type { handler_Response } from '../models/handler_Response';
 import type { request_LoginRequest } from '../models/request_LoginRequest';
 import type { request_RefreshTokenRequest } from '../models/request_RefreshTokenRequest';
-import type { request_RegisterRequest } from '../models/request_RegisterRequest';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import type { BaseHttpRequest } from '../core/BaseHttpRequest';
 export class AuthService {
@@ -63,25 +62,6 @@ export class AuthService {
       errors: {
         400: `Bad Request`,
         401: `Unauthorized`,
-      },
-    });
-  }
-  /**
-   * 用户注册
-   * @param request 注册数据
-   * @returns handler_Response Created
-   * @throws ApiError
-   */
-  public postAuthRegister(
-    request: request_RegisterRequest,
-  ): CancelablePromise<handler_Response> {
-    return this.httpRequest.request({
-      method: 'POST',
-      url: '/auth/register',
-      body: request,
-      errors: {
-        400: `Bad Request`,
-        409: `Conflict`,
       },
     });
   }

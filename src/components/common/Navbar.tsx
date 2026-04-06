@@ -108,12 +108,6 @@ export function Navbar() {
                 >
                   登录
                 </Link>
-                <Link
-                  to="/register"
-                  className="btn-regular scale-animation rounded-lg h-11 px-3 active:scale-95 text-sm"
-                >
-                  注册
-                </Link>
               </div>
             )}
 
@@ -190,20 +184,6 @@ export function Navbar() {
                 >
                   <span className="text-75 font-bold group-hover:text-[var(--primary)] transition">
                     登录
-                  </span>
-                  <Icon
-                    icon="material-symbols:chevron-right-rounded"
-                    className="text-lg text-[var(--primary)]"
-                  />
-                </Link>
-                <Link
-                  to="/register"
-                  onClick={() => setShowMobileMenu(false)}
-                  className="group flex justify-between items-center py-2 pl-3 pr-1 rounded-lg
-                    hover:bg-[var(--btn-plain-bg-hover)] transition"
-                >
-                  <span className="text-75 font-bold group-hover:text-[var(--primary)] transition">
-                    注册
                   </span>
                   <Icon
                     icon="material-symbols:chevron-right-rounded"

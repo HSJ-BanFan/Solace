@@ -1,13 +1,14 @@
 /* generated using openapi-typescript-codegen -- do not edit */
 /* istanbul ignore file */
 /* tslint:disable */
- 
+/* eslint-disable */
 import type { BaseHttpRequest } from './core/BaseHttpRequest';
 import type { OpenAPIConfig } from './core/OpenAPI';
 import { FetchHttpRequest } from './core/FetchHttpRequest';
 import { ArticleService } from './services/ArticleService';
 import { AuthService } from './services/AuthService';
 import { CategoryService } from './services/CategoryService';
+import { OwnerService } from './services/OwnerService';
 import { TagService } from './services/TagService';
 import { UserService } from './services/UserService';
 type HttpRequestConstructor = new (config: OpenAPIConfig) => BaseHttpRequest;
@@ -15,6 +16,7 @@ export class ApiClient {
   public readonly article: ArticleService;
   public readonly auth: AuthService;
   public readonly category: CategoryService;
+  public readonly owner: OwnerService;
   public readonly tag: TagService;
   public readonly user: UserService;
   public readonly request: BaseHttpRequest;
@@ -33,6 +35,7 @@ export class ApiClient {
     this.article = new ArticleService(this.request);
     this.auth = new AuthService(this.request);
     this.category = new CategoryService(this.request);
+    this.owner = new OwnerService(this.request);
     this.tag = new TagService(this.request);
     this.user = new UserService(this.request);
   }

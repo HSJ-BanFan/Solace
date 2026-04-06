@@ -1,3 +1,4 @@
 export { AdminArticlesPage } from './AdminArticlesPage';
 export { ArticleEditorPage } from './ArticleEditorPage';
-export { AdminProfilePage } from './AdminProfilePage';
+export { AdminCategoriesPage } from './AdminCategoriesPage';
+export { AdminTagsPage } from './AdminTagsPage';

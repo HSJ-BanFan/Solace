@@ -16,6 +16,11 @@
   --primary: oklch(0.68 0.16 var(--hue)); /* 稍微提升亮度和饱和度 */
   --title-active: oklch(0.6 0.1 var(--hue));
 
+  /* === Klein Blue (渐变色) === */
+  --klein-blue: oklch(0.55 0.2 var(--hue));
+  --klein-blue-light: oklch(0.70 0.15 var(--hue));
+  --sky-blue: oklch(0.75 0.12 var(--hue));
+
   /* === 背景色 === */
   --page-bg: oklch(0.97 0.015 var(--hue)); /* 稍微增加一点背景的颜色倾向 */
   --card-bg: #ffffff;
@@ -80,6 +85,11 @@
   /* === 主色 === */
   --primary: oklch(0.75 0.16 var(--hue));
   --title-active: oklch(0.8 0.12 var(--hue));
+
+  /* === Klein Blue (渐变色 - 深色模式更亮) === */
+  --klein-blue: oklch(0.65 0.18 var(--hue));
+  --klein-blue-light: oklch(0.75 0.14 var(--hue));
+  --sky-blue: oklch(0.80 0.10 var(--hue));
 
   /* === 背景色 === */
   --page-bg: oklch(0.15 0.012 var(--hue)); /* 更深的背景，对比度更好 */

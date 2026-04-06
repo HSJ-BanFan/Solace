@@ -1,7 +1,7 @@
 /* generated using openapi-typescript-codegen -- do not edit */
 /* istanbul ignore file */
 /* tslint:disable */
- 
+/* eslint-disable */
 export { ApiClient } from './ApiClient';
 
 export { ApiError } from './core/ApiError';
@@ -17,7 +17,6 @@ export type { request_CreateCategoryRequest } from './models/request_CreateCateg
 export type { request_CreateTagRequest } from './models/request_CreateTagRequest';
 export type { request_LoginRequest } from './models/request_LoginRequest';
 export type { request_RefreshTokenRequest } from './models/request_RefreshTokenRequest';
-export type { request_RegisterRequest } from './models/request_RegisterRequest';
 export { request_UpdateArticleRequest } from './models/request_UpdateArticleRequest';
 export type { request_UpdateCategoryRequest } from './models/request_UpdateCategoryRequest';
 export type { request_UpdateTagRequest } from './models/request_UpdateTagRequest';
@@ -26,5 +25,6 @@ export type { request_UpdateUserRequest } from './models/request_UpdateUserReque
 export { ArticleService } from './services/ArticleService';
 export { AuthService } from './services/AuthService';
 export { CategoryService } from './services/CategoryService';
+export { OwnerService } from './services/OwnerService';
 export { TagService } from './services/TagService';
 export { UserService } from './services/UserService';
