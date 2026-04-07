@@ -1,3 +1,14 @@
+/**
+ * 应用根组件
+ *
+ * 结构：
+ * - QueryClientProvider: React Query 状态管理
+ * - BrowserRouter: 路由管理
+ * - ThemeInitializer: 主题初始化
+ * - UserInitializer: 用户信息初始化
+ * - Routes: 路由配置
+ */
+
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MainLayout, AuthLayout, AdminLayout } from '@/layouts';
@@ -17,7 +28,7 @@ import { useAuthStore, useThemeStore } from '@/stores';
 import { useCurrentUser } from '@/hooks';
 import { useEffect } from 'react';
 
-// 受保护路由包装器
+/** 受保护路由 - 未登录时跳转到登录页 */
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, accessToken } = useAuthStore();
 
@@ -28,7 +39,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
-// 初始化主题
+/** 主题初始化组件 - 根据状态切换深色模式 */
 function ThemeInitializer() {
   const { theme } = useThemeStore();
 
@@ -43,7 +54,7 @@ function ThemeInitializer() {
   return null;
 }
 
-// 初始化用户信息（刷新页面后更新头像等数据）
+/** 用户初始化组件 - 刷新后恢复用户信息 */
 function UserInitializer() {
   const { isAuthenticated, setUser } = useAuthStore();
   const { data: user } = useCurrentUser();
@@ -57,7 +68,7 @@ function UserInitializer() {
   return null;
 }
 
-// 查询客户端
+/** React Query 客户端配置 */
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -74,7 +85,7 @@ function App() {
         <ThemeInitializer />
         <UserInitializer />
         <Routes>
-          {/* 公开路由 */}
+          {/* 公开路由 - 主布局 */}
           <Route element={<MainLayout />}>
             <Route path="/" element={<HomePage />} />
             <Route path="/articles/:slug" element={<ArticleDetailPage />} />
@@ -83,12 +94,12 @@ function App() {
             <Route path="/tags/:slug" element={<TagPage />} />
           </Route>
 
-          {/* 认证路由 */}
+          {/* 认证路由 - 登录布局 */}
           <Route element={<AuthLayout />}>
             <Route path="/login" element={<LoginPage />} />
           </Route>
 
-          {/* 管理后台路由（受保护） */}
+          {/* 管理路由 - 需要登录 */}
           <Route
             element={
               <ProtectedRoute>

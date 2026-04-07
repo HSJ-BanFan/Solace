@@ -1,3 +1,9 @@
+/**
+ * 首页
+ *
+ * 展示已发布文章列表（分页）
+ */
+
 import { useState } from 'react';
 import { useArticles } from '@/hooks';
 import { PostCard, PostCardSkeletonList, Pagination, EmptyState, InlineLoader } from '@/components';

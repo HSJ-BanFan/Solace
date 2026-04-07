@@ -1,8 +1,14 @@
-export { ThemeToggle } from '../common/ThemeToggle';
-export { HuePicker } from './HuePicker';
-export { Profile } from './Profile';
-export { Categories } from './Categories';
-export { Tags } from './Tags';
-export { SideBar } from './SideBar';
-export { SearchModal } from './SearchModal';
-export { TableOfContents, type TocHeading } from './TableOfContents';
+/**
+ * Widget 组件导出
+ *
+ * 侧边栏相关组件：个人信息、分类、标签、搜索、目录等
+ */
+
+export { ThemeToggle } from "../common/ThemeToggle";
+export { HuePicker } from "./HuePicker";
+export { Profile } from "./Profile";
+export { Categories } from "./Categories";
+export { Tags } from "./Tags";
+export { SideBar } from "./SideBar";
+export { SearchModal } from "./SearchModal";
+export { TableOfContents, type TocHeading } from "./TableOfContents";
