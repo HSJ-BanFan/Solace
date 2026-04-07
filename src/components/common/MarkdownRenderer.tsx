@@ -1,3 +1,13 @@
+/**
+ * Markdown 渲染组件
+ *
+ * 将 Markdown 内容渲染为 HTML，支持：
+ * - GFM 语法（表格、任务列表等）
+ * - 代码高亮
+ * - 标题锚点
+ * - 目录提取
+ */
+
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import React, { memo, useEffect, useMemo } from 'react';
@@ -11,23 +21,22 @@ interface MarkdownRendererProps {
   onHeadingsExtracted?: (headings: TocHeading[]) => void;
 }
 
-// 生成标题 ID 的辅助函数
+/** 生成标题 ID */
 function generateHeadingId(text: string): string {
   return text
     .toLowerCase()
-    .replace(/[^\w\u4e00-\u9fa5\s-]/g, '') // 保留中文、英文、数字、空格、连字符
-    .replace(/\s+/g, '-') // 空格转连字符
-    .replace(/-+/g, '-') // 多个连字符合并
-    .replace(/^-|-$/g, ''); // 移除首尾连字符
+    .replace(/[^\w\u4e00-\u9fa5\s-]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '');
 }
 
-// 从 markdown 内容提取标题
+/** 从 markdown 内容提取标题 */
 export function extractHeadings(content: string): TocHeading[] {
   const headings: TocHeading[] = [];
   const lines = content.split('\n');
 
   lines.forEach((line) => {
-    // 匹配 ATX 风格标题 (# 标题)
     const match = line.match(/^(#{1,6})\s+(.+)$/);
     if (match && match[1] && match[2]) {
       const depth = match[1].length;
@@ -49,9 +58,9 @@ export const MarkdownRenderer = memo(function MarkdownRenderer({ content, classN
     }
   }, [content, onHeadingsExtracted]);
 
-  // 自定义组件
+  // 自定义渲染组件
   const components = useMemo(() => ({
-    // 标题添加锚点支持
+    // 标题
     h1: ({ children }: { children?: React.ReactNode }) => {
       const text = String(children || '');
       const id = generateHeadingId(text);
@@ -112,22 +121,17 @@ export const MarkdownRenderer = memo(function MarkdownRenderer({ content, classN
       </a>
     ),
 
-    // pre 元素 - 简化处理
-    pre: ({ children }: { children?: React.ReactNode }) => {
-      // 直接渲染 children（code 组件会处理代码块逻辑）
-      return <>{children}</>;
-    },
+    // pre 元素
+    pre: ({ children }: { children?: React.ReactNode }) => <>{children}</>,
 
-    // code 元素 - 处理代码块和行内代码
+    // code 元素
     code: ({ className, children }: { className?: string; children?: React.ReactNode }) => {
       const isBlock = className?.includes('hljs') || className?.includes('language-');
 
       if (isBlock) {
-        // 这是代码块，将 children 转为字符串
         const langMatch = className?.match(/language-(\w+)/);
         const lang = langMatch ? langMatch[1] : '';
 
-        // 提取纯文本内容
         const codeText = typeof children === 'string'
           ? children
           : React.Children.toArray(children)

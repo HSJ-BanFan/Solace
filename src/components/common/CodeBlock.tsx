@@ -1,3 +1,9 @@
+/**
+ * 代码块组件
+ *
+ * 支持 syntax 高亮、行号、复制功能
+ */
+
 import { memo, useState, useCallback, useEffect, useMemo } from 'react';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { oneDark, oneLight } from 'react-syntax-highlighter/dist/esm/styles/prism';
@@ -9,7 +15,7 @@ interface CodeBlockProps {
   className?: string;
 }
 
-// 语言显示名称映射
+/** 语言显示名称映射 */
 const LANGUAGE_NAMES: Record<string, string> = {
   js: 'JavaScript', javascript: 'JavaScript',
   ts: 'TypeScript', typescript: 'TypeScript',
@@ -39,7 +45,7 @@ function getLanguageName(lang: string): string {
   return LANGUAGE_NAMES[normalized] || normalized.toUpperCase();
 }
 
-// 模拟 Mac 窗口控制按钮（更小的尺寸）
+/** Mac 窗口控制按钮 */
 const WindowControls = memo(function WindowControls() {
   return (
     <div className="flex items-center gap-1">
@@ -50,6 +56,7 @@ const WindowControls = memo(function WindowControls() {
   );
 });
 
+/** 深色模式检测 hook */
 function useDarkMode(): boolean {
   const [isDark, setIsDark] = useState(() => {
     if (typeof document === 'undefined') return false;
@@ -85,11 +92,9 @@ export const CodeBlock = memo(function CodeBlock({ children, language, className
     }
   }, [children]);
 
-  // 行号数据
   const lines = children.split('\n');
   const lineCount = lines.length;
 
-  // 主题色配置统一使用 CSS 变量，但在组件内做回退保护
   const theme = useMemo(() => isDark ? {
     bg: 'var(--codeblock-bg, #282c34)',
     headerBg: 'var(--codeblock-header-bg, #21252b)',
@@ -119,7 +124,6 @@ export const CodeBlock = memo(function CodeBlock({ children, language, className
       >
         <WindowControls />
 
-        {/* 语言显示居中 */}
         <span
           className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-[0.7rem] font-medium tracking-wider"
           style={{ color: 'var(--codeblock-lang-color, #888)', fontFamily: "'JetBrains Mono Variable', monospace" }}
@@ -127,13 +131,12 @@ export const CodeBlock = memo(function CodeBlock({ children, language, className
           {langDisplay}
         </span>
 
-        {/* 复制按钮 */}
         <button
           onClick={handleCopy}
           className="flex items-center justify-center w-6 h-6 rounded transition-all duration-200 opacity-0 group-hover:opacity-100"
           style={{ backgroundColor: theme.btnBg, color: theme.text }}
-          aria-label="Copy code"
-          title="Copy code"
+          aria-label="复制代码"
+          title="复制代码"
           onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = theme.btnHover)}
           onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = theme.btnBg)}
         >
@@ -169,14 +172,13 @@ export const CodeBlock = memo(function CodeBlock({ children, language, className
 
         {/* 代码内容 */}
         <div className="flex-1 overflow-x-auto scrollbar-hide group-hover:scrollbar-default transition-all relative code-content-wrapper">
-          {/* 这里移除 SyntaxHighlighter 默认添加的背景色，仅使用其文字颜色和布局 */}
           <SyntaxHighlighter
             language={lang}
             style={isDark ? oneDark : oneLight}
             customStyle={{
               margin: 0,
               padding: '0.75rem',
-              background: 'transparent', // 确保无底色
+              background: 'transparent',
               fontSize: '0.85rem',
               lineHeight: '1.6',
               fontFamily: "'JetBrains Mono Variable', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace",
@@ -184,7 +186,7 @@ export const CodeBlock = memo(function CodeBlock({ children, language, className
             codeTagProps={{
               style: {
                 fontFamily: "'JetBrains Mono Variable', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace",
-                background: 'transparent', // 再次确保无底色
+                background: 'transparent',
               },
             }}
             PreTag="div"

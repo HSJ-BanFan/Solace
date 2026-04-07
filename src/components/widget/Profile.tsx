@@ -1,3 +1,9 @@
+/**
+ * 个人信息组件
+ *
+ * 展示站长头像、昵称、简介、社交链接
+ */
+
 import { Icon } from '@iconify/react';
 import { Link } from 'react-router-dom';
 import { useAuthStore } from '@/stores';

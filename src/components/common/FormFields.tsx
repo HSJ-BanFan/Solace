@@ -1,3 +1,10 @@
+/**
+ * 表单组件
+ *
+ * 包含带加载状态的按钮、输入框、文本域
+ */
+
+/** 带加载状态的按钮 */
 interface LoadingButtonProps {
   loading: boolean;
   onClick?: () => void;
@@ -33,6 +40,7 @@ export function LoadingButton({
   );
 }
 
+/** 输入框 */
 interface InputFieldProps {
   label: string;
   error?: string;
@@ -72,6 +80,7 @@ export function InputField({
   );
 }
 
+/** 文本域 */
 interface TextAreaFieldProps {
   label: string;
   error?: string;

@@ -1,3 +1,9 @@
+/**
+ * 标签列表组件
+ *
+ * 展示所有标签
+ */
+
 import { Link } from 'react-router-dom';
 import { useTags } from '@/hooks';
 
@@ -15,7 +21,7 @@ export function Tags({ className, style }: TagsProps) {
         <div className="font-bold text-lg text-90 relative ml-8 mt-4 mb-2
           before:w-1 before:h-4 before:rounded-md before:bg-[var(--primary)]
           before:absolute before:-left-4 before:top-[5.5px]">
-          Tags
+          标签
         </div>
         <div className="px-4 flex gap-2 flex-wrap">
           {[...Array(6)].map((_, index) => (
@@ -35,7 +41,7 @@ export function Tags({ className, style }: TagsProps) {
       <div className="font-bold text-lg text-90 relative ml-8 mt-4 mb-2
         before:w-1 before:h-4 before:rounded-md before:bg-[var(--primary)]
         before:absolute before:-left-4 before:top-[5.5px]">
-        Tags
+        标签
       </div>
       <div className="px-4 flex gap-2 flex-wrap">
         {tags.map((tag) => (

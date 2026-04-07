@@ -1,3 +1,9 @@
+/**
+ * 认证状态管理
+ *
+ * 管理用户登录状态和令牌
+ */
+
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { User } from '@/types';
@@ -61,7 +67,7 @@ export const useAuthStore = create<AuthState>()(
   )
 );
 
-// Listen for token refresh events from API interceptor
+// 监听 API 拦截器的令牌刷新事件
 if (typeof window !== 'undefined') {
   window.addEventListener('auth:token-refreshed', ((event: CustomEvent) => {
     const { accessToken, refreshToken } = event.detail;

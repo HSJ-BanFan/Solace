@@ -1,3 +1,9 @@
+/**
+ * 搜索弹窗组件
+ *
+ * 提供文章搜索功能
+ */
+
 import { useState, useEffect, useCallback } from 'react';
 import { Icon } from '@iconify/react';
 import { useNavigate } from 'react-router-dom';
@@ -14,7 +20,7 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
   const [debouncedQuery, setDebouncedQuery] = useState('');
   const navigate = useNavigate();
 
-  // Debounce search query
+  // 防抖搜索
   const debouncedSetQuery = useDebouncedCallback((value: string) => {
     setDebouncedQuery(value);
   }, 300);
@@ -47,12 +53,12 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
     };
   }, [isOpen, onClose]);
 
-  // Keyboard shortcut: Cmd/Ctrl + K
+  // 键盘快捷键：Cmd/Ctrl + K
   useEffect(() => {
     const handleShortcut = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
         e.preventDefault();
-        // Toggle search modal
+        // 切换搜索弹窗
       }
     };
     document.addEventListener('keydown', handleShortcut);
@@ -63,22 +69,22 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
 
   return (
     <div className="fixed inset-0 z-[100] flex items-start justify-center pt-20 fade-in-up">
-      {/* Backdrop */}
+      {/* 背景遮罩 */}
       <div
         className="absolute inset-0 bg-[var(--klein-blue)]/20 dark:bg-[var(--klein-blue)]/40 backdrop-blur-sm"
         onClick={onClose}
       />
 
-      {/* Modal */}
+      {/* 弹窗主体 */}
       <div className="relative float-panel w-full max-w-2xl mx-4 overflow-hidden">
-        {/* Search Input */}
+        {/* 搜索输入框 */}
         <div className="flex items-center gap-2 p-4 border-b border-[var(--border-light)]">
           <Icon icon="material-symbols:search-rounded" className="text-2xl text-[var(--primary)]" />
           <input
             type="text"
             value={query}
             onChange={(e) => handleQueryChange(e.target.value)}
-            placeholder="Search articles..."
+            placeholder="搜索文章..."
             className="input-base flex-1 border-none shadow-none focus:ring-0"
             autoFocus
           />
@@ -93,12 +99,12 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
           </button>
         </div>
 
-        {/* Results */}
+        {/* 搜索结果 */}
         <div className="max-h-[60vh] overflow-y-auto">
           {query.trim() && !isLoading && searchResults?.data?.length === 0 && (
             <div className="p-8 text-center text-50">
               <Icon icon="material-symbols:search-off-rounded" className="text-4xl mb-2" />
-              <p>No results found for "{query}"</p>
+              <p>未找到 "{query}" 的相关文章</p>
             </div>
           )}
 
@@ -132,8 +138,8 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
           {!query.trim() && (
             <div className="p-8 text-center text-50">
               <Icon icon="material-symbols:search-rounded" className="text-4xl mb-2 text-[var(--primary)]" />
-              <p>Type to search articles</p>
-              <p className="text-xs mt-1">Search by title or content</p>
+              <p>输入关键词搜索文章</p>
+              <p className="text-xs mt-1">支持标题和内容搜索</p>
             </div>
           )}
         </div>

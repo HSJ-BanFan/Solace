@@ -1,3 +1,9 @@
+/**
+ * 分页组件
+ *
+ * 显示页码导航，支持跳页
+ */
+
 import { Icon } from '@iconify/react';
 
 interface PaginationProps {
@@ -22,19 +28,19 @@ export function Pagination({ page, pageSize, total, onPageChange }: PaginationPr
 
   return (
     <div className="flex items-center justify-center gap-2">
-      {/* Previous */}
+      {/* 上一页 */}
       <button
         onClick={() => onPageChange(page - 1)}
         disabled={page === 1}
         className={`btn-card rounded-[var(--radius-medium)] h-10 w-10 scale-animation ripple ${
           page === 1 ? 'opacity-50 cursor-not-allowed' : ''
         }`}
-        aria-label="Previous page"
+        aria-label="上一页"
       >
         <Icon icon="material-symbols:chevron-left-rounded" className="text-xl" />
       </button>
 
-      {/* First page */}
+      {/* 首页 */}
       {start > 1 && (
         <>
           <button
@@ -47,7 +53,7 @@ export function Pagination({ page, pageSize, total, onPageChange }: PaginationPr
         </>
       )}
 
-      {/* Page numbers */}
+      {/* 页码 */}
       {pages.map((p) => (
         <button
           key={p}
@@ -62,7 +68,7 @@ export function Pagination({ page, pageSize, total, onPageChange }: PaginationPr
         </button>
       ))}
 
-      {/* Last page */}
+      {/* 末页 */}
       {end < totalPages && (
         <>
           {end < totalPages - 1 && <span className="text-30 px-1">...</span>}
@@ -75,14 +81,14 @@ export function Pagination({ page, pageSize, total, onPageChange }: PaginationPr
         </>
       )}
 
-      {/* Next */}
+      {/* 下一页 */}
       <button
         onClick={() => onPageChange(page + 1)}
         disabled={page === totalPages}
         className={`btn-card rounded-[var(--radius-medium)] h-10 w-10 scale-animation ripple ${
           page === totalPages ? 'opacity-50 cursor-not-allowed' : ''
         }`}
-        aria-label="Next page"
+        aria-label="下一页"
       >
         <Icon icon="material-symbols:chevron-right-rounded" className="text-xl" />
       </button>

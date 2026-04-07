@@ -1,9 +1,16 @@
+/**
+ * 文章卡片骨架屏
+ *
+ * 文章列表加载时的占位组件
+ */
+
 import { memo } from 'react';
 
 interface PostCardSkeletonProps {
   hasCover?: boolean;
 }
 
+/** 单个卡片骨架 */
 export const PostCardSkeleton = memo(function PostCardSkeleton({ hasCover = false }: PostCardSkeletonProps) {
   const coverWidth = '28%';
 
@@ -75,6 +82,7 @@ export const PostCardSkeleton = memo(function PostCardSkeleton({ hasCover = fals
   );
 });
 
+/** 骨架屏列表 */
 export function PostCardSkeletonList({ count = 5, hasCover = false }: { count?: number; hasCover?: boolean }) {
   return (
     <>

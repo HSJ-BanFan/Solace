@@ -1,3 +1,9 @@
+/**
+ * 主题状态管理
+ *
+ * 管理深色/浅色模式和主题色相
+ */
+
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 

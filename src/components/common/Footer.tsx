@@ -1,3 +1,7 @@
+/**
+ * 页脚组件
+ */
+
 import { Icon } from '@iconify/react';
 
 export function Footer() {

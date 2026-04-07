@@ -1,3 +1,9 @@
+/**
+ * 目录状态管理
+ *
+ * 管理文章目录的标题列表
+ */
+
 import { create } from 'zustand';
 import type { TocHeading } from '@/components/widget/TableOfContents';
 

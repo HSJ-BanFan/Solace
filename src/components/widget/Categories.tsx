@@ -1,3 +1,9 @@
+/**
+ * 分类列表组件
+ *
+ * 展示所有分类及其文章数量
+ */
+
 import { Link } from 'react-router-dom';
 import { useCategories } from '@/hooks';
 
@@ -15,7 +21,7 @@ export function Categories({ className, style }: CategoriesProps) {
         <div className="font-bold text-lg text-90 relative ml-8 mt-4 mb-2
           before:w-1 before:h-4 before:rounded-md before:bg-[var(--primary)]
           before:absolute before:-left-4 before:top-[5.5px]">
-          Categories
+          分类
         </div>
         <div className="px-4 py-4 space-y-2">
           {[...Array(4)].map((_, index) => (
@@ -35,7 +41,7 @@ export function Categories({ className, style }: CategoriesProps) {
       <div className="font-bold text-lg text-90 relative ml-8 mt-4 mb-2
         before:w-1 before:h-4 before:rounded-md before:bg-[var(--primary)]
         before:absolute before:-left-4 before:top-[5.5px]">
-        Categories
+        分类
       </div>
       <div className="px-4 space-y-1">
         {categories.map((category) => (
