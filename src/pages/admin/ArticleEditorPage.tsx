@@ -16,6 +16,7 @@ export function ArticleEditorPage() {
   const updateMutation = useUpdateArticle();
 
   const [title, setTitle] = useState('');
+  const [slug, setSlug] = useState('');
   const [content, setContent] = useState('');
   const [summary, setSummary] = useState('');
   const [coverImage, setCoverImage] = useState('');
@@ -28,6 +29,7 @@ export function ArticleEditorPage() {
   useEffect(() => {
     if (existingArticle) {
       setTitle(existingArticle.title);
+      setSlug(existingArticle.slug || '');
       setContent(existingArticle.content);
       setSummary(existingArticle.summary || '');
       setCoverImage(existingArticle.cover_image || '');
@@ -62,6 +64,7 @@ export function ArticleEditorPage() {
     try {
       const articleData = {
         title,
+        slug: slug.trim() || undefined, // 空则后端自动生成
         content,
         summary,
         cover_image: coverImage || undefined,
@@ -104,6 +107,24 @@ export function ArticleEditorPage() {
         )}
 
         <InputField label="标题" value={title} onChange={setTitle} placeholder="文章标题" required />
+
+        {/* Slug 输入 */}
+        <div className="mb-4">
+          <label className="block text-75 text-sm font-medium mb-2">
+            Slug <span className="text-50 text-xs ml-1">(留空自动从标题生成)</span>
+          </label>
+          <input
+            type="text"
+            value={slug}
+            onChange={(e) => setSlug(e.target.value)}
+            placeholder="例如: my-first-post"
+            className="input-base"
+          />
+          <p className="text-50 text-xs mt-1">
+            用于文章 URL，仅支持英文字母、数字和连字符。中文标题会自动转换为拼音。
+          </p>
+        </div>
+
         <InputField label="封面图片" value={coverImage} onChange={setCoverImage} placeholder="https://example.com/cover.jpg" type="url" />
         <TextAreaField label="摘要" value={summary} onChange={setSummary} placeholder="文章简要摘要" rows={2} />
 

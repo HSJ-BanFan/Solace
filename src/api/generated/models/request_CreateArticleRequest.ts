@@ -6,6 +6,7 @@ export type request_CreateArticleRequest = {
   category_id?: number;
   content: string;
   cover_image?: string;
+  slug?: string;
   status?: request_CreateArticleRequest.status;
   summary?: string;
   tag_ids?: Array<number>;
