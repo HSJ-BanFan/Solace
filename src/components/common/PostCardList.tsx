@@ -3,8 +3,8 @@
  *
  * 移动端布局规则：
  * - 有封面的卡片：占满整行
- * - 无封面的卡片：两两配对，两列布局
- * - 无封面卡片如果总数是奇数，最后一个占满整行
+ * - 无封面的卡片：相邻配对，两列布局
+ * - 无封面卡片如果下一个也有封面或是最后一个，则单独占满整行
  * - 桌面端：单列布局
  */
 
@@ -18,25 +18,23 @@ interface PostCardListProps {
 
 export function PostCardList({ articles, className = '' }: PostCardListProps) {
   // 预计算每个无封面卡片是否应该占半行
-  // 无封面卡片按顺序两两配对，配对的两个各占半行
-  const noCoverIndices = articles
-    .map((article, index) => (!article.cover_image ? index : -1))
-    .filter((i) => i !== -1);
-
-  // 记录哪些无封面卡片应该占半行（配对成功的）
+  // 规则：相邻的两个无封面卡片配对，各占半行
   const halfRowIndices = new Set<number>();
 
-  // 两两配对
-  for (let i = 0; i < noCoverIndices.length; i += 2) {
-    const first = noCoverIndices[i];
-    const second = noCoverIndices[i + 1];
+  for (let i = 0; i < articles.length; i++) {
+    // 跳过有封面的
+    if (articles[i].cover_image) continue;
 
-    if (first !== undefined && second !== undefined) {
-      // 有配对，两个都占半行
-      halfRowIndices.add(first);
-      halfRowIndices.add(second);
+    // 检查下一个是否也无封面
+    const next = articles[i + 1];
+    if (next && !next.cover_image) {
+      // 相邻配对成功，两个都占半行
+      halfRowIndices.add(i);
+      halfRowIndices.add(i + 1);
+      // 跳过下一个，因为它已经配对了
+      i++;
     }
-    // 如果是奇数个，最后一个不加入halfRowIndices，会占整行
+    // 如果没有配对成功，不加入halfRowIndices，会占整行
   }
 
   return (

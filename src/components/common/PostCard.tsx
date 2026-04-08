@@ -162,7 +162,7 @@ function TitleLink({ article }: { article: PostCardArticle }) {
   return (
     <Link
       to={`/articles/${article.slug}`}
-      className="transition-smooth group w-full block font-bold mb-3 text-3xl text-90
+      className="transition-smooth group w-full block font-bold mb-3 text-[1.625rem] text-70
         hover:text-[var(--primary)] dark:hover:text-[var(--primary)]
         before:w-1 before:h-5 before:rounded-md before:bg-[var(--primary)]
         before:absolute before:top-[35px] before:left-[18px]"

@@ -11,7 +11,7 @@ import { toPostCardArticle } from '@/utils/article';
 
 export function HomePage() {
   const [page, setPage] = useState(1);
-  const pageSize = 5;
+  const pageSize = 7;
 
   const { data, isLoading, isFetching, error } = useArticles({
     page,
