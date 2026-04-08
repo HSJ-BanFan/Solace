@@ -23,9 +23,50 @@ import { useState } from 'react';
 
 /** 导航链接配置 */
 const navLinks = [
-  { name: '首页', path: '/' },
-  { name: '归档', path: '/archive' },
+  { name: '首页', path: '/', icon: 'material-symbols:home-outline-rounded' },
+  { name: '归档', path: '/archive', icon: 'material-symbols:archive-outline-rounded' },
 ];
+
+/** 菜单项组件（移动端使用） */
+function MenuItem({
+  link,
+  onClick,
+  onLogout
+}: {
+  link: { name: string; path: string; icon?: string };
+  onClick?: () => void;
+  onLogout?: () => void;
+}) {
+  const content = (
+    <>
+      <span className="text-75 font-bold group-hover:text-[var(--primary)] transition">{link.name}</span>
+      <Icon icon={link.icon || 'material-symbols:chevron-right-rounded'} className="text-lg text-[var(--primary)]" />
+    </>
+  );
+
+  if (link.path === 'logout') {
+    return (
+      <button
+        onClick={onLogout}
+        className="w-full group flex justify-between items-center py-2 pl-3 pr-1 rounded-lg
+          hover:bg-[var(--btn-plain-bg-hover)] transition text-left"
+      >
+        {content}
+      </button>
+    );
+  }
+
+  return (
+    <Link
+      to={link.path}
+      onClick={onClick}
+      className="group flex justify-between items-center py-2 pl-3 pr-1 rounded-lg
+        hover:bg-[var(--btn-plain-bg-hover)] transition"
+    >
+      {content}
+    </Link>
+  );
+}
 
 export function Navbar() {
   const { isAuthenticated } = useAuthStore();
@@ -39,6 +80,15 @@ export function Navbar() {
     navigate('/');
     setShowMobileMenu(false);
   };
+
+  // 移动端菜单项（包含认证相关）
+  const mobileMenuItems = isAuthenticated
+    ? [
+        ...navLinks,
+        { name: '管理后台', path: '/admin' },
+        { name: '退出登录', path: 'logout', icon: 'material-symbols:logout-rounded' },
+      ]
+    : [...navLinks, { name: '登录', path: '/login' }];
 
   return (
     <>
@@ -135,45 +185,14 @@ export function Navbar() {
               showMobileMenu ? '' : 'float-panel-closed'
             }`}
           >
-            {navLinks.map((link) => (
-              <Link
-                key={link.path}
-                to={link.path}
+            {mobileMenuItems.map((item) => (
+              <MenuItem
+                key={item.path}
+                link={item}
                 onClick={() => setShowMobileMenu(false)}
-                className="group flex justify-between items-center py-2 pl-3 pr-1 rounded-lg hover:bg-[var(--btn-plain-bg-hover)] transition"
-              >
-                <span className="text-75 font-bold group-hover:text-[var(--primary)] transition">{link.name}</span>
-                <Icon icon="material-symbols:chevron-right-rounded" className="text-lg text-[var(--primary)]" />
-              </Link>
+                onLogout={handleLogout}
+              />
             ))}
-            {isAuthenticated ? (
-              <>
-                <Link
-                  to="/admin"
-                  onClick={() => setShowMobileMenu(false)}
-                  className="group flex justify-between items-center py-2 pl-3 pr-1 rounded-lg hover:bg-[var(--btn-plain-bg-hover)] transition"
-                >
-                  <span className="text-75 font-bold group-hover:text-[var(--primary)] transition">管理后台</span>
-                  <Icon icon="material-symbols:chevron-right-rounded" className="text-lg text-[var(--primary)]" />
-                </Link>
-                <button
-                  onClick={handleLogout}
-                  className="w-full group flex justify-between items-center py-2 pl-3 pr-1 rounded-lg hover:bg-[var(--btn-plain-bg-hover)] transition text-left"
-                >
-                  <span className="text-75 font-bold group-hover:text-[var(--primary)] transition">退出登录</span>
-                  <Icon icon="material-symbols:logout-rounded" className="text-lg text-[var(--primary)]" />
-                </button>
-              </>
-            ) : (
-              <Link
-                to="/login"
-                onClick={() => setShowMobileMenu(false)}
-                className="group flex justify-between items-center py-2 pl-3 pr-1 rounded-lg hover:bg-[var(--btn-plain-bg-hover)] transition"
-              >
-                <span className="text-75 font-bold group-hover:text-[var(--primary)] transition">登录</span>
-                <Icon icon="material-symbols:chevron-right-rounded" className="text-lg text-[var(--primary)]" />
-              </Link>
-            )}
           </div>
         </div>
       </div>

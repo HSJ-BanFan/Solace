@@ -7,3 +7,8 @@ export * from './api';
 
 // 认证相关 hooks
 export * from './useAuth';
+
+// UI 相关 hooks
+export * from './useDarkMode';
+export * from './useTocScroll';
+export * from './useActiveIndicator';

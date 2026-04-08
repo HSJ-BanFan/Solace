@@ -4,10 +4,11 @@
  * 支持 syntax 高亮、行号、复制功能
  */
 
-import { memo, useState, useCallback, useEffect, useMemo } from 'react';
+import { memo, useState, useCallback, useMemo } from 'react';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { oneDark, oneLight } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { Icon } from '@iconify/react';
+import { useDarkMode } from '@/hooks';
 
 interface CodeBlockProps {
   children: string;
@@ -15,28 +16,22 @@ interface CodeBlockProps {
   className?: string;
 }
 
-/** 语言显示名称映射 */
+/** 语言显示名称（紧凑格式：短名 -> 显示名） */
 const LANGUAGE_NAMES: Record<string, string> = {
-  js: 'JavaScript', javascript: 'JavaScript',
-  ts: 'TypeScript', typescript: 'TypeScript',
-  py: 'Python', python: 'Python',
-  go: 'Go', rust: 'Rust', java: 'Java',
-  cpp: 'C++', c: 'C', cs: 'C#', csharp: 'C#',
-  php: 'PHP', rb: 'Ruby', ruby: 'Ruby',
-  swift: 'Swift', kt: 'Kotlin', kotlin: 'Kotlin',
-  sql: 'SQL', sh: 'Shell', shell: 'Shell', bash: 'Bash',
-  json: 'JSON', yaml: 'YAML', yml: 'YAML',
-  xml: 'XML', html: 'HTML', css: 'CSS',
-  scss: 'SCSS', sass: 'Sass', less: 'Less',
-  md: 'Markdown', markdown: 'Markdown',
-  dockerfile: 'Dockerfile', docker: 'Docker',
-  makefile: 'Makefile', lua: 'Lua', perl: 'Perl',
-  r: 'R', matlab: 'MATLAB',
-  vue: 'Vue', svelte: 'Svelte',
-  jsx: 'JSX', tsx: 'TSX',
-  graphql: 'GraphQL', gql: 'GraphQL',
-  toml: 'TOML', ini: 'INI', diff: 'Diff',
-  plaintext: 'Text', text: 'Text', plain: 'Text',
+  // 主流语言
+  js: 'JavaScript', ts: 'TypeScript', py: 'Python',
+  go: 'Go', rs: 'Rust', java: 'Java', kt: 'Kotlin',
+  c: 'C', cpp: 'C++', cs: 'C#',
+  rb: 'Ruby', php: 'PHP', swift: 'Swift',
+  // Web & 样式
+  html: 'HTML', css: 'CSS', scss: 'SCSS', sass: 'Sass',
+  vue: 'Vue', svelte: 'Svelte', jsx: 'JSX', tsx: 'TSX',
+  // 脚本 & 配置
+  sh: 'Shell', bash: 'Bash', sql: 'SQL', lua: 'Lua',
+  json: 'JSON', yaml: 'YAML', yml: 'YAML', xml: 'XML', toml: 'TOML',
+  // 其他
+  md: 'Markdown', dockerfile: 'Dockerfile', graphql: 'GraphQL',
+  diff: 'Diff', r: 'R', matlab: 'MATLAB', perl: 'Perl',
 };
 
 function getLanguageName(lang: string): string {
@@ -55,24 +50,6 @@ const WindowControls = memo(function WindowControls() {
     </div>
   );
 });
-
-/** 深色模式检测 hook */
-function useDarkMode(): boolean {
-  const [isDark, setIsDark] = useState(() => {
-    if (typeof document === 'undefined') return false;
-    return document.documentElement.classList.contains('dark');
-  });
-
-  useEffect(() => {
-    const observer = new MutationObserver(() => {
-      setIsDark(document.documentElement.classList.contains('dark'));
-    });
-    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
-    return () => observer.disconnect();
-  }, []);
-
-  return isDark;
-}
 
 export const CodeBlock = memo(function CodeBlock({ children, language, className }: CodeBlockProps) {
   const [copied, setCopied] = useState(false);

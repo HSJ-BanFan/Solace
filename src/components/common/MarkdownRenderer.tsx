@@ -31,6 +31,14 @@ function generateHeadingId(text: string): string {
     .replace(/^-|-$/g, '');
 }
 
+/** 标题样式配置 */
+const HEADING_STYLES = {
+  h1: { size: 'text-3xl', margin: 'mt-8 mb-4' },
+  h2: { size: 'text-2xl', margin: 'mt-6 mb-3' },
+  h3: { size: 'text-xl', margin: 'mt-4 mb-2' },
+  h4: { size: 'text-lg', margin: 'mt-3 mb-2' },
+} as const;
+
 /** 从 markdown 内容提取标题 */
 export function extractHeadings(content: string): TocHeading[] {
   const headings: TocHeading[] = [];
@@ -59,52 +67,35 @@ export const MarkdownRenderer = memo(function MarkdownRenderer({ content, classN
   }, [content, onHeadingsExtracted]);
 
   // 自定义渲染组件
-  const components = useMemo(() => ({
-    // 标题
-    h1: ({ children }: { children?: React.ReactNode }) => {
-      const text = String(children || '');
-      const id = generateHeadingId(text);
-      return (
-        <h1 id={id} className="text-3xl font-bold mt-8 mb-4 text-90 scroll-mt-24 transition-colors">
-          <a href={`#${id}`} className="!text-90 hover:!text-[var(--primary)] !border-none !bg-transparent before:content-['#'] before:absolute before:-left-6 before:opacity-0 hover:before:opacity-100 before:transition-opacity before:text-[var(--primary)] relative">
+  const components = useMemo(() => {
+    /** 创建标题渲染组件 */
+    const createHeadingComponent = (level: 'h1' | 'h2' | 'h3' | 'h4') => {
+      return ({ children }: { children?: React.ReactNode }) => {
+        const text = String(children || '');
+        const id = generateHeadingId(text);
+        const { size, margin } = HEADING_STYLES[level];
+
+        return React.createElement(
+          level,
+          { id, className: `${size} font-bold ${margin} text-90 scroll-mt-24 transition-colors` },
+          <a
+            href={`#${id}`}
+            className="!text-90 hover:!text-[var(--primary)] !border-none !bg-transparent
+              before:content-['#'] before:absolute before:-left-6 before:opacity-0
+              hover:before:opacity-100 before:transition-opacity before:text-[var(--primary)] relative"
+          >
             {children}
           </a>
-        </h1>
-      );
-    },
-    h2: ({ children }: { children?: React.ReactNode }) => {
-      const text = String(children || '');
-      const id = generateHeadingId(text);
-      return (
-        <h2 id={id} className="text-2xl font-bold mt-6 mb-3 text-90 scroll-mt-24 transition-colors">
-          <a href={`#${id}`} className="!text-90 hover:!text-[var(--primary)] !border-none !bg-transparent before:content-['#'] before:absolute before:-left-6 before:opacity-0 hover:before:opacity-100 before:transition-opacity before:text-[var(--primary)] relative">
-            {children}
-          </a>
-        </h2>
-      );
-    },
-    h3: ({ children }: { children?: React.ReactNode }) => {
-      const text = String(children || '');
-      const id = generateHeadingId(text);
-      return (
-        <h3 id={id} className="text-xl font-bold mt-4 mb-2 text-90 scroll-mt-24 transition-colors">
-          <a href={`#${id}`} className="!text-90 hover:!text-[var(--primary)] !border-none !bg-transparent before:content-['#'] before:absolute before:-left-6 before:opacity-0 hover:before:opacity-100 before:transition-opacity before:text-[var(--primary)] relative">
-            {children}
-          </a>
-        </h3>
-      );
-    },
-    h4: ({ children }: { children?: React.ReactNode }) => {
-      const text = String(children || '');
-      const id = generateHeadingId(text);
-      return (
-        <h4 id={id} className="text-lg font-bold mt-3 mb-2 text-90 scroll-mt-24 transition-colors">
-          <a href={`#${id}`} className="!text-90 hover:!text-[var(--primary)] !border-none !bg-transparent before:content-['#'] before:absolute before:-left-6 before:opacity-0 hover:before:opacity-100 before:transition-opacity before:text-[var(--primary)] relative">
-            {children}
-          </a>
-        </h4>
-      );
-    },
+        );
+      };
+    };
+
+    return {
+      // 标题（使用工厂函数生成）
+      h1: createHeadingComponent('h1'),
+      h2: createHeadingComponent('h2'),
+      h3: createHeadingComponent('h3'),
+      h4: createHeadingComponent('h4'),
 
     // 段落
     p: ({ children }: { children?: React.ReactNode }) => <p className="mb-4 leading-relaxed text-75">{children}</p>,
@@ -195,7 +186,8 @@ export const MarkdownRenderer = memo(function MarkdownRenderer({ content, classN
     tr: ({ children }: { children?: React.ReactNode }) => <tr className="border-t border-[var(--border-light)]">{children}</tr>,
     th: ({ children }: { children?: React.ReactNode }) => <th className="px-4 py-2 text-left font-bold text-90">{children}</th>,
     td: ({ children }: { children?: React.ReactNode }) => <td className="px-4 py-2 text-75">{children}</td>,
-  }), []);
+    };
+  }, []);
 
   return (
     <div className={`custom-md ${className}`}>
