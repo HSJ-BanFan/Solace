@@ -3,6 +3,7 @@ package request
 // CreateCategoryRequest 创建分类请求体
 type CreateCategoryRequest struct {
 	Name        string `json:"name" validate:"required,min=1,max=100"`
+	Slug        string `json:"slug" validate:"omitempty,min=1,max=100"` // 可选，为空则自动生成
 	Description string `json:"description" validate:"omitempty,max=500"`
 	ParentID    *uint  `json:"parent_id" validate:"omitempty"`
 	SortOrder   int    `json:"sort_order" validate:"omitempty,min=0"`
@@ -11,6 +12,7 @@ type CreateCategoryRequest struct {
 // UpdateCategoryRequest 更新分类请求体
 type UpdateCategoryRequest struct {
 	Name        string `json:"name" validate:"omitempty,min=1,max=100"`
+	Slug        string `json:"slug" validate:"omitempty,min=1,max=100"` // 可选，为空则保持不变
 	Description string `json:"description" validate:"omitempty,max=500"`
 	ParentID    *uint  `json:"parent_id" validate:"omitempty"`
 	SortOrder   int    `json:"sort_order" validate:"omitempty,min=0"`

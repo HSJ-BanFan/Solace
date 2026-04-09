@@ -61,6 +61,11 @@ definitions:
         type: string
       parent_id:
         type: integer
+      slug:
+        description: 可选，为空则自动生成
+        maxLength: 100
+        minLength: 1
+        type: string
       sort_order:
         minimum: 0
         type: integer
@@ -70,6 +75,11 @@ definitions:
   request.CreateTagRequest:
     properties:
       name:
+        maxLength: 50
+        minLength: 1
+        type: string
+      slug:
+        description: 可选，为空则自动生成
         maxLength: 50
         minLength: 1
         type: string
@@ -140,6 +150,11 @@ definitions:
         type: string
       parent_id:
         type: integer
+      slug:
+        description: 可选，为空则保持不变
+        maxLength: 100
+        minLength: 1
+        type: string
       sort_order:
         minimum: 0
         type: integer
@@ -147,6 +162,11 @@ definitions:
   request.UpdateTagRequest:
     properties:
       name:
+        maxLength: 50
+        minLength: 1
+        type: string
+      slug:
+        description: 可选，为空则保持不变
         maxLength: 50
         minLength: 1
         type: string
@@ -777,28 +797,6 @@ paths:
       summary: 根据Slug获取标签
       tags:
       - tag
-  /users/{id}:
-    get:
-      parameters:
-      - description: 用户ID
-        in: path
-        name: id
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/handler.Response'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/handler.Response'
-      summary: 根据 ID 获取用户
-      tags:
-      - user
   /users/me:
     get:
       produces:

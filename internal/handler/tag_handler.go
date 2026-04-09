@@ -37,7 +37,7 @@ func (h *TagHandler) Create(c *gin.Context) {
 		return
 	}
 
-	tag, err := h.tagService.Create(c.Request.Context(), req.Name)
+	tag, err := h.tagService.Create(c.Request.Context(), req.Name, req.Slug)
 	if err != nil {
 		RespondWithError(c, err)
 		return
@@ -137,7 +137,7 @@ func (h *TagHandler) Update(c *gin.Context) {
 		return
 	}
 
-	tag, err := h.tagService.Update(c.Request.Context(), uint(id), req.Name)
+	tag, err := h.tagService.Update(c.Request.Context(), uint(id), req.Name, req.Slug)
 	if err != nil {
 		RespondWithError(c, err)
 		return

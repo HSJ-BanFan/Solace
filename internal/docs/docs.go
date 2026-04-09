@@ -1012,40 +1012,6 @@ const docTemplate = `{
                     }
                 }
             }
-        },
-        "/users/{id}": {
-            "get": {
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "user"
-                ],
-                "summary": "根据 ID 获取用户",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "用户ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/handler.Response"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/handler.Response"
-                        }
-                    }
-                }
-            }
         }
     },
     "definitions": {
@@ -1138,6 +1104,12 @@ const docTemplate = `{
                 "parent_id": {
                     "type": "integer"
                 },
+                "slug": {
+                    "description": "可选，为空则自动生成",
+                    "type": "string",
+                    "maxLength": 100,
+                    "minLength": 1
+                },
                 "sort_order": {
                     "type": "integer",
                     "minimum": 0
@@ -1151,6 +1123,12 @@ const docTemplate = `{
             ],
             "properties": {
                 "name": {
+                    "type": "string",
+                    "maxLength": 50,
+                    "minLength": 1
+                },
+                "slug": {
+                    "description": "可选，为空则自动生成",
                     "type": "string",
                     "maxLength": 50,
                     "minLength": 1
@@ -1248,6 +1226,12 @@ const docTemplate = `{
                 "parent_id": {
                     "type": "integer"
                 },
+                "slug": {
+                    "description": "可选，为空则保持不变",
+                    "type": "string",
+                    "maxLength": 100,
+                    "minLength": 1
+                },
                 "sort_order": {
                     "type": "integer",
                     "minimum": 0
@@ -1258,6 +1242,12 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "name": {
+                    "type": "string",
+                    "maxLength": 50,
+                    "minLength": 1
+                },
+                "slug": {
+                    "description": "可选，为空则保持不变",
                     "type": "string",
                     "maxLength": 50,
                     "minLength": 1

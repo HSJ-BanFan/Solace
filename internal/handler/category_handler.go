@@ -40,6 +40,7 @@ func (h *CategoryHandler) Create(c *gin.Context) {
 	category, err := h.categoryService.Create(
 		c.Request.Context(),
 		req.Name,
+		req.Slug,
 		req.Description,
 		req.ParentID,
 		req.SortOrder,
@@ -147,6 +148,7 @@ func (h *CategoryHandler) Update(c *gin.Context) {
 		c.Request.Context(),
 		uint(id),
 		req.Name,
+		req.Slug,
 		req.Description,
 		req.ParentID,
 		req.SortOrder,

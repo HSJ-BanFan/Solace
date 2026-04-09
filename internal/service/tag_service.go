@@ -13,11 +13,11 @@ import (
 
 // TagService 标签业务逻辑接口
 type TagService interface {
-	Create(ctx context.Context, name string) (*response.TagResponse, error)
+	Create(ctx context.Context, name, customSlug string) (*response.TagResponse, error)
 	GetByID(ctx context.Context, id uint) (*response.TagResponse, error)
 	GetBySlug(ctx context.Context, slug string) (*response.TagResponse, error)
 	GetList(ctx context.Context) (*response.TagListResponse, error)
-	Update(ctx context.Context, id uint, name string) (*response.TagResponse, error)
+	Update(ctx context.Context, id uint, name, customSlug string) (*response.TagResponse, error)
 	Delete(ctx context.Context, id uint) error
 }
 
@@ -31,14 +31,21 @@ func NewTagService(tagRepo tagRepository) TagService {
 	return &tagService{tagRepo: tagRepo}
 }
 
-func (s *tagService) Create(ctx context.Context, name string) (*response.TagResponse, error) {
+func (s *tagService) Create(ctx context.Context, name, customSlug string) (*response.TagResponse, error) {
 	// 检查名称唯一性
 	if s.tagRepo.ExistsByName(ctx, name) {
 		return nil, ErrTagAlreadyExists
 	}
 
-	// 生成 slug
-	tagSlug := slug.Generate(name)
+	// 生成或使用自定义 slug
+	tagSlug := customSlug
+	if tagSlug == "" {
+		// 没有提供 slug，从名称自动生成
+		tagSlug = slug.Generate(name)
+	} else {
+		// 提供了自定义 slug，进行格式化处理
+		tagSlug = slug.Generate(tagSlug)
+	}
 
 	// 检查 slug 唯一性
 	if s.tagRepo.ExistsBySlug(ctx, tagSlug) {
@@ -102,7 +109,7 @@ func (s *tagService) GetList(ctx context.Context) (*response.TagListResponse, er
 	return &response.TagListResponse{Items: items}, nil
 }
 
-func (s *tagService) Update(ctx context.Context, id uint, name string) (*response.TagResponse, error) {
+func (s *tagService) Update(ctx context.Context, id uint, name, customSlug string) (*response.TagResponse, error) {
 	tag, err := s.tagRepo.FindByID(ctx, id)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -118,11 +125,12 @@ func (s *tagService) Update(ctx context.Context, id uint, name string) (*respons
 			return nil, ErrTagAlreadyExists
 		}
 		tag.Name = name
-
-		// 更新 slug
-		newSlug := slug.Generate(name)
+	}
+	// 更新 slug（仅当提供了新 slug 时）
+	if customSlug != "" {
+		newSlug := slug.Generate(customSlug)
 		if newSlug != tag.Slug && s.tagRepo.ExistsBySlug(ctx, newSlug) {
-			newSlug = slug.GenerateWithTimestamp(name)
+			newSlug = slug.GenerateWithTimestamp(customSlug)
 		}
 		tag.Slug = newSlug
 	}

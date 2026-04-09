@@ -13,11 +13,11 @@ import (
 
 // CategoryService 分类业务逻辑接口
 type CategoryService interface {
-	Create(ctx context.Context, name, description string, parentID *uint, sortOrder int) (*response.CategoryResponse, error)
+	Create(ctx context.Context, name, customSlug, description string, parentID *uint, sortOrder int) (*response.CategoryResponse, error)
 	GetByID(ctx context.Context, id uint) (*response.CategoryResponse, error)
 	GetBySlug(ctx context.Context, slug string) (*response.CategoryResponse, error)
 	GetList(ctx context.Context) (*response.CategoryListResponse, error)
-	Update(ctx context.Context, id uint, name, description string, parentID *uint, sortOrder int) (*response.CategoryResponse, error)
+	Update(ctx context.Context, id uint, name, customSlug, description string, parentID *uint, sortOrder int) (*response.CategoryResponse, error)
 	Delete(ctx context.Context, id uint) error
 }
 
@@ -31,9 +31,16 @@ func NewCategoryService(categoryRepo categoryRepository) CategoryService {
 	return &categoryService{categoryRepo: categoryRepo}
 }
 
-func (s *categoryService) Create(ctx context.Context, name, description string, parentID *uint, sortOrder int) (*response.CategoryResponse, error) {
-	// 生成 slug
-	categorySlug := slug.Generate(name)
+func (s *categoryService) Create(ctx context.Context, name, customSlug, description string, parentID *uint, sortOrder int) (*response.CategoryResponse, error) {
+	// 生成或使用自定义 slug
+	categorySlug := customSlug
+	if categorySlug == "" {
+		// 没有提供 slug，从名称自动生成
+		categorySlug = slug.Generate(name)
+	} else {
+		// 提供了自定义 slug，进行格式化处理
+		categorySlug = slug.Generate(categorySlug)
+	}
 
 	// 检查 slug 唯一性
 	if s.categoryRepo.ExistsBySlug(ctx, categorySlug) {
@@ -103,7 +110,7 @@ func (s *categoryService) GetList(ctx context.Context) (*response.CategoryListRe
 	return &response.CategoryListResponse{Items: items}, nil
 }
 
-func (s *categoryService) Update(ctx context.Context, id uint, name, description string, parentID *uint, sortOrder int) (*response.CategoryResponse, error) {
+func (s *categoryService) Update(ctx context.Context, id uint, name, customSlug, description string, parentID *uint, sortOrder int) (*response.CategoryResponse, error) {
 	category, err := s.categoryRepo.FindByID(ctx, id)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -115,10 +122,12 @@ func (s *categoryService) Update(ctx context.Context, id uint, name, description
 	// 更新字段
 	if name != "" {
 		category.Name = name
-		// 名称变更时更新 slug
-		newSlug := slug.Generate(name)
+	}
+	// 更新 slug（仅当提供了新 slug 时）
+	if customSlug != "" {
+		newSlug := slug.Generate(customSlug)
 		if newSlug != category.Slug && s.categoryRepo.ExistsBySlug(ctx, newSlug) {
-			newSlug = slug.GenerateWithTimestamp(name)
+			newSlug = slug.GenerateWithTimestamp(customSlug)
 		}
 		category.Slug = newSlug
 	}
