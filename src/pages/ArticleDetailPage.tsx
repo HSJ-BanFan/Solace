@@ -31,7 +31,7 @@ export function ArticleDetailPage() {
         <PostMeta article={article} />
         {!article.cover_image && <div className="border-[var(--border-light)] border-dashed border-b mb-5" />}
         {article.summary && (
-          <div className="text-50 border-l-2 border-[var(--primary)] pl-4 mb-6 bg-[var(--btn-regular-bg)] rounded-r-[var(--radius-medium)] py-2 italic">
+          <div className="text-50 border-l-2 border-[var(--primary)] pl-4 mb-6 bg-[var(--btn-regular-bg)]  py-2 italic">
             {article.summary}
           </div>
         )}

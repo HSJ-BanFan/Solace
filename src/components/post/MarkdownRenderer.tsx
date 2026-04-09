@@ -157,7 +157,7 @@ export const MarkdownRenderer = memo(function MarkdownRenderer({ content, classN
 
     // 引用块
     blockquote: ({ children }: { children?: React.ReactNode }) => (
-      <blockquote className="not-italic border-l-4 border-[var(--primary)] pl-4 py-2 my-4 bg-[var(--btn-regular-bg)] rounded-r-[var(--radius-medium)] text-75">
+      <blockquote className="not-italic border-l-4 border-[var(--primary)] pl-4 py-2 my-4 bg-[var(--btn-regular-bg)] text-75">
         {children}
       </blockquote>
     ),

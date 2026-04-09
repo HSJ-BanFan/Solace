@@ -97,8 +97,8 @@ export function MainLayout() {
       <Navbar />
 
       {/* 主内容区域 - 三栏布局 */}
-      <div className="flex-1 max-w-[var(--page-width)] mx-auto w-full px-6 md:px-8 py-4">
-        <div className="flex gap-4 justify-center">
+      <div className="flex-1 max-w-[var(--page-width)] mx-auto w-full px-4 py-4">
+        <div className="flex gap-4">
           {/* 左侧边栏 - Profile + TOC */}
           <LeftSidebar
             isArticlePage={isArticlePage}
@@ -107,7 +107,7 @@ export function MainLayout() {
           />
 
           {/* 主内容区 */}
-          <main className="min-w-0 flex-1 max-w-[50rem] flex flex-col gap-4">
+          <main className="min-w-0 flex-1 flex flex-col gap-4">
             <Outlet />
           </main>
 
