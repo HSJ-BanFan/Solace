@@ -159,7 +159,7 @@ export function Navbar() {
 
   return (
     <>
-      <div id="navbar" className="z-50 onload-animation">
+      <div id="navbar" className="z-50">
         {/* 动画背景 */}
         <div className="absolute h-8 left-0 right-0 -top-8 bg-[var(--card-bg)] transition" />
 
