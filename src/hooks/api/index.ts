@@ -35,10 +35,7 @@ export {
 } from './tags';
 
 // 用户相关
-export {
-  useCurrentUser,
-  useUpdateUser,
-} from './users';
+export { useCurrentUser } from './users';
 
 // 站长信息
 export { useOwner } from './owner';
