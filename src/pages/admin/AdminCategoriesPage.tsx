@@ -21,12 +21,14 @@ export function AdminCategoriesPage() {
   const [showForm, setShowForm] = useState(false);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [name, setName] = useState('');
+  const [slug, setSlug] = useState('');
   const [description, setDescription] = useState('');
   const [sortOrder, setSortOrder] = useState('0');
   const [errorForm, setErrorForm] = useState('');
 
   const resetForm = () => {
     setName('');
+    setSlug('');
     setDescription('');
     setSortOrder('0');
     setErrorForm('');
@@ -37,6 +39,7 @@ export function AdminCategoriesPage() {
   const handleEdit = (category: Category) => {
     setEditingCategory(category);
     setName(category.name);
+    setSlug(category.slug);
     setDescription(category.description || '');
     setSortOrder(String(category.sort_order));
     setShowForm(true);
@@ -66,6 +69,7 @@ export function AdminCategoriesPage() {
           id: editingCategory.id,
           data: {
             name,
+            slug: slug || undefined,
             description,
             sort_order: parseInt(sortOrder) || 0,
           },
@@ -73,6 +77,7 @@ export function AdminCategoriesPage() {
       } else {
         await createMutation.mutateAsync({
           name,
+          slug: slug || undefined,
           description,
           sort_order: parseInt(sortOrder) || 0,
         });
@@ -106,6 +111,7 @@ export function AdminCategoriesPage() {
           )}
 
           <InputField label="名称" value={name} onChange={setName} placeholder="分类名称" required />
+          <InputField label="Slug" value={slug} onChange={setSlug} placeholder="留空自动生成（基于名称）" />
           <TextAreaField label="描述" value={description} onChange={setDescription} placeholder="分类简要描述" rows={2} />
           <InputField label="排序" type="number" value={sortOrder} onChange={setSortOrder} placeholder="排序顺序（数字越小越靠前）" />
 

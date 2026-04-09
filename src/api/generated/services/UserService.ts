@@ -41,24 +41,4 @@ export class UserService {
       },
     });
   }
-  /**
-   * 根据 ID 获取用户
-   * @param id 用户ID
-   * @returns handler_Response OK
-   * @throws ApiError
-   */
-  public getUsers(
-    id: number,
-  ): CancelablePromise<handler_Response> {
-    return this.httpRequest.request({
-      method: 'GET',
-      url: '/users/{id}',
-      path: {
-        'id': id,
-      },
-      errors: {
-        404: `Not Found`,
-      },
-    });
-  }
 }

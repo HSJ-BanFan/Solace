@@ -20,10 +20,12 @@ export function AdminTagsPage() {
   const [showForm, setShowForm] = useState(false);
   const [editingTag, setEditingTag] = useState<Tag | null>(null);
   const [name, setName] = useState('');
+  const [slug, setSlug] = useState('');
   const [errorForm, setErrorForm] = useState('');
 
   const resetForm = () => {
     setName('');
+    setSlug('');
     setErrorForm('');
     setEditingTag(null);
     setShowForm(false);
@@ -32,6 +34,7 @@ export function AdminTagsPage() {
   const handleEdit = (tag: Tag) => {
     setEditingTag(tag);
     setName(tag.name);
+    setSlug(tag.slug);
     setShowForm(true);
   };
 
@@ -57,10 +60,10 @@ export function AdminTagsPage() {
       if (editingTag) {
         await updateMutation.mutateAsync({
           id: editingTag.id,
-          data: { name },
+          data: { name, slug: slug || undefined },
         });
       } else {
-        await createMutation.mutateAsync({ name });
+        await createMutation.mutateAsync({ name, slug: slug || undefined });
       }
       resetForm();
     } catch (err) {
@@ -91,6 +94,7 @@ export function AdminTagsPage() {
           )}
 
           <InputField label="名称" value={name} onChange={setName} placeholder="标签名称" required />
+          <InputField label="Slug" value={slug} onChange={setSlug} placeholder="留空自动生成（基于名称）" />
 
           <div className="flex gap-2 mt-4">
             <LoadingButton

@@ -4,5 +4,9 @@
 /* eslint-disable */
 export type request_UpdateTagRequest = {
   name?: string;
+  /**
+   * 可选，为空则保持不变
+   */
+  slug?: string;
 };
 
