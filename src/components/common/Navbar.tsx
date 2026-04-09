@@ -142,6 +142,15 @@ export function Navbar() {
   const [showHuePicker, setShowHuePicker] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
 
+  // Refs for click outside detection
+  const huePickerRef = useRef<HTMLDivElement>(null);
+  const mobileMenuRef = useRef<HTMLDivElement>(null);
+
+  // 点击外部关闭颜色选择器
+  useClickOutside(huePickerRef, () => setShowHuePicker(false), showHuePicker);
+  // 点击外部关闭移动端菜单
+  useClickOutside(mobileMenuRef, () => setShowMobileMenu(false), showMobileMenu);
+
   const handleLogout = () => {
     useAuthStore.getState().logout();
     navigate('/');
@@ -205,7 +214,7 @@ export function Navbar() {
             </button>
 
             {/* 色相选择器 */}
-            <div className="relative">
+            <div ref={huePickerRef} className="relative">
               <button
                 onClick={() => setShowHuePicker(!showHuePicker)}
                 className="btn-plain scale-animation rounded-lg h-11 w-11 active:scale-90"
@@ -247,6 +256,7 @@ export function Navbar() {
 
         {/* 移动端菜单面板 */}
         <div
+          ref={mobileMenuRef}
           className={`float-panel absolute top-full left-4 right-4 mt-1 p-2 md:hidden transition-all ${
             showMobileMenu ? '' : 'float-panel-closed'
           }`}

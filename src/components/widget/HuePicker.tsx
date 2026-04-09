@@ -19,10 +19,12 @@ export function HuePicker({ isOpen }: HuePickerProps) {
     setHue(defaultHue);
   };
 
-  if (!isOpen) return null;
-
   return (
-    <div className="float-panel absolute right-0 top-12 w-72 px-4 py-3 z-50">
+    <div
+      className={`float-panel absolute right-0 top-12 w-72 px-4 py-3 z-50 transition-all ${
+        isOpen ? '' : 'float-panel-closed'
+      }`}
+    >
       {/* 标题 */}
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-2 font-bold text-base text-90">
