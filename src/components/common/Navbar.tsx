@@ -159,7 +159,7 @@ export function Navbar() {
 
   return (
     <>
-      <div id="navbar" className="z-50">
+      <div id="navbar" className="relative z-50">
         {/* 动画背景 */}
         <div className="absolute h-8 left-0 right-0 -top-8 bg-[var(--card-bg)] transition" />
 
@@ -243,22 +243,22 @@ export function Navbar() {
               <Icon icon="material-symbols:menu-rounded" className="text-[1.25rem]" />
             </button>
           </div>
+        </div>
 
-          {/* 移动端菜单面板 */}
-          <div
-            className={`float-panel absolute top-full left-4 right-4 mt-1 p-2 md:hidden transition-all ${
-              showMobileMenu ? '' : 'float-panel-closed'
-            }`}
-          >
-            {mobileMenuItems.map((item) => (
-              <MenuItem
-                key={item.path}
-                link={item}
-                onClick={() => setShowMobileMenu(false)}
-                onLogout={handleLogout}
-              />
-            ))}
-          </div>
+        {/* 移动端菜单面板 */}
+        <div
+          className={`float-panel absolute top-full left-4 right-4 mt-1 p-2 md:hidden transition-all ${
+            showMobileMenu ? '' : 'float-panel-closed'
+          }`}
+        >
+          {mobileMenuItems.map((item) => (
+            <MenuItem
+              key={item.path}
+              link={item}
+              onClick={() => setShowMobileMenu(false)}
+              onLogout={handleLogout}
+            />
+          ))}
         </div>
       </div>
 
