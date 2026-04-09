@@ -2,11 +2,10 @@
  * 导航栏组件
  */
 
-import { Icon } from '@iconify/react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/stores';
 import { useClickOutside } from '@/hooks';
-import { ThemeToggle } from '@/components/common/ui';
+import { ThemeToggle, SafeIcon } from '@/components/common/ui';
 import { SearchModal, HuePicker } from '@/components/widget';
 import { useState, useRef, useMemo } from 'react';
 
@@ -20,7 +19,7 @@ function MenuItem({ link, onClose, onLogout }: { link: { name: string; path: str
   const content = (
     <>
       <span className="text-75 font-bold group-hover:text-[var(--primary)] transition">{link.name}</span>
-      <Icon icon={link.icon || 'material-symbols:chevron-right-rounded'} className="text-lg text-[var(--primary)]" />
+      <SafeIcon icon={link.icon || 'material-symbols:chevron-right-rounded'} size="1.125rem" className="text-[var(--primary)]" />
     </>
   );
 
@@ -58,22 +57,22 @@ function UserMenu({ onLogout }: { onLogout: () => void }) {
           {user?.avatar_url ? (
             <img src={user.avatar_url} alt={user.nickname || user.username} className="w-full h-full object-cover" />
           ) : (
-            <Icon icon="material-symbols:person-outline-rounded" className="text-white text-sm" />
+            <SafeIcon icon="material-symbols:person-outline-rounded" size="0.875rem" className="text-white" />
           )}
         </div>
         <span className="text-[var(--text-75)] max-w-[80px] truncate">{user?.nickname || user?.username || '用户'}</span>
-        <Icon icon={isOpen ? 'material-symbols:expand-less-rounded' : 'material-symbols:expand-more-rounded'} className="text-base text-[var(--text-50)]" />
+        <SafeIcon icon={isOpen ? 'material-symbols:expand-less-rounded' : 'material-symbols:expand-more-rounded'} size="1rem" className="text-[var(--text-50)]" />
       </button>
 
       {isOpen && (
         <div className="absolute right-0 top-full mt-2 w-48 py-2 rounded-[var(--radius-medium)] bg-[var(--card-bg)] shadow-lg border border-[var(--border-medium)] z-50 fade-in-down">
           <Link to="/admin" onClick={() => setIsOpen(false)} className="flex items-center gap-2 px-4 py-2.5 hover:bg-[var(--btn-plain-bg-hover)] transition-colors text-sm text-[var(--text-75)]">
-            <Icon icon="material-symbols:admin-panel-settings-outline-rounded" className="text-lg text-[var(--primary)]" />
+            <SafeIcon icon="material-symbols:admin-panel-settings-outline-rounded" size="1.125rem" className="text-[var(--primary)]" />
             管理后台
           </Link>
           <div className="h-px bg-[var(--line-divider)] mx-2 my-1" />
           <button onClick={closeAndLogout} className="w-full flex items-center gap-2 px-4 py-2.5 hover:bg-[var(--btn-plain-bg-hover)] transition-colors text-sm text-[var(--text-75)] text-left">
-            <Icon icon="material-symbols:logout-rounded" className="text-lg text-[var(--primary)]" />
+            <SafeIcon icon="material-symbols:logout-rounded" size="1.125rem" className="text-[var(--primary)]" />
             退出登录
           </button>
         </div>
@@ -118,7 +117,7 @@ export function Navbar() {
         <div className="card-base !overflow-visible max-w-[var(--page-width)] h-[4.5rem] !rounded-t-none mx-auto flex items-center justify-between px-4">
           <Link to="/" className="btn-plain scale-animation rounded-lg h-[3.25rem] px-5 font-bold active:scale-95">
             <div className="flex flex-row text-[var(--primary)] items-center text-md">
-              <Icon icon="material-symbols:home-outline-rounded" className="text-[1.75rem] mb-1 mr-2" />
+              <SafeIcon icon="material-symbols:home-outline-rounded" size="1.75rem" className="mb-1 mr-2" />
               <span>Blog</span>
             </div>
           </Link>
@@ -138,12 +137,12 @@ export function Navbar() {
 
           <div className="flex items-center gap-1">
             <button onClick={() => setShowSearch(true)} className="btn-plain scale-animation rounded-lg h-11 w-11 active:scale-90" aria-label="搜索">
-              <Icon icon="material-symbols:search-rounded" className="text-[1.25rem]" />
+              <SafeIcon icon="material-symbols:search-rounded" size="1.25rem" />
             </button>
 
             <div ref={huePickerRef} className="relative">
               <button onClick={() => setShowHuePicker(!showHuePicker)} className="btn-plain scale-animation rounded-lg h-11 w-11 active:scale-90" aria-label="显示设置">
-                <Icon icon="material-symbols:palette-outline" className="text-[1.25rem]" />
+                <SafeIcon icon="material-symbols:palette-outline" size="1.25rem" />
               </button>
               <HuePicker isOpen={showHuePicker} />
             </div>
@@ -155,14 +154,14 @@ export function Navbar() {
                 <UserMenu onLogout={handleLogout} />
               ) : (
                 <Link to="/login" className="btn-regular px-4 h-9 rounded-[var(--radius-medium)] font-medium text-sm flex items-center gap-1.5 hover:shadow-sm transition-shadow">
-                  <Icon icon="material-symbols:login-rounded" className="text-lg" />
+                  <SafeIcon icon="material-symbols:login-rounded" size="1.125rem" />
                   登录
                 </Link>
               )}
             </div>
 
             <button ref={mobileMenuBtnRef} onClick={() => setShowMobileMenu(!showMobileMenu)} className="btn-plain scale-animation rounded-lg w-11 h-11 active:scale-90 md:hidden" aria-label="菜单">
-              <Icon icon="material-symbols:menu-rounded" className="text-[1.25rem]" />
+              <SafeIcon icon="material-symbols:menu-rounded" size="1.25rem" />
             </button>
           </div>
         </div>

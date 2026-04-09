@@ -6,3 +6,5 @@ export { ThemeToggle } from './ThemeToggle';
 export { CodeBlock } from './CodeBlock';
 export { LazyImage } from './LazyImage';
 export { MetaItem } from './MetaItem';
+export { SafeIcon } from './SafeIcon';
+export type { SafeIconProps } from './SafeIcon';
