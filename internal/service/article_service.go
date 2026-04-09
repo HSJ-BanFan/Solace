@@ -53,7 +53,6 @@ type articleRepository interface {
 	Update(ctx context.Context, article *model.Article) error
 	UpdateWithTags(ctx context.Context, article *model.Article, tagIDs []uint) error
 	Delete(ctx context.Context, id uint) error
-	IncrementViewCount(ctx context.Context, id uint) error
 }
 
 // categoryRepository 分类数据访问接口
@@ -173,11 +172,6 @@ func (s *articleService) GetByID(ctx context.Context, id uint) (*response.Articl
 		return nil, err
 	}
 
-	// 异步增加浏览量
-	go func() {
-		_ = s.articleRepo.IncrementViewCount(context.Background(), id)
-	}()
-
 	return toArticleResponse(article, nil, nil), nil
 }
 
@@ -189,11 +183,6 @@ func (s *articleService) GetBySlug(ctx context.Context, articleSlug string) (*re
 		}
 		return nil, err
 	}
-
-	// 异步增加浏览量
-	go func() {
-		_ = s.articleRepo.IncrementViewCount(context.Background(), article.ID)
-	}()
 
 	return toArticleResponse(article, prev, next), nil
 }
@@ -446,7 +435,6 @@ func toArticleResponse(article *model.Article, prev, next *model.Article) *respo
 		CoverImage:  article.CoverImage,
 		AuthorID:    article.AuthorID,
 		Status:      article.Status,
-		ViewCount:   article.ViewCount,
 		IsTop:       article.IsTop,
 		Version:     article.Version,
 		WordCount:   wordCount,
@@ -509,7 +497,6 @@ func toArticleSummary(article *model.Article) *response.ArticleSummary {
 		Summary:     article.Summary,
 		CoverImage:  article.CoverImage,
 		Status:      article.Status,
-		ViewCount:   article.ViewCount,
 		PublishedAt: article.PublishedAt,
 		CreatedAt:   article.CreatedAt,
 		Author:      author,

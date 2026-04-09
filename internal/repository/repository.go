@@ -47,7 +47,6 @@ type ArticleRepository interface {
 	Update(ctx context.Context, article *model.Article) error
 	UpdateWithTags(ctx context.Context, article *model.Article, tagIDs []uint) error
 	Delete(ctx context.Context, id uint) error
-	IncrementViewCount(ctx context.Context, id uint) error
 	SyncTags(ctx context.Context, articleID uint, tagIDs []uint) error
 }
 

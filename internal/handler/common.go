@@ -17,14 +17,3 @@ func HealthCheck(c *gin.Context) {
 		},
 	})
 }
-
-// PlaceholderUpload 上传接口占位响应
-func PlaceholderUpload(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{
-		"success": true,
-		"data": gin.H{
-			"message":   "上传功能即将上线",
-			"image_url": "",
-		},
-	})
-}

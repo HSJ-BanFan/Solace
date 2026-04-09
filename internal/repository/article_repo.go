@@ -327,13 +327,6 @@ func (r *articleRepo) Delete(ctx context.Context, id uint) error {
 	return r.db.WithContext(ctx).Delete(&model.Article{}, id).Error
 }
 
-func (r *articleRepo) IncrementViewCount(ctx context.Context, id uint) error {
-	return r.db.WithContext(ctx).
-		Model(&model.Article{}).
-		Where("id = ?", id).
-		UpdateColumn("view_count", gorm.Expr("view_count + 1")).Error
-}
-
 func (r *articleRepo) SyncTags(ctx context.Context, articleID uint, tagIDs []uint) error {
 	var article model.Article
 	article.ID = articleID

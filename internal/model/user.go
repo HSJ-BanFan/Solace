@@ -30,9 +30,6 @@ func (User) TableName() string {
 	return "users"
 }
 
-// 用户角色常量
 const (
-	RoleUser      = "user"
-	RoleAdmin     = "admin"
-	RoleModerator = "moderator"
+	RoleAdmin = "admin"
 )

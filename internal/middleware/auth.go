@@ -57,64 +57,6 @@ func Auth(authService service.AuthService) gin.HandlerFunc {
 	}
 }
 
-// OptionalAuth 可选认证中间件，允许未认证请求通过
-func OptionalAuth(authService service.AuthService) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		authHeader := c.GetHeader("Authorization")
-		if authHeader == "" {
-			c.Next()
-			return
-		}
-
-		parts := strings.SplitN(authHeader, " ", 2)
-		if len(parts) != 2 || parts[0] != "Bearer" {
-			c.Next()
-			return
-		}
-
-		token := parts[1]
-		claims, err := authService.ValidateAccessToken(token)
-		if err != nil {
-			c.Next()
-			return
-		}
-
-		c.Set("user_id", claims.UserID)
-		c.Set("username", claims.Username)
-		c.Set("role", claims.Role)
-
-		c.Next()
-	}
-}
-
-// RequireRole 检查用户是否具有所需角色
-func RequireRole(roles ...string) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		userRole := c.GetString("role")
-		if userRole == "" {
-			RespondWithError(c, apperrors.ErrUnauthorized)
-			c.Abort()
-			return
-		}
-
-		hasRole := false
-		for _, role := range roles {
-			if userRole == role {
-				hasRole = true
-				break
-			}
-		}
-
-		if !hasRole {
-			RespondWithError(c, apperrors.ErrForbidden)
-			c.Abort()
-			return
-		}
-
-		c.Next()
-	}
-}
-
 // RespondWithError 中间件错误响应辅助函数
 func RespondWithError(c *gin.Context, err error) {
 	var appErr apperrors.AppError

@@ -15,7 +15,6 @@ type ArticleResponse struct {
 	Category    *CategoryResponse `json:"category,omitempty"`
 	Tags        []*TagResponse    `json:"tags,omitempty"`
 	Status      string            `json:"status"`
-	ViewCount   int               `json:"view_count"`
 	IsTop       bool              `json:"is_top"`
 	Version     int               `json:"version"`
 	WordCount   int               `json:"word_count"` // 字数（计算）
@@ -46,7 +45,6 @@ type ArticleSummary struct {
 	Category    *CategoryResponse `json:"category,omitempty"`
 	Tags        []*TagResponse    `json:"tags,omitempty"`
 	Status      string            `json:"status"`
-	ViewCount   int               `json:"view_count"`
 	PublishedAt *time.Time        `json:"published_at,omitempty"`
 	CreatedAt   time.Time         `json:"created_at"`
 }

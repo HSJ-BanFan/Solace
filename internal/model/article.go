@@ -17,7 +17,6 @@ type Article struct {
 	AuthorID    uint           `gorm:"not null;index" json:"author_id"`
 	CategoryID  *uint          `gorm:"index" json:"category_id,omitempty"`
 	Status      string         `gorm:"type:varchar(20);default:draft;index" json:"status"`
-	ViewCount   int            `gorm:"default:0" json:"view_count"`
 	IsTop       bool           `gorm:"default:false" json:"is_top"`
 	Version     int            `gorm:"default:1" json:"version"` // 乐观锁版本号
 	PublishedAt *time.Time     `json:"published_at,omitempty"`
