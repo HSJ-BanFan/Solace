@@ -370,19 +370,25 @@ export function ContributionCalendar({ className, style }: ContributionCalendarP
               type="button"
               className={`aspect-square flex items-center justify-center rounded-md cursor-pointer relative transition-all duration-200
                 ${cell.isToday
-                  ? 'text-[var(--primary)] font-medium ring-1 ring-[var(--primary)]/20'
+                  ? 'font-bold ring-2 ring-[var(--primary)]/40'
                   : 'hover:bg-[var(--btn-plain-bg-hover)]'
                 }`}
               style={{
                 backgroundColor: cell.isToday
                   ? isDark
-                    ? 'oklch(0.28 0.05 var(--hue))' // 深色模式：稍亮的深色背景
-                    : 'oklch(0.92 0.04 var(--hue))' // 浅色模式：稍深的浅色背景
+                    ? 'oklch(0.35 0.08 var(--hue))'
+                    : 'oklch(0.88 0.06 var(--hue))'
                   : getCellBg(cell),
               }}
               title={`${cell.date}: ${cell.count} 次贡献`}
             >
-              <span className={`text-[11px] ${cell.count > 0 ? 'font-medium text-neutral-700 dark:text-neutral-300' : 'text-neutral-400 dark:text-neutral-500'}`}>
+              <span className={`text-[11px] ${
+                cell.isToday
+                  ? 'font-bold text-neutral-500 dark:text-neutral-200'
+                  : cell.count > 0
+                    ? 'font-medium text-neutral-700 dark:text-neutral-300'
+                    : 'text-neutral-400 dark:text-neutral-500'
+              }`}>
                 {cell.day}
               </span>
               {/* 有贡献的小圆点 */}

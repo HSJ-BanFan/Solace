@@ -1,6 +1,5 @@
-import { Icon } from '@iconify/react';
 import { Link } from 'react-router-dom';
-import { LazyImage } from '@/components/common/ui';
+import { LazyImage, SafeIcon } from '@/components/common/ui';
 import { PostMeta } from './PostMeta';
 import type { PostCardArticle } from '@/types';
 
@@ -65,7 +64,7 @@ export function PostCard({ article, className, style }: PostCardProps) {
               before:absolute before:top-[35px] before:left-[18px]"
           >
             {article.title}
-            <Icon icon="material-symbols:chevron-right-rounded" className="text-[var(--primary)] text-[2rem] transition-bounce inline absolute translate-y-0.5 opacity-0 group-hover:opacity-100 -translate-x-1 group-hover:translate-x-0" />
+            <SafeIcon icon="material-symbols:chevron-right-rounded" size="2rem" className="text-[var(--primary)] transition-bounce inline absolute translate-y-0.5 opacity-0 group-hover:opacity-100 -translate-x-1 group-hover:translate-x-0" />
           </Link>
           <PostMeta article={article} />
           <div className="transition-smooth text-75 mb-3.5 pr-4 line-clamp-1">{article.summary || '暂无摘要'}</div>
@@ -87,12 +86,12 @@ export function PostCard({ article, className, style }: PostCardProps) {
         {hasCover ? (
           <Link to={`/articles/${article.slug}`} className="group w-[var(--coverWidth)] absolute top-3 bottom-3 right-3 rounded-xl overflow-hidden">
             <div className="absolute inset-0 group-hover:bg-black/30 transition-smooth" />
-            <Icon icon="material-symbols:chevron-right-rounded" className="absolute z-20 opacity-0 group-hover:opacity-100 scale-50 group-hover:scale-100 text-white text-5xl transition-bounce inset-0 m-auto" />
+            <SafeIcon icon="material-symbols:chevron-right-rounded" size="3rem" className="absolute z-20 opacity-0 group-hover:opacity-100 scale-50 group-hover:scale-100 text-white transition-bounce inset-0 m-auto" />
             <LazyImage src={article.cover_image!} alt={article.title} className="w-full h-full object-cover transition-smooth group-hover:scale-105" wrapperClassName="w-full h-full" effect="blur" />
           </Link>
         ) : (
           <Link to={`/articles/${article.slug}`} className="btn-regular w-[3.25rem] absolute right-3 top-3 bottom-3 rounded-xl hover:bg-[var(--btn-regular-bg-hover)] active:scale-95 transition-smooth">
-            <Icon icon="material-symbols:chevron-right-rounded" className="text-[var(--primary)] text-4xl mx-auto" />
+            <SafeIcon icon="material-symbols:chevron-right-rounded" size="2.5rem" className="text-[var(--primary)] mx-auto" />
           </Link>
         )}
       </div>

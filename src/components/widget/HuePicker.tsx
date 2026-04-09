@@ -2,8 +2,8 @@
  * 色相选择器组件
  */
 
-import { Icon } from '@iconify/react';
 import { useThemeStore } from '@/stores/theme';
+import { SafeIcon } from '@/components/common/ui';
 
 export function HuePicker({ isOpen }: { isOpen: boolean }) {
   const { hue, setHue } = useThemeStore();
@@ -15,7 +15,7 @@ export function HuePicker({ isOpen }: { isOpen: boolean }) {
         <div className="flex items-center gap-2 font-bold text-base text-90">
           主题颜色
           <button onClick={() => setHue(defaultHue)} className={`btn-regular w-6 h-6 rounded scale-animation ${hue === defaultHue ? 'opacity-0 pointer-events-none' : ''}`} aria-label="重置">
-            <Icon icon="fa6-solid:arrow-rotate-left" className="text-xs" />
+            <SafeIcon icon="fa6-solid:arrow-rotate-left" size="0.75rem" />
           </button>
         </div>
         <div className="bg-[var(--btn-regular-bg)] w-8 h-6 rounded flex justify-center font-bold text-xs items-center text-[var(--btn-content)]">{hue}</div>

@@ -4,7 +4,7 @@
  * 用于管理页面和列表页的标题区域
  */
 
-import { Icon } from '@iconify/react';
+import { SafeIcon } from '@/components/common/ui';
 import { Link } from 'react-router-dom';
 
 interface PageHeaderProps {
@@ -26,7 +26,7 @@ export function PageHeader({ title, subtitle, icon, count, action }: PageHeaderP
       onClick={action.onClick}
       className="btn-regular rounded-[var(--radius-medium)] py-2 px-4 font-medium scale-animation ripple"
     >
-      <Icon icon="material-symbols:add-rounded" className="mr-1" />
+      <SafeIcon icon="material-symbols:add-rounded" size="1rem" className="mr-1" />
       {action.label}
     </LinkOrButton>
   );
@@ -48,7 +48,7 @@ export function PageHeader({ title, subtitle, icon, count, action }: PageHeaderP
 function IconBadge({ icon }: { icon: string }) {
   return (
     <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[var(--klein-blue)] to-[var(--sky-blue)] flex items-center justify-center">
-      <Icon icon={icon} className="text-xl text-white" />
+      <SafeIcon icon={icon} size="1.25rem" className="text-white" />
     </div>
   );
 }

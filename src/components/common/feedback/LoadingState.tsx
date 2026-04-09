@@ -1,4 +1,4 @@
-import { Icon } from '@iconify/react';
+import { SafeIcon } from '@/components/common/ui';
 
 interface LoadingStateProps {
   message?: string;
@@ -39,7 +39,7 @@ export function EmptyState({
 }) {
   return (
     <div className={`card-base p-8 text-center onload-animation ${className}`}>
-      <Icon icon={icon} className="text-4xl text-50 mb-4" />
+      <SafeIcon icon={icon} size="2.5rem" className="text-50 mb-4" />
       <p className="text-75">{message}</p>
     </div>
   );

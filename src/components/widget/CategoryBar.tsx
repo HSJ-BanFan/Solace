@@ -13,8 +13,8 @@
 
 import { Link, useLocation } from 'react-router-dom';
 import { useEffect, useRef, useState, useMemo } from 'react';
-import { Icon } from '@iconify/react';
 import { useCategories } from '@/hooks';
+import { SafeIcon } from '@/components/common/ui';
 
 interface CategoryBarProps {
   className?: string;
@@ -116,7 +116,7 @@ export function CategoryBar({ className }: CategoryBarProps) {
             }`}
           data-active={isHome || undefined}
         >
-          <Icon icon="material-symbols:home" className="text-lg" />
+          <SafeIcon icon="material-symbols:home" size="1.125rem" />
         </Link>
 
         {/* 归档按钮 */}

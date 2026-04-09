@@ -1,4 +1,4 @@
-import { Icon } from '@iconify/react';
+import { SafeIcon } from '@/components/common/ui';
 
 interface StatusDisplayProps {
   message?: string;
@@ -19,7 +19,7 @@ export function StatusDisplay({ message, icon, variant = 'error', className = ''
   return (
     <div className={`card-base p-8 text-center fade-in-up ${className}`}>
       <div className={`w-16 h-16 rounded-full ${v.bg} mx-auto mb-4 flex items-center justify-center`}>
-        <Icon icon={icon || v.defaultIcon} className={`text-3xl ${v.iconColor}`} />
+        <SafeIcon icon={icon || v.defaultIcon} size="1.875rem" className={v.iconColor} />
       </div>
       <p className="text-75">{message || v.defaultMsg}</p>
     </div>

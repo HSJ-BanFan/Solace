@@ -2,11 +2,10 @@
  * 个人信息组件
  */
 
-import { Icon } from '@iconify/react';
 import { Link } from 'react-router-dom';
 import { useAuthStore } from '@/stores';
 import { useOwner } from '@/hooks';
-import { LazyImage } from '@/components/common/ui';
+import { LazyImage, SafeIcon } from '@/components/common/ui';
 
 export function Profile() {
   const { isAuthenticated } = useAuthStore();
@@ -21,13 +20,13 @@ export function Profile() {
     <div className="card-base p-3 onload-animation">
       <Link to="/about" className="group block relative mx-auto mt-1 lg:mx-0 lg:mt-0 mb-3 max-w-[12rem] lg:max-w-none overflow-hidden rounded-xl active:scale-95">
         <div className="absolute inset-0 pointer-events-none group-hover:bg-black/30 group-active:bg-black/50 z-50 flex items-center justify-center">
-          <Icon icon="fa6-regular:address-card" className="opacity-0 scale-90 group-hover:scale-100 group-hover:opacity-100 text-white text-5xl transition" />
+          <SafeIcon icon="fa6-regular:address-card" size="3rem" className="opacity-0 scale-90 group-hover:scale-100 group-hover:opacity-100 text-white transition" />
         </div>
         {displayAvatar ? (
           <LazyImage src={displayAvatar} alt="头像" className="mx-auto lg:w-full h-full object-cover rounded-xl" effect="blur" />
         ) : (
           <div className="mx-auto lg:w-full h-32 lg:h-40 bg-gradient-to-br from-[var(--primary)] to-[var(--primary-light)] rounded-xl flex items-center justify-center">
-            <Icon icon="material-symbols:person-outline-rounded" className="text-4xl text-white" />
+            <SafeIcon icon="material-symbols:person-outline-rounded" size="2.5rem" className="text-white" />
           </div>
         )}
       </Link>
@@ -39,13 +38,13 @@ export function Profile() {
 
         <div className="flex flex-wrap gap-2 justify-center mb-1">
           {isAuthenticated ? (
-            <Link to="/admin" className="btn-regular rounded-lg h-10 gap-2 px-3 font-bold active:scale-95">
-              <Icon icon="material-symbols:dashboard-outline-rounded" className="text-[1.25rem]" />
+            <Link to="/admin" className="btn-regular rounded-lg h-10 gap-2 px-3 font-bold active:scale-95 flex items-center">
+              <SafeIcon icon="material-symbols:dashboard-outline-rounded" size="1.25rem" />
               管理后台
             </Link>
           ) : githubUrl && (
-            <a href={githubUrl} target="_blank" rel="noopener noreferrer" className="btn-regular rounded-lg h-10 gap-2 px-3 font-bold active:scale-95" aria-label="GitHub">
-              <Icon icon="fa6-brands:github" className="text-[1.5rem]" />
+            <a href={githubUrl} target="_blank" rel="noopener noreferrer" className="btn-regular rounded-lg h-10 gap-2 px-3 font-bold active:scale-95 flex items-center" aria-label="GitHub">
+              <SafeIcon icon="fa6-brands:github" size="1.5rem" />
               GitHub
             </a>
           )}

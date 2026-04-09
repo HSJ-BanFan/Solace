@@ -10,10 +10,9 @@
  * └─────────┴───────────────────────┘
  */
 
-import { Outlet, useLocation } from 'react-router-dom';
+import { Outlet, useLocation, Link } from 'react-router-dom';
 import { Navbar, Footer } from '@/components/common';
-import { Icon } from '@iconify/react';
-import { Link } from 'react-router-dom';
+import { SafeIcon } from '@/components/common/ui';
 import { useAuthStore } from '@/stores';
 
 /** 侧边栏导航项 */
@@ -62,13 +61,13 @@ export function AdminLayout() {
                   <Link
                     key={item.path}
                     to={item.path}
-                    className={`rounded-lg py-2 px-3 text-sm transition ${
+                    className={`rounded-lg py-2 px-3 text-sm transition flex items-center ${
                       isActive(item.path)
                         ? 'bg-[var(--btn-regular-bg)] text-[var(--primary)] font-medium'
                         : 'btn-plain'
                     }`}
                   >
-                    <Icon icon={item.icon} className="mr-2 text-lg" />
+                    <SafeIcon icon={item.icon} size="1.125rem" className="mr-2" />
                     {item.name}
                   </Link>
                 ))}

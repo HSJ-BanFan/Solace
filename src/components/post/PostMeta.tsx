@@ -2,7 +2,7 @@
  * 文章元信息组件
  */
 
-import { Icon } from '@iconify/react';
+import { SafeIcon } from '@/components/common/ui';
 import { Link } from 'react-router-dom';
 import { formatDate } from '@/utils/date';
 import { MetaItem } from '@/components/common/ui';
@@ -15,7 +15,7 @@ export function PostMeta({ article }: { article: PostCardArticle }) {
       {article.category && (
         <Link to={`/categories/${article.category.slug}`} className="flex items-center text-50 hover:text-[var(--primary)] transition-colors">
           <div className="meta-icon">
-            <Icon icon="material-symbols:book-2-outline-rounded" className="text-xl" />
+            <SafeIcon icon="material-symbols:book-2-outline-rounded" size="1.25rem" />
           </div>
           <span className="text-sm font-medium whitespace-nowrap">{article.category.name}</span>
         </Link>

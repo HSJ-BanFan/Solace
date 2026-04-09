@@ -7,8 +7,8 @@
 import { memo, useState, useCallback, useMemo } from 'react';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { oneDark, oneLight } from 'react-syntax-highlighter/dist/esm/styles/prism';
-import { Icon } from '@iconify/react';
 import { useDarkMode } from '@/hooks';
+import { SafeIcon } from '@/components/common/ui';
 
 interface CodeBlockProps {
   children: string;
@@ -118,9 +118,9 @@ export const CodeBlock = memo(function CodeBlock({ children, language, className
           onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = theme.btnBg)}
         >
           {copied ? (
-            <Icon icon="lucide:check" className="w-3.5 h-3.5 text-green-500" />
+            <SafeIcon icon="lucide:check" size="0.875rem" className="text-green-500" />
           ) : (
-            <Icon icon="lucide:copy" className="w-3.5 h-3.5" />
+            <SafeIcon icon="lucide:copy" size="0.875rem" />
           )}
         </button>
       </div>

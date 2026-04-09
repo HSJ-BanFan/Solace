@@ -3,10 +3,10 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { Icon } from '@iconify/react';
 import { useNavigate } from 'react-router-dom';
 import { useSearch, useEscapeKey } from '@/hooks';
 import { useDebouncedCallback } from 'use-debounce';
+import { SafeIcon } from '@/components/common/ui';
 
 interface SearchModalProps {
   isOpen: boolean;
@@ -45,7 +45,7 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
       <div className="absolute inset-0 bg-[var(--klein-blue)]/20 dark:bg-[var(--klein-blue)]/40 backdrop-blur-sm" onClick={onClose} />
       <div className="relative float-panel w-full max-w-2xl mx-4 overflow-hidden">
         <div className="flex items-center gap-2 p-4 border-b border-[var(--border-light)]">
-          <Icon icon="material-symbols:search-rounded" className="text-2xl text-[var(--primary)]" />
+          <SafeIcon icon="material-symbols:search-rounded" size="1.5rem" className="text-[var(--primary)]" />
           <input
             type="text"
             value={query}
@@ -56,19 +56,19 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
           />
           {isLoading && <div className="w-5 h-5 rounded-full border-2 border-[var(--primary)] border-t-transparent animate-spin" />}
           <button onClick={onClose} className="btn-plain rounded-[var(--radius-medium)] h-10 w-10 scale-animation ripple">
-            <Icon icon="material-symbols:close-rounded" className="text-xl" />
+            <SafeIcon icon="material-symbols:close-rounded" size="1.25rem" />
           </button>
         </div>
 
         <div className="max-h-[60vh] overflow-y-auto">
           {showEmpty && (
             <div className="p-8 text-center text-50">
-              <Icon icon="material-symbols:search-off-rounded" className="text-4xl mb-2" />
+              <SafeIcon icon="material-symbols:search-off-rounded" size="2.5rem" className="mb-2" />
               <p>未找到 "{query}" 的相关文章</p>
             </div>
           )}
 
-          {results?.data?.length > 0 && (
+          {results?.data?.length ? (
             <div className="p-2">
               {results.data.map((article) => (
                 <button
@@ -78,17 +78,17 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
                 >
                   <div className="flex items-center gap-2">
                     <span className="text-90 font-bold group-hover:text-[var(--primary)] transition-colors flex-1">{article.title}</span>
-                    <Icon icon="material-symbols:chevron-right-rounded" className="text-lg text-30 group-hover:text-[var(--primary)] group-hover:translate-x-1 transition-all" />
+                    <SafeIcon icon="material-symbols:chevron-right-rounded" size="1.125rem" className="text-30 group-hover:text-[var(--primary)] group-hover:translate-x-1 transition-all" />
                   </div>
                   {article.summary && <div className="text-50 text-sm line-clamp-1 mt-1">{article.summary}</div>}
                 </button>
               ))}
             </div>
-          )}
+          ) : null}
 
           {!query.trim() && (
             <div className="p-8 text-center text-50">
-              <Icon icon="material-symbols:search-rounded" className="text-4xl mb-2 text-[var(--primary)]" />
+              <SafeIcon icon="material-symbols:search-rounded" size="2.5rem" className="mb-2 text-[var(--primary)]" />
               <p>输入关键词搜索文章</p>
               <p className="text-xs mt-1">支持标题和内容搜索</p>
             </div>

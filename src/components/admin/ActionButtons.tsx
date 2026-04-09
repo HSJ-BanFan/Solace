@@ -1,5 +1,5 @@
-import { Icon } from '@iconify/react';
 import { Link } from 'react-router-dom';
+import { SafeIcon } from '@/components/common/ui';
 
 interface ActionButtonProps {
   icon: string;
@@ -14,21 +14,21 @@ interface ActionButtonProps {
  * 操作按钮组件 - 用于管理列表项
  */
 export function ActionButton({ icon, title, href, onClick, disabled, danger }: ActionButtonProps) {
-  const className = `btn-plain rounded-[var(--radius-medium)] h-9 w-9 scale-animation ripple ${
+  const className = `btn-plain rounded-[var(--radius-medium)] h-9 w-9 scale-animation ripple flex items-center justify-center ${
     danger ? 'text-red-500 hover:bg-red-500/10' : ''
   } ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`;
 
   if (href) {
     return (
       <Link to={href} className={className} title={title}>
-        <Icon icon={icon} className="text-lg" />
+        <SafeIcon icon={icon} size="1.125rem" />
       </Link>
     );
   }
 
   return (
     <button onClick={onClick} disabled={disabled} className={className} title={title}>
-      <Icon icon={icon} className="text-lg" />
+      <SafeIcon icon={icon} size="1.125rem" />
     </button>
   );
 }

@@ -1,9 +1,7 @@
 import { useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useLogin } from '@/hooks';
-import { LoadingButton, InputField } from '@/components';
-import { Icon } from '@iconify/react';
-import { Link } from 'react-router-dom';
+import { LoadingButton, InputField, SafeIcon } from '@/components';
 
 export function LoginPage() {
   const navigate = useNavigate();
@@ -38,7 +36,7 @@ export function LoginPage() {
       {/* 头部 */}
       <div className="text-center mb-6">
         <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[var(--klein-blue)] to-[var(--sky-blue)] mx-auto mb-4 flex items-center justify-center breathing">
-          <Icon icon="material-symbols:login-rounded" className="text-3xl text-white" />
+          <SafeIcon icon="material-symbols:login-rounded" size="1.875rem" className="text-white" />
         </div>
         <h1 className="text-90 text-2xl font-bold">欢迎回来</h1>
         <p className="text-50 text-sm mt-1">登录您的账户</p>

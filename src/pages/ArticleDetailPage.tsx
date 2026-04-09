@@ -1,8 +1,7 @@
 import { useParams, Link } from 'react-router-dom';
 import { useArticleBySlug } from '@/hooks';
-import { PostMeta, MarkdownRenderer, ErrorDisplay, NotFoundDisplay, ArticleDetailSkeleton, LazyImage } from '@/components';
+import { PostMeta, MarkdownRenderer, ErrorDisplay, NotFoundDisplay, ArticleDetailSkeleton, LazyImage, SafeIcon } from '@/components';
 import type { TocHeading } from '@/components/widget/TableOfContents';
-import { Icon } from '@iconify/react';
 import { formatDate } from '@/utils';
 import { useEffect, useCallback } from 'react';
 import { useTocStore } from '@/stores';
@@ -43,7 +42,7 @@ export function ArticleDetailPage() {
           <div className="flex items-center justify-between text-50 text-sm">
             {/* 左下角：更新时间 */}
             <span className="flex items-center gap-2">
-              <Icon icon="material-symbols:edit-calendar-outline-rounded" className="text-base" />
+              <SafeIcon icon="material-symbols:edit-calendar-outline-rounded" size="1rem" />
               {hasUpdate ? formatDate(article.updated_at) : formatDate(article.published_at || article.created_at)}
             </span>
             {/* 右下角：标签 */}

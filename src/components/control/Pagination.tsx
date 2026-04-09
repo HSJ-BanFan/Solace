@@ -4,7 +4,7 @@
  * 显示页码导航，支持跳页
  */
 
-import { Icon } from '@iconify/react';
+import { SafeIcon } from '@/components/common/ui';
 
 interface PaginationProps {
   page: number;
@@ -37,7 +37,7 @@ export function Pagination({ page, pageSize, total, onPageChange }: PaginationPr
         }`}
         aria-label="上一页"
       >
-        <Icon icon="material-symbols:chevron-left-rounded" className="text-xl" />
+        <SafeIcon icon="material-symbols:chevron-left-rounded" size="1.25rem" />
       </button>
 
       {/* 首页 */}
@@ -90,7 +90,7 @@ export function Pagination({ page, pageSize, total, onPageChange }: PaginationPr
         }`}
         aria-label="下一页"
       >
-        <Icon icon="material-symbols:chevron-right-rounded" className="text-xl" />
+        <SafeIcon icon="material-symbols:chevron-right-rounded" size="1.25rem" />
       </button>
     </div>
   );
