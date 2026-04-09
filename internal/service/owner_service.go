@@ -88,6 +88,3 @@ type AdminConfig struct {
 	Bio       string
 	GitHubURL string
 }
-
-// UserRepository 需要添加 FindAll 方法
-// 在 repository.go 中添加

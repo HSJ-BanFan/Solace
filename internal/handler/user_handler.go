@@ -63,34 +63,3 @@ func (h *UserHandler) UpdateMe(c *gin.Context) {
 
 	RespondWithSuccess(c, user)
 }
-
-// GetUser 根据 ID 获取用户
-// @Summary 根据 ID 获取用户
-// @Tags user
-// @Produce json
-// @Param id path int true "用户ID"
-// @Success 200 {object} Response
-// @Failure 404 {object} Response
-// @Router /users/{id} [get]
-func (h *UserHandler) GetUser(c *gin.Context) {
-	id := c.Param("id")
-	if id == "" {
-		RespondWithError(c, apperrors.NewBadRequest("用户ID不能为空", nil))
-		return
-	}
-
-	// 解析 ID
-	var userID uint
-	if _, err := c.Params.Get("id"); !err {
-		RespondWithError(c, apperrors.NewBadRequest("无效的用户ID", nil))
-		return
-	}
-
-	user, err := h.userService.GetByID(c.Request.Context(), userID)
-	if err != nil {
-		RespondWithError(c, err)
-		return
-	}
-
-	RespondWithSuccess(c, user)
-}

@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"gin-quickstart/internal/pkg/text"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -39,6 +40,12 @@ func (h *ArticleHandler) Create(c *gin.Context) {
 		return
 	}
 
+	// 如果没有提供摘要，则从内容生成
+	summary := req.Summary
+	if summary == "" {
+		summary = text.GenerateSummary(req.Content, 100)
+	}
+
 	// 默认状态为草稿
 	status := req.Status
 	if status == "" {
@@ -50,7 +57,7 @@ func (h *ArticleHandler) Create(c *gin.Context) {
 		req.Title,
 		req.Slug,
 		req.Content,
-		req.Summary,
+		summary,
 		req.CoverImage,
 		req.CategoryID,
 		req.TagIDs,
@@ -242,6 +249,12 @@ func (h *ArticleHandler) Update(c *gin.Context) {
 		return
 	}
 
+	// 如果没有提供摘要，则从内容生成
+	summary := req.Summary
+	if summary == "" {
+		summary = text.GenerateSummary(req.Content, 100)
+	}
+
 	article, err := h.articleService.Update(
 		c.Request.Context(),
 		uint(id),
@@ -250,7 +263,7 @@ func (h *ArticleHandler) Update(c *gin.Context) {
 		req.Title,
 		req.Slug,
 		req.Content,
-		req.Summary,
+		summary,
 		req.CoverImage,
 		req.CategoryID,
 		req.TagIDs,

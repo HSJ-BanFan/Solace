@@ -18,17 +18,6 @@ func HealthCheck(c *gin.Context) {
 	})
 }
 
-// PlaceholderSearch 搜索接口占位响应
-func PlaceholderSearch(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{
-		"success": true,
-		"data": gin.H{
-			"message": "搜索功能即将上线",
-			"items":   []interface{}{},
-		},
-	})
-}
-
 // PlaceholderUpload 上传接口占位响应
 func PlaceholderUpload(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
