@@ -1,10 +1,5 @@
-/**
- * 文章卡片组件
- */
-
 import { Icon } from '@iconify/react';
 import { Link } from 'react-router-dom';
-import { formatDate } from '@/utils/date';
 import { LazyImage } from './LazyImage';
 import { PostMeta } from './PostMeta';
 import type { PostCardArticle } from '@/types';
@@ -21,7 +16,6 @@ interface PostCardProps {
 
 export function PostCard({ article, className, style }: PostCardProps) {
   const hasCover = Boolean(article.cover_image);
-  const date = formatDate(article.published_at || article.created_at);
 
   return (
     <article
@@ -40,9 +34,18 @@ export function PostCard({ article, className, style }: PostCardProps) {
           <p className="text-sm text-50 line-clamp-2 leading-relaxed flex-1">
             {article.summary || '暂无摘要'}
           </p>
-          <div className="flex items-center gap-3 text-xs text-30 pt-2">
-            <MetaItem icon="material-symbols:calendar-today-outline-rounded" text={date} />
-            <MetaItem icon="material-symbols:visibility-outline-rounded" text={`${article.view_count}`} />
+          <div className="flex flex-wrap gap-2 mt-2">
+            {article.tags && article.tags.length > 0
+              ? article.tags.slice(0, 3).map((tag) => (
+                  <Link
+                    key={tag.id}
+                    to={`/tags/${tag.slug}`}
+                    className="btn-regular h-6 text-xs px-2 rounded-lg hover:text-[var(--primary)] whitespace-nowrap"
+                  >
+                    # {tag.name}
+                  </Link>
+                ))
+              : <span className="text-xs text-30">暂无标签</span>}
           </div>
         </div>
         {hasCover && (
@@ -66,7 +69,19 @@ export function PostCard({ article, className, style }: PostCardProps) {
           </Link>
           <PostMeta article={article} />
           <div className="transition-smooth text-75 mb-3.5 pr-4 line-clamp-1">{article.summary || '暂无摘要'}</div>
-          <div className="text-sm text-30">{article.view_count} 次浏览</div>
+          <div className="flex flex-wrap gap-2 mt-2">
+            {article.tags && article.tags.length > 0
+              ? article.tags.map((tag) => (
+                  <Link
+                    key={tag.id}
+                    to={`/tags/${tag.slug}`}
+                    className="btn-regular h-6 text-xs px-2 rounded-lg hover:text-[var(--primary)] whitespace-nowrap"
+                  >
+                    # {tag.name}
+                  </Link>
+                ))
+              : <span className="text-xs text-30">暂无标签</span>}
+          </div>
         </div>
 
         {hasCover ? (
@@ -84,15 +99,5 @@ export function PostCard({ article, className, style }: PostCardProps) {
 
       <div className="hidden md:block absolute inset-0 pointer-events-none card-hover-overlay rounded-[var(--radius-large)]" />
     </article>
-  );
-}
-
-/** 移动端元信息项 */
-function MetaItem({ icon, text }: { icon: string; text: string }) {
-  return (
-    <span className="flex items-center gap-1">
-      <Icon icon={icon} className="text-sm" />
-      {text}
-    </span>
   );
 }

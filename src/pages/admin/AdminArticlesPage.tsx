@@ -109,8 +109,6 @@ export function AdminArticlesPage() {
                     }`}>
                       {article.status === 'published' ? '已发布' : '草稿'}
                     </span>
-                    <span>•</span>
-                    <span>{article.view_count} 次浏览</span>
                   </div>
                 </div>
                 <div className="flex items-center gap-1 shrink-0">

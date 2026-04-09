@@ -11,10 +11,11 @@ export function toPostCardArticle(article: ArticleSummary): PostCardArticle {
 		summary: article.summary,
 		cover_image: processArticleCoverImage(article.cover_image),
 		author: article.author,
+		category: article.category,
+		tags: article.tags,
 		status: article.status,
-		view_count: article.view_count,
 		published_at: article.published_at,
 		created_at: article.created_at,
-		updated_at: article.updated_at,
+		updated_at: article.updated_at ?? article.created_at,
 	};
 }

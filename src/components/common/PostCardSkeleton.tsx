@@ -72,11 +72,6 @@ export const PostCardSkeleton = memo(function PostCardSkeleton({ hasCover = fals
             <div className="skeleton h-4 rounded w-full mb-2"></div>
             <div className="skeleton h-4 rounded w-5/6 hidden md:block"></div>
           </div>
-
-          {/* 浏览量 */}
-          <div className="flex gap-4">
-            <div className="skeleton h-4 rounded w-16"></div>
-          </div>
         </div>
 
         {/* 封面图片骨架 */}

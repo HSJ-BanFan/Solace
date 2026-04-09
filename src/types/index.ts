@@ -92,7 +92,6 @@ export interface Article {
 	category?: Category;
 	tags?: Tag[];
 	status: "draft" | "published";
-	view_count: number;
 	is_top: boolean;
 	version: number;
 	word_count: number;
@@ -121,9 +120,9 @@ export interface ArticleSummary {
 	category?: Category;
 	tags?: Tag[];
 	status: string;
-	view_count: number;
 	published_at?: string;
 	created_at: string;
+	updated_at?: string;
 }
 
 /** 归档分组（按年份） */
@@ -184,8 +183,9 @@ export interface PostCardArticle {
 	summary?: string;
 	cover_image?: string;
 	author?: { id: number; username: string; nickname?: string };
+	category?: Category;
+	tags?: Tag[];
 	status: string;
-	view_count: number;
 	published_at?: string;
 	created_at: string;
 	updated_at: string;

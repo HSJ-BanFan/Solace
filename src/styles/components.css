@@ -121,12 +121,12 @@
 	/* === 图标徽章 === */
 	.meta-icon {
 		@apply flex items-center justify-center transition-colors duration-200;
-		width: 2.25rem;
-		height: 2.25rem;
+		width: 2rem;
+		height: 2rem;
 		border-radius: var(--radius-small);
 		background: var(--btn-regular-bg);
 		color: var(--btn-content);
-		margin-right: 0.75rem;
+		margin-right: 0.5rem;
 	}
 
 	/* === 分隔符 === */

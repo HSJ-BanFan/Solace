@@ -1,4 +1,4 @@
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { useArticleBySlug } from '@/hooks';
 import { PostMeta, MarkdownRenderer, ErrorDisplay, NotFoundDisplay, ArticleDetailSkeleton, LazyImage } from '@/components';
 import type { TocHeading } from '@/components/widget/TableOfContents';
@@ -21,6 +21,9 @@ export function ArticleDetailPage() {
   if (isLoading) return <ArticleDetailSkeleton />;
   if (!article) return <NotFoundDisplay message="未找到文章" />;
 
+  // 判断是否有更新（更新时间与创建时间不同）
+  const hasUpdate = article.updated_at && article.updated_at !== article.created_at;
+
   return (
     <article className="flex-1 min-w-0 space-y-4">
       <div className="card-base p-6 md:p-8 fade-in-up">
@@ -38,14 +41,25 @@ export function ArticleDetailPage() {
         <MarkdownRenderer content={article.content} className="mt-6" onHeadingsExtracted={handleHeadings} />
         <div className="border-t border-[var(--border-light)] mt-8 pt-4">
           <div className="flex items-center justify-between text-50 text-sm">
+            {/* 左下角：更新时间 */}
             <span className="flex items-center gap-2">
-              <Icon icon="material-symbols:calendar-today-outline-rounded" className="text-base" />
-              {formatDate(article.published_at || article.created_at)}
+              <Icon icon="material-symbols:edit-calendar-outline-rounded" className="text-base" />
+              {hasUpdate ? formatDate(article.updated_at) : formatDate(article.published_at || article.created_at)}
             </span>
-            <span className="flex items-center gap-2">
-              <Icon icon="material-symbols:visibility-outline-rounded" className="text-base" />
-              {article.view_count} 次浏览
-            </span>
+            {/* 右下角：标签 */}
+            {article.tags && article.tags.length > 0 && (
+              <div className="flex items-center gap-2 flex-wrap justify-end">
+                {article.tags.map((tag) => (
+                  <Link
+                    key={tag.id}
+                    to={`/tags/${tag.slug}`}
+                    className="btn-regular h-6 text-xs px-2 rounded-lg hover:text-[var(--primary)] whitespace-nowrap"
+                  >
+                    # {tag.name}
+                  </Link>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </div>
