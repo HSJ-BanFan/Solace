@@ -4,7 +4,7 @@
 
 @tailwind utilities;
 
-/* === 归档时间线 (Fuwari) === */
+/* === 归档时间线 (Fuwari/Mizuki) === */
 .dash-line {
   position: relative;
 }
@@ -15,10 +15,17 @@
   width: 10%;
   height: 100%;
   left: calc(50% - 1px);
-  border-left: 2px dashed var(--line-color);
+  border-left: 2px dashed oklch(0.7 0.05 var(--hue) / 0.4);
   pointer-events: none;
-  transition: all 0.3s;
+  transition: all 0.3s ease-out;
   transform: translateY(-50%);
+}
+
+/* hover 时虚线变实线，更精致 */
+.group:hover .dash-line::before {
+  border-left-style: solid;
+  border-left-color: var(--primary);
+  border-left-width: 2px;
 }
 
 /* === 色调滑块 === */

@@ -50,9 +50,9 @@ export function ArchivePage() {
                   <div className="flex flex-row justify-start items-center h-full">
                     <div className="w-[15%] md:w-[10%] text-sm text-right text-50">{formatShortDate(post.published_at || post.created_at)}</div>
                     <div className="w-[15%] md:w-[10%] relative dash-line h-full flex items-center">
-                      <div className="mx-auto w-1 h-1 rounded group-hover:h-5 bg-[oklch(0.5_0.05_var(--hue))] group-hover:bg-[var(--primary)] outline outline-4 z-50 outline-[var(--card-bg)] group-hover:outline-[var(--btn-plain-bg-hover)] group-active:outline-[var(--btn-plain-bg-active)]" />
+                      <div className="transition-all duration-300 ease-out mx-auto w-1 h-1 rounded group-hover:h-5 bg-[oklch(0.5_0.05_var(--hue))] group-hover:bg-[var(--primary)] outline outline-4 z-50 outline-[var(--card-bg)] group-hover:outline-[var(--btn-plain-bg-hover)] group-active:outline-[var(--btn-plain-bg-active)]" />
                     </div>
-                    <div className="w-[70%] md:max-w-[65%] text-left font-bold group-hover:translate-x-1 transition-all group-hover:text-[var(--primary)] text-75 pr-8 truncate">
+                    <div className="w-[70%] md:max-w-[65%] text-left font-bold group-hover:translate-x-1 transition-all duration-300 ease-out group-hover:text-[var(--primary)] text-75 pr-8 truncate">
                       {post.title}
                     </div>
                     <div className="hidden md:block md:w-[15%] text-left text-sm text-30 truncate">{formatTags(post.tags)}</div>
