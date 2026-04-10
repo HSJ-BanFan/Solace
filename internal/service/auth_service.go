@@ -2,20 +2,21 @@ package service
 
 import (
 	"context"
-	"errors"
 	"time"
 
 	"gin-quickstart/internal/config"
 	"gin-quickstart/internal/dto/request"
 	"gin-quickstart/internal/dto/response"
+	apperrors "gin-quickstart/internal/pkg/errors"
 	"gin-quickstart/internal/pkg/hash"
 	"gin-quickstart/internal/pkg/jwt"
 )
 
+// 认证相关错误
 var (
-	ErrInvalidCredentials = errors.New("用户名或密码错误")
-	ErrTokenExpired       = errors.New("令牌已过期")
-	ErrTokenRevoked       = errors.New("令牌已被撤销")
+	ErrInvalidCredentials = apperrors.NewUnauthorized("邮箱或密码错误")
+	ErrTokenExpired       = apperrors.NewUnauthorized("令牌已过期")
+	ErrTokenRevoked       = apperrors.NewUnauthorized("令牌已被撤销")
 )
 
 // AuthService 认证业务逻辑接口
@@ -63,14 +64,13 @@ func (s *authService) Login(ctx context.Context, req *request.LoginRequest) (*re
 
 func (s *authService) Logout(ctx context.Context, refreshToken string) error {
 	// 单用户模式，登出无需额外处理
-	// JWT 令牌会在过期后自动失效
 	return nil
 }
 
 func (s *authService) Refresh(ctx context.Context, req *request.RefreshTokenRequest) (*response.RefreshResponse, error) {
 	// 验证刷新令牌
 	if err := s.jwtManager.ValidateRefreshToken(req.RefreshToken); err != nil {
-		return nil, err
+		return nil, ErrTokenExpired
 	}
 
 	// 生成新令牌
