@@ -18,14 +18,14 @@ export function Profile() {
 
   return (
     <div className="card-base p-3 onload-animation">
-      <Link to="/about" className="group block relative mx-auto mt-1 lg:mx-0 lg:mt-0 mb-3 max-w-[12rem] lg:max-w-none overflow-hidden rounded-xl active:scale-95">
+      <Link to="/about" className="group block relative mx-auto mt-1 lg:mx-0 lg:mt-0 mb-3 max-w-[12rem] lg:max-w-none aspect-square overflow-hidden rounded-xl active:scale-95">
         <div className="absolute inset-0 pointer-events-none group-hover:bg-black/30 group-active:bg-black/50 z-50 flex items-center justify-center">
           <SafeIcon icon="fa6-regular:address-card" size="3rem" className="opacity-0 scale-90 group-hover:scale-100 group-hover:opacity-100 text-white transition" />
         </div>
         {displayAvatar ? (
-          <LazyImage src={displayAvatar} alt="头像" className="mx-auto lg:w-full h-full object-cover rounded-xl" effect="blur" />
+          <LazyImage src={displayAvatar} alt="头像" className="w-full h-full object-cover rounded-xl" wrapperClassName="w-full h-full" effect="blur" />
         ) : (
-          <div className="mx-auto lg:w-full h-32 lg:h-40 bg-gradient-to-br from-[var(--primary)] to-[var(--primary-light)] rounded-xl flex items-center justify-center">
+          <div className="w-full h-full bg-gradient-to-br from-[var(--primary)] to-[var(--primary-light)] rounded-xl flex items-center justify-center">
             <SafeIcon icon="material-symbols:person-outline-rounded" size="2.5rem" className="text-white" />
           </div>
         )}
