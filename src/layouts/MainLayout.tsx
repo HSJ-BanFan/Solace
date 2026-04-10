@@ -26,29 +26,13 @@ import { Profile, Categories, Tags, ContributionCalendar } from '@/components/wi
 import { useTocStore } from '@/stores';
 import { useMemo } from 'react';
 
-/** 侧边栏骨架屏 */
-function SidebarSkeleton() {
-  return (
-    <div className="card-base pb-4 animate-pulse">
-      <div className="h-6 bg-[var(--btn-regular-bg)] rounded mx-4 mt-4 mb-3 w-16" />
-      <div className="px-4 space-y-2">
-        <div className="h-9 bg-[var(--btn-regular-bg)] rounded-lg" />
-        <div className="h-9 bg-[var(--btn-regular-bg)] rounded-lg w-3/4" />
-        <div className="h-9 bg-[var(--btn-regular-bg)] rounded-lg w-5/6" />
-        <div className="h-9 bg-[var(--btn-regular-bg)] rounded-lg w-2/3" />
-      </div>
-    </div>
-  );
-}
-
 /** 左侧边栏组件 */
 interface LeftSidebarProps {
   isArticlePage: boolean;
   headings: { id: string; text: string; depth: number }[];
-  isLoading: boolean;
 }
 
-function LeftSidebar({ isArticlePage, headings, isLoading }: LeftSidebarProps) {
+function LeftSidebar({ isArticlePage, headings }: LeftSidebarProps) {
   return (
     <aside className="hidden lg:block w-64 flex-shrink-0">
       {/* 顶部组件区域 - Profile 始终显示 */}
@@ -83,7 +67,7 @@ function RightSidebar() {
 }
 
 export function MainLayout() {
-  const { headings, isArticleLoading } = useTocStore();
+  const { headings } = useTocStore();
   const location = useLocation();
 
   // 判断是否为文章详情页
@@ -103,7 +87,6 @@ export function MainLayout() {
           <LeftSidebar
             isArticlePage={isArticlePage}
             headings={headings}
-            isLoading={isArticleLoading}
           />
 
           {/* 主内容区 */}

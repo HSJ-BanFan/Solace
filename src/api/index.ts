@@ -9,10 +9,10 @@
  */
 
 import { OpenAPI, ApiClient } from './generated';
+import { getApiBase } from '@/config/runtime';
 
-// 配置 OpenAPI 基础 URL
-const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:8080/api/v1';
-OpenAPI.BASE = API_BASE;
+// 配置 OpenAPI 基础 URL（支持运行时配置）
+OpenAPI.BASE = getApiBase();
 
 // Token 刷新状态（防止并发刷新）
 let isRefreshing = false;
@@ -93,7 +93,7 @@ async function doRefreshToken(): Promise<string | null> {
   }
 
   try {
-    const response = await fetch(`${API_BASE}/auth/refresh`, {
+    const response = await fetch(`${getApiBase()}/auth/refresh`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -214,8 +214,11 @@ window.fetch = async (input: RequestInfo | URL, init?: RequestInit): Promise<Res
   return response;
 };
 
-// 创建 API 客户端实例，传递 Token 解析器
-export const apiClient = new ApiClient({ TOKEN: OpenAPI.TOKEN });
+// 创建 API 客户端实例，显式传入 BASE 和 Token 解析器
+export const apiClient = new ApiClient({
+  BASE: getApiBase(),
+  TOKEN: OpenAPI.TOKEN
+});
 
 // 工具函数（已废弃，Token 现通过解析器自动处理）
 export const setApiToken = (): void => { /* 无操作 */ };

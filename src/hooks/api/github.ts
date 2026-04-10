@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { useOwner } from "./owner";
+import { getGitHubToken } from "@/config/runtime";
 
 /**
  * GitHub 贡献日历数据类型
@@ -38,7 +39,7 @@ export function useGitHubContributions() {
 				throw new Error("GitHub username not found");
 			}
 
-			const token = import.meta.env.VITE_GITHUB_TOKEN;
+			const token = getGitHubToken();
 			if (!token) {
 				throw new Error("GitHub token not configured");
 			}
