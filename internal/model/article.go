@@ -25,7 +25,6 @@ type Article struct {
 	DeletedAt   gorm.DeletedAt `gorm:"index" json:"-"`
 
 	// Relations 关联关系
-	Author   *User     `gorm:"foreignKey:AuthorID" json:"author,omitempty"`
 	Category *Category `gorm:"foreignKey:CategoryID" json:"category,omitempty"`
 	Tags     []Tag     `gorm:"many2many:article_tags;" json:"tags,omitempty"`
 }

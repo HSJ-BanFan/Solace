@@ -1,111 +1,146 @@
 package config
 
 import (
-	"os"
-	"strconv"
+	"fmt"
+	"sync"
 	"time"
 
-	"github.com/joho/godotenv"
+	"gin-quickstart/internal/pkg/hash"
+	
 )
 
 // Config 应用配置结构体
 type Config struct {
-	// Server 服务器配置
-	ServerPort    string
-	ServerMode    string // debug, release, test
+	Server    ServerConfig    `toml:"server"`
+	Database  DatabaseConfig  `toml:"database"`
+	JWT       JWTConfig       `toml:"jwt"`
+	Logging   LoggingConfig   `toml:"logging"`
+	Migration MigrationConfig `toml:"migration"`
+	Admin     AdminConfig     `toml:"admin"`
 
-	// Database 数据库配置
-	DBHost     string
-	DBPort     string
-	DBUser     string
-	DBPassword string
-	DBName     string
-	DBSSLMode  string
-
-	// JWT 令牌配置
-	JWTSecret          string
-	JWTAccessDuration  time.Duration
-	JWTRefreshDuration time.Duration
-
-	// Logging 日志配置
-	LogLevel string
-	LogEnv   string // development, production
-
-	// Migration 迁移配置
-	MigrationPath string
-
-	// Admin 管理员（站长）配置
-	AdminUsername  string
-	AdminEmail     string
-	AdminPassword  string
-	AdminNickname  string
-	AdminAvatarURL string
-	AdminBio       string
-	AdminGitHub    string
+	// 缓存的密码哈希
+	adminPasswordHash string
+	once              sync.Once
 }
 
-// Load 从环境变量加载配置
+// ServerConfig 服务器配置
+type ServerConfig struct {
+	Port string `toml:"port"`
+	Mode string `toml:"mode"` // debug, release, test
+}
+
+// DatabaseConfig 数据库配置
+type DatabaseConfig struct {
+	Host     string `toml:"host"`
+	Port     string `toml:"port"`
+	User     string `toml:"user"`
+	Password string `toml:"password"`
+	Name     string `toml:"name"`
+	SSLMode  string `toml:"sslmode"`
+}
+
+// JWTConfig JWT 令牌配置
+type JWTConfig struct {
+	Secret          string `toml:"secret"`
+	AccessDuration  int    `toml:"access_duration"`  // 分钟
+	RefreshDuration int    `toml:"refresh_duration"` // 分钟
+}
+
+// LoggingConfig 日志配置
+type LoggingConfig struct {
+	Level string `toml:"level"` // trace, debug, info, warn, error, fatal, panic
+	Env   string `toml:"env"`   // development, production
+}
+
+// MigrationConfig 迁移配置
+type MigrationConfig struct {
+	Path string `toml:"path"`
+}
+
+// AdminConfig 管理员（站长）配置
+type AdminConfig struct {
+	Username  string `toml:"username"`
+	Email     string `toml:"email"`
+	Password  string `toml:"password"`
+	Nickname  string `toml:"nickname"`
+	AvatarURL string `toml:"avatar_url"`
+	Bio       string `toml:"bio"`
+	GitHub    string `toml:"github"`
+}
+
+// Load 从 TOML 文件加载配置
 func Load() *Config {
-	// 加载 .env 文件（如果不存在则忽略，使用系统环境变量）
-	_ = godotenv.Load()
+	configPath := getConfigPath()
 
-	return &Config{
-		ServerPort:    getEnv("SERVER_PORT", "8080"),
-		ServerMode:    getEnv("SERVER_MODE", "debug"),
-
-		DBHost:     getEnv("DB_HOST", "localhost"),
-		DBPort:     getEnv("DB_PORT", "5432"),
-		DBUser:     getEnv("DB_USER", "postgres"),
-		DBPassword: getEnv("DB_PASSWORD", ""),
-		DBName:     getEnv("DB_NAME", "blog"),
-		DBSSLMode:  getEnv("DB_SSLMODE", "disable"),
-
-		JWTSecret:          getEnv("JWT_SECRET", "your-secret-key-change-in-production"),
-		JWTAccessDuration:  getDurationEnv("JWT_ACCESS_DURATION", 15*time.Minute),
-		JWTRefreshDuration: getDurationEnv("JWT_REFRESH_DURATION", 7*24*time.Hour),
-
-		LogLevel: getEnv("LOG_LEVEL", "info"),
-		LogEnv:   getEnv("LOG_ENV", "development"),
-
-		MigrationPath: getEnv("MIGRATION_PATH", "migrations"),
-
-		// Admin 配置
-		AdminUsername:  getEnv("ADMIN_USERNAME", "admin"),
-		AdminEmail:     getEnv("ADMIN_EMAIL", "admin@example.com"),
-		AdminPassword:  getEnv("ADMIN_PASSWORD", "admin123"),
-		AdminNickname:  getEnv("ADMIN_NICKNAME", "博主"),
-		AdminAvatarURL: getEnv("ADMIN_AVATAR_URL", ""),
-		AdminBio:       getEnv("ADMIN_BIO", "欢迎来到我的博客"),
-		AdminGitHub:    getEnv("ADMIN_GITHUB", ""),
+	var cfg Config
+	if _, err := toml.DecodeFile(configPath, &cfg); err != nil {
+		panic(fmt.Sprintf("无法加载配置文件 %s: %v", configPath, err))
 	}
+
+	return &cfg
 }
 
-// getEnv 获取环境变量，如果不存在则返回默认值
-func getEnv(key, defaultValue string) string {
-	if value := os.Getenv(key); value != "" {
-		return value
-	}
-	return defaultValue
-}
-
-// getDurationEnv 获取时间类型的环境变量（单位：分钟）
-func getDurationEnv(key string, defaultValue time.Duration) time.Duration {
-	if value := os.Getenv(key); value != "" {
-		minutes, err := strconv.Atoi(value)
-		if err != nil {
-			return defaultValue
-		}
-		return time.Duration(minutes) * time.Minute
-	}
-	return defaultValue
+// getConfigPath 获取配置文件路径
+func getConfigPath() string {
+	return "config.toml"
 }
 
 // GetDSN 返回数据库连接字符串
 func (c *Config) GetDSN() string {
-	return "host=" + c.DBHost +
-		" port=" + c.DBPort +
-		" user=" + c.DBUser +
-		" password=" + c.DBPassword +
-		" dbname=" + c.DBName +
-		" sslmode=" + c.DBSSLMode
+	return fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
+		c.Database.Host,
+		c.Database.Port,
+		c.Database.User,
+		c.Database.Password,
+		c.Database.Name,
+		c.Database.SSLMode,
+	)
 }
+
+// GetJWTAccessDuration 返回 Access Token 有效期
+func (c *Config) GetJWTAccessDuration() time.Duration {
+	return time.Duration(c.JWT.AccessDuration) * time.Minute
+}
+
+// GetJWTRefreshDuration 返回 Refresh Token 有效期
+func (c *Config) GetJWTRefreshDuration() time.Duration {
+	return time.Duration(c.JWT.RefreshDuration) * time.Minute
+}
+
+// GetAdminPasswordHash 返回管理员密码哈希（缓存）
+func (c *Config) GetAdminPasswordHash() string {
+	c.once.Do(func() {
+		hashed, err := hash.HashPassword(c.Admin.Password)
+		if err != nil {
+			panic(fmt.Sprintf("无法哈希管理员密码: %v", err))
+		}
+		c.adminPasswordHash = hashed
+	})
+	return c.adminPasswordHash
+}
+
+// Server 配置访问器
+func (c *Config) ServerPort() string { return c.Server.Port }
+func (c *Config) ServerMode() string { return c.Server.Mode }
+
+// Logging 配置访问器
+func (c *Config) LogLevel() string { return c.Logging.Level }
+func (c *Config) LogEnv() string   { return c.Logging.Env }
+
+// JWT 配置访问器
+func (c *Config) JWTSecret() string                 { return c.JWT.Secret }
+func (c *Config) JWTAccessDuration() time.Duration  { return c.GetJWTAccessDuration() }
+func (c *Config) JWTRefreshDuration() time.Duration { return c.GetJWTRefreshDuration() }
+
+// Migration 配置访问器
+func (c *Config) MigrationPath() string { return c.Migration.Path }
+
+// Admin 配置访问器
+func (c *Config) AdminUsername() string     { return c.Admin.Username }
+func (c *Config) AdminEmail() string        { return c.Admin.Email }
+func (c *Config) AdminPassword() string     { return c.Admin.Password }
+func (c *Config) AdminNickname() string     { return c.Admin.Nickname }
+func (c *Config) AdminAvatarURL() string    { return c.Admin.AvatarURL }
+func (c *Config) AdminBio() string          { return c.Admin.Bio }
+func (c *Config) AdminGitHub() string       { return c.Admin.GitHub }
+func (c *Config) AdminPasswordHash() string { return c.GetAdminPasswordHash() }

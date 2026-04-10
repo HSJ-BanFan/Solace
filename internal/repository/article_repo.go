@@ -20,7 +20,6 @@ func NewArticleRepository(db *gorm.DB) ArticleRepository {
 func (r *articleRepo) FindByID(ctx context.Context, id uint) (*model.Article, error) {
 	var article model.Article
 	err := r.db.WithContext(ctx).
-		Preload("Author").
 		Preload("Category").
 		Preload("Tags").
 		First(&article, id).Error
@@ -33,7 +32,6 @@ func (r *articleRepo) FindByID(ctx context.Context, id uint) (*model.Article, er
 func (r *articleRepo) FindBySlug(ctx context.Context, slug string) (*model.Article, error) {
 	var article model.Article
 	err := r.db.WithContext(ctx).
-		Preload("Author").
 		Preload("Category").
 		Preload("Tags").
 		Where("slug = ?", slug).
@@ -48,7 +46,7 @@ func (r *articleRepo) FindAll(ctx context.Context, limit, offset int, filters ma
 	var articles []*model.Article
 	var total int64
 
-	query := r.db.WithContext(ctx).Model(&model.Article{}).Preload("Author").Preload("Category").Preload("Tags")
+	query := r.db.WithContext(ctx).Model(&model.Article{}).Preload("Category").Preload("Tags")
 
 	// 应用筛选条件
 	if status, ok := filters["status"]; ok {
@@ -80,7 +78,6 @@ func (r *articleRepo) FindPublished(ctx context.Context, limit, offset int, filt
 
 	query := r.db.WithContext(ctx).
 		Model(&model.Article{}).
-		Preload("Author").
 		Preload("Category").
 		Preload("Tags").
 		Where("status = ?", model.StatusPublished)
@@ -118,7 +115,6 @@ func (r *articleRepo) FindByCategory(ctx context.Context, categorySlug string, l
 
 	query := r.db.WithContext(ctx).
 		Model(&model.Article{}).
-		Preload("Author").
 		Preload("Category").
 		Preload("Tags").
 		Where("status = ? AND category_id = ?", model.StatusPublished, category.ID)
@@ -151,7 +147,6 @@ func (r *articleRepo) FindByTag(ctx context.Context, tagSlug string, limit, offs
 
 	query := r.db.WithContext(ctx).
 		Model(&model.Article{}).
-		Preload("Author").
 		Preload("Category").
 		Preload("Tags").
 		Joins("JOIN article_tags ON article_tags.article_id = articles.id").
@@ -248,7 +243,6 @@ func (r *articleRepo) Search(ctx context.Context, query string, limit, offset in
 
 	dbQuery := r.db.WithContext(ctx).
 		Model(&model.Article{}).
-		Preload("Author").
 		Preload("Category").
 		Where("status = ?", model.StatusPublished).
 		Where("title ILIKE ? OR content ILIKE ?", searchPattern, searchPattern)

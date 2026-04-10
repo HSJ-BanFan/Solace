@@ -16,9 +16,7 @@ import (
 
 var (
 	ErrArticleNotFound        = errors.New("文章未找到")
-	ErrArticleNotAuthorized   = errors.New("无权修改此文章")
 	ErrArticleVersionConflict = errors.New("文章版本冲突，请刷新后重试")
-	ErrArticleAlreadyDeleted  = errors.New("文章已被删除")
 	ErrCategoryNotFound       = errors.New("分类未找到")
 	ErrCategoryHasArticles    = errors.New("分类下存在文章，无法删除")
 	ErrTagNotFound            = errors.New("标签未找到")
@@ -33,8 +31,8 @@ type ArticleService interface {
 	GetList(ctx context.Context, page, pageSize int, status string, authorID *uint, categorySlug, tagSlug string) (*response.ArticleListResponse, error)
 	GetArchive(ctx context.Context) (*response.ArchiveResponse, error)
 	Search(ctx context.Context, query string, page, pageSize int) (*response.ArticleListResponse, error)
-	Update(ctx context.Context, id uint, userID uint, version int, title, articleSlug, content, summary, coverImage string, categoryID *uint, tagIDs []uint, status string) (*response.ArticleResponse, error)
-	Delete(ctx context.Context, id uint, userID uint) error
+	Update(ctx context.Context, id uint, version int, title, articleSlug, content, summary, coverImage string, categoryID *uint, tagIDs []uint, status string) (*response.ArticleResponse, error)
+	Delete(ctx context.Context, id uint) error
 }
 
 // articleRepository 文章数据访问接口
@@ -116,10 +114,9 @@ func (s *articleService) Create(ctx context.Context, title, articleSlug, content
 	// 生成或使用自定义 slug
 	finalSlug := articleSlug
 	if finalSlug == "" {
-		// 没有提供 slug，从标题自动生成
 		finalSlug = slug.Generate(title)
 	}
-	// 检查 slug 唯一性，如果冲突则添加时间戳
+	// 检查 slug 唯一性
 	existing, err := s.articleRepo.FindBySlug(ctx, finalSlug)
 	if err == nil && existing != nil {
 		finalSlug = slug.GenerateWithTimestamp(title)
@@ -138,12 +135,10 @@ func (s *articleService) Create(ctx context.Context, title, articleSlug, content
 		Version:    1,
 	}
 
-	// 如果状态为已发布，设置发布时间
 	if status == model.StatusPublished {
 		article.PublishedAt = &now
 	}
 
-	// 创建文章（含标签关联）
 	if len(tagIDs) > 0 {
 		if err := s.articleRepo.CreateWithTags(ctx, article, tagIDs); err != nil {
 			return nil, err
@@ -154,7 +149,6 @@ func (s *articleService) Create(ctx context.Context, title, articleSlug, content
 		}
 	}
 
-	// 获取带关联信息的文章
 	article, err = s.articleRepo.FindByID(ctx, article.ID)
 	if err != nil {
 		return nil, err
@@ -193,20 +187,17 @@ func (s *articleService) GetList(ctx context.Context, page, pageSize int, status
 	var total int64
 	var err error
 
-	// 根据筛选条件获取文章
 	if categorySlug != "" {
 		articles, total, err = s.articleRepo.FindByCategory(ctx, categorySlug, pageSize, offset)
 	} else if tagSlug != "" {
 		articles, total, err = s.articleRepo.FindByTag(ctx, tagSlug, pageSize, offset)
 	} else if status == "" || status == model.StatusPublished {
-		// 公开接口只返回已发布文章
 		filters := make(map[string]interface{})
 		if authorID != nil {
 			filters["author_id"] = *authorID
 		}
 		articles, total, err = s.articleRepo.FindPublished(ctx, pageSize, offset, filters)
 	} else {
-		// 管理接口返回所有状态
 		filters := make(map[string]interface{})
 		filters["status"] = status
 		if authorID != nil {
@@ -238,7 +229,6 @@ func (s *articleService) GetArchive(ctx context.Context) (*response.ArchiveRespo
 		return nil, err
 	}
 
-	// 按年份分组
 	yearMap := make(map[int]*response.ArchiveGroup)
 
 	for _, article := range articles {
@@ -248,7 +238,6 @@ func (s *articleService) GetArchive(ctx context.Context) (*response.ArchiveRespo
 
 		year := article.PublishedAt.Year()
 
-		// 初始化年份组
 		if _, ok := yearMap[year]; !ok {
 			yearMap[year] = &response.ArchiveGroup{
 				Year:  year,
@@ -257,17 +246,14 @@ func (s *articleService) GetArchive(ctx context.Context) (*response.ArchiveRespo
 			}
 		}
 
-		// 添加文章
 		yearMap[year].Posts = append(yearMap[year].Posts, toArticleSummary(article))
 		yearMap[year].Count++
 	}
 
-	// 转换为响应格式（按年份降序）
 	groups := make([]*response.ArchiveGroup, 0, len(yearMap))
 	for _, yearGroup := range yearMap {
 		groups = append(groups, yearGroup)
 	}
-	// 按年份降序排序
 	sort.Slice(groups, func(i, j int) bool {
 		return groups[i].Year > groups[j].Year
 	})
@@ -296,18 +282,13 @@ func (s *articleService) Search(ctx context.Context, query string, page, pageSiz
 	}, nil
 }
 
-func (s *articleService) Update(ctx context.Context, id uint, userID uint, version int, title, articleSlug, content, summary, coverImage string, categoryID *uint, tagIDs []uint, status string) (*response.ArticleResponse, error) {
+func (s *articleService) Update(ctx context.Context, id uint, version int, title, articleSlug, content, summary, coverImage string, categoryID *uint, tagIDs []uint, status string) (*response.ArticleResponse, error) {
 	article, err := s.articleRepo.FindByID(ctx, id)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, ErrArticleNotFound
 		}
 		return nil, err
-	}
-
-	// 检查权限
-	if article.AuthorID != userID {
-		return nil, ErrArticleNotAuthorized
 	}
 
 	// 乐观锁检查
@@ -322,15 +303,12 @@ func (s *articleService) Update(ctx context.Context, id uint, userID uint, versi
 		}
 	}
 
-	// 更新字段
 	if title != "" {
 		article.Title = title
 	}
-	// 更新 slug（仅当提供了新 slug 时）
 	if articleSlug != "" {
 		newSlug := slug.Generate(articleSlug)
 		if newSlug != article.Slug {
-			// 检查新 slug 是否已被其他文章使用
 			existing, err := s.articleRepo.FindBySlug(ctx, newSlug)
 			if err == nil && existing != nil && existing.ID != article.ID {
 				newSlug = slug.GenerateWithTimestamp(articleSlug)
@@ -348,7 +326,6 @@ func (s *articleService) Update(ctx context.Context, id uint, userID uint, versi
 		article.CoverImage = coverImage
 	}
 
-	// 处理分类
 	if categoryID != nil {
 		if *categoryID == 0 {
 			article.CategoryID = nil
@@ -357,7 +334,6 @@ func (s *articleService) Update(ctx context.Context, id uint, userID uint, versi
 		}
 	}
 
-	// 处理状态变更
 	if status != "" && status != article.Status {
 		article.Status = status
 		if status == model.StatusPublished && article.PublishedAt == nil {
@@ -366,10 +342,8 @@ func (s *articleService) Update(ctx context.Context, id uint, userID uint, versi
 		}
 	}
 
-	// 递增版本号
 	article.Version++
 
-	// 更新文章（含标签关联）
 	if tagIDs != nil {
 		if err := s.articleRepo.UpdateWithTags(ctx, article, tagIDs); err != nil {
 			return nil, err
@@ -380,7 +354,6 @@ func (s *articleService) Update(ctx context.Context, id uint, userID uint, versi
 		}
 	}
 
-	// 获取更新后的文章
 	article, err = s.articleRepo.FindByID(ctx, id)
 	if err != nil {
 		return nil, err
@@ -389,8 +362,8 @@ func (s *articleService) Update(ctx context.Context, id uint, userID uint, versi
 	return toArticleResponse(article, nil, nil), nil
 }
 
-func (s *articleService) Delete(ctx context.Context, id uint, userID uint) error {
-	article, err := s.articleRepo.FindByID(ctx, id)
+func (s *articleService) Delete(ctx context.Context, id uint) error {
+	_, err := s.articleRepo.FindByID(ctx, id)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return ErrArticleNotFound
@@ -398,23 +371,14 @@ func (s *articleService) Delete(ctx context.Context, id uint, userID uint) error
 		return err
 	}
 
-	// 检查权限
-	if article.AuthorID != userID {
-		return ErrArticleNotAuthorized
-	}
-
 	return s.articleRepo.Delete(ctx, id)
 }
 
-// calculateWordCount 计算字数（简单实现）
 func calculateWordCount(content string) int {
-	// 移除空白字符后计算
 	return len(strings.TrimSpace(content))
 }
 
-// calculateReadTime 计算阅读时间（分钟）
 func calculateReadTime(wordCount int) int {
-	// 假设每分钟阅读 300 字
 	readTime := wordCount / 300
 	if readTime < 1 {
 		return 1
@@ -442,10 +406,6 @@ func toArticleResponse(article *model.Article, prev, next *model.Article) *respo
 		PublishedAt: article.PublishedAt,
 		CreatedAt:   article.CreatedAt,
 		UpdatedAt:   article.UpdatedAt,
-	}
-
-	if article.Author != nil {
-		resp.Author = toUserResponse(article.Author)
 	}
 
 	if article.Category != nil {
@@ -485,11 +445,6 @@ func toArticleResponse(article *model.Article, prev, next *model.Article) *respo
 }
 
 func toArticleSummary(article *model.Article) *response.ArticleSummary {
-	var author *response.UserResponse
-	if article.Author != nil {
-		author = toUserResponse(article.Author)
-	}
-
 	return &response.ArticleSummary{
 		ID:          article.ID,
 		Title:       article.Title,
@@ -499,7 +454,6 @@ func toArticleSummary(article *model.Article) *response.ArticleSummary {
 		Status:      article.Status,
 		PublishedAt: article.PublishedAt,
 		CreatedAt:   article.CreatedAt,
-		Author:      author,
 		Category:    toCategorySummary(article.Category),
 		Tags:        toTagSummaries(article.Tags),
 	}

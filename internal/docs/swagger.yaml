@@ -171,25 +171,13 @@ definitions:
         minLength: 1
         type: string
     type: object
-  request.UpdateUserRequest:
-    properties:
-      avatar_url:
-        maxLength: 500
-        type: string
-      bio:
-        maxLength: 500
-        type: string
-      nickname:
-        maxLength: 100
-        type: string
-    type: object
 host: localhost:8080
 info:
   contact:
     email: support@swagger.io
     name: API 支持
     url: http://www.swagger.io/support
-  description: 博客后端 API 服务，支持文章管理、用户认证等功能
+  description: 博客后端 API 服务，支持文章管理、配置文件认证等功能
   license:
     name: MIT
     url: https://opensource.org/licenses/MIT
@@ -797,50 +785,6 @@ paths:
       summary: 根据Slug获取标签
       tags:
       - tag
-  /users/me:
-    get:
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/handler.Response'
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/handler.Response'
-      summary: 获取当前用户信息
-      tags:
-      - user
-    put:
-      consumes:
-      - application/json
-      parameters:
-      - description: 用户数据
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/request.UpdateUserRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/handler.Response'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/handler.Response'
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/handler.Response'
-      summary: 更新当前用户信息
-      tags:
-      - user
 securityDefinitions:
   BearerAuth:
     description: 'JWT 认证令牌，格式: Bearer {token}'

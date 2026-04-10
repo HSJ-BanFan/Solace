@@ -1,0 +1,35 @@
+# 博客后端配置文件示例
+# 复制此文件为 config.toml 并修改配置
+
+[server]
+port = "8080"
+mode = "debug"  # debug, release, test
+
+[database]
+host = "localhost"
+port = "5432"
+user = "postgres"
+password = "your_password_here"
+name = "blog"
+sslmode = "disable"
+
+[jwt]
+secret = "your-secret-key-change-in-production"
+access_duration = 15      # 分钟
+refresh_duration = 10080  # 分钟 (7天)
+
+[logging]
+level = "info"      # trace, debug, info, warn, error, fatal, panic
+env = "development" # development, production
+
+[migration]
+path = "migrations"
+
+[admin]
+username = "admin"
+email = "admin@example.com"
+password = "admin123"
+nickname = "博主"
+avatar_url = ""
+bio = "欢迎来到我的博客"
+github = ""

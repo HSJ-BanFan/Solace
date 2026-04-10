@@ -944,74 +944,6 @@ const docTemplate = `{
                     }
                 }
             }
-        },
-        "/users/me": {
-            "get": {
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "user"
-                ],
-                "summary": "获取当前用户信息",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/handler.Response"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/handler.Response"
-                        }
-                    }
-                }
-            },
-            "put": {
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "user"
-                ],
-                "summary": "更新当前用户信息",
-                "parameters": [
-                    {
-                        "description": "用户数据",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/request.UpdateUserRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/handler.Response"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/handler.Response"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/handler.Response"
-                        }
-                    }
-                }
-            }
         }
     },
     "definitions": {
@@ -1253,23 +1185,6 @@ const docTemplate = `{
                     "minLength": 1
                 }
             }
-        },
-        "request.UpdateUserRequest": {
-            "type": "object",
-            "properties": {
-                "avatar_url": {
-                    "type": "string",
-                    "maxLength": 500
-                },
-                "bio": {
-                    "type": "string",
-                    "maxLength": 500
-                },
-                "nickname": {
-                    "type": "string",
-                    "maxLength": 100
-                }
-            }
         }
     },
     "securityDefinitions": {
@@ -1289,7 +1204,7 @@ var SwaggerInfo = &swag.Spec{
 	BasePath:         "/api/v1",
 	Schemes:          []string{},
 	Title:            "博客系统 API",
-	Description:      "博客后端 API 服务，支持文章管理、用户认证等功能",
+	Description:      "博客后端 API 服务，支持文章管理、配置文件认证等功能",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",

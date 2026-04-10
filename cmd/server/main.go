@@ -8,12 +8,9 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/gin-gonic/gin"
-
 	"gin-quickstart/internal/config"
 	_ "gin-quickstart/internal/docs" // swagger docs
 	"gin-quickstart/internal/handler"
-	"gin-quickstart/internal/model"
 	"gin-quickstart/internal/pkg/database"
 	"gin-quickstart/internal/pkg/jwt"
 	"gin-quickstart/internal/pkg/logger"
@@ -24,7 +21,7 @@ import (
 
 // @title 博客系统 API
 // @version 1.0
-// @description 博客后端 API 服务，支持文章管理、用户认证等功能
+// @description 博客后端 API 服务，支持文章管理、配置文件认证等功能
 // @termsOfService http://swagger.io/terms/
 
 // @contact.name API 支持
@@ -46,74 +43,44 @@ func main() {
 	cfg := config.Load()
 
 	// 初始化日志
-	logger.Init(cfg.LogLevel, cfg.LogEnv)
+	logger.Init(cfg.LogLevel(), cfg.LogEnv())
 
 	logger.Info().
-		Str("port", cfg.ServerPort).
-		Str("mode", cfg.ServerMode).
+		Str("port", cfg.ServerPort()).
+		Str("mode", cfg.ServerMode()).
 		Msg("正在启动服务器")
 
 	// 连接数据库
-	db, err := database.Connect(cfg.GetDSN(), cfg.LogLevel)
+	db, err := database.Connect(cfg.GetDSN(), cfg.LogLevel())
 	if err != nil {
 		logger.Fatal().Err(err).Msg("数据库连接失败")
 	}
 
-	// 自动迁移数据库表结构（只添加新字段，不修改现有索引）
-	// 手动添加 github_url 字段
-	if db.Migrator().HasColumn(&model.User{}, "github_url") == false {
-		if err := db.Exec("ALTER TABLE users ADD COLUMN github_url VARCHAR(500)").Error; err != nil {
-			logger.Warn().Err(err).Msg("添加 github_url 字段失败（可能已存在）")
-		} else {
-			logger.Info().Msg("成功添加 github_url 字段")
-		}
-	}
-
 	// 初始化仓储
-	userRepo := repository.NewUserRepository(db)
-	refreshTokenRepo := repository.NewRefreshTokenRepository(db)
 	articleRepo := repository.NewArticleRepository(db)
 	categoryRepo := repository.NewCategoryRepository(db)
 	tagRepo := repository.NewTagRepository(db)
 
 	// 初始化 JWT 管理器
 	jwtManager := jwt.NewJWTManager(
-		cfg.JWTSecret,
-		cfg.JWTAccessDuration,
-		cfg.JWTRefreshDuration,
+		cfg.JWTSecret(),
+		cfg.JWTAccessDuration(),
+		cfg.JWTRefreshDuration(),
 	)
 
 	// 初始化服务
 	authService := service.NewAuthService(
-		userRepo,
-		refreshTokenRepo,
+		cfg,
 		jwtManager,
-		cfg.JWTAccessDuration,
+		cfg.JWTAccessDuration(),
 	)
-	userService := service.NewUserService(userRepo)
-	ownerService := service.NewOwnerService(userRepo)
+	ownerService := service.NewOwnerService(cfg)
 	articleService := service.NewArticleService(articleRepo, categoryRepo, tagRepo)
 	categoryService := service.NewCategoryService(categoryRepo)
 	tagService := service.NewTagService(tagRepo)
 
-	// 初始化管理员用户
-	if err := service.InitAdminUser(userRepo, service.AdminConfig{
-		Username:  cfg.AdminUsername,
-		Email:     cfg.AdminEmail,
-		Password:  cfg.AdminPassword,
-		Nickname:  cfg.AdminNickname,
-		AvatarURL: cfg.AdminAvatarURL,
-		Bio:       cfg.AdminBio,
-		GitHubURL: cfg.AdminGitHub,
-	}); err != nil {
-		logger.Warn().Err(err).Msg("初始化管理员用户失败（可能已存在）")
-	} else {
-		logger.Info().Msg("管理员用户初始化成功")
-	}
-
 	// 初始化处理器
 	authHandler := handler.NewAuthHandler(authService)
-	userHandler := handler.NewUserHandler(userService)
 	ownerHandler := handler.NewOwnerHandler(ownerService)
 	articleHandler := handler.NewArticleHandler(articleService)
 	categoryHandler := handler.NewCategoryHandler(categoryService)
@@ -122,18 +89,17 @@ func main() {
 	// 设置路由
 	appRouter := router.NewRouter(
 		authHandler,
-		userHandler,
 		articleHandler,
 		categoryHandler,
 		tagHandler,
 		ownerHandler,
 		authService,
 	)
-	r := appRouter.Setup(cfg.ServerMode)
+	r := appRouter.Setup(cfg.ServerMode())
 
 	// 创建 HTTP 服务器
 	srv := &http.Server{
-		Addr:    ":" + cfg.ServerPort,
+		Addr:    ":" + cfg.ServerPort(),
 		Handler: r,
 	}
 
@@ -169,11 +135,4 @@ func main() {
 	}
 
 	logger.Info().Msg("服务器已停止")
-}
-
-func init() {
-	// 根据环境变量设置 Gin 模式
-	if mode := os.Getenv("SERVER_MODE"); mode != "" {
-		gin.SetMode(mode)
-	}
 }

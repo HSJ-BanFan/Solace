@@ -32,8 +32,6 @@ func NewArticleHandler(articleService service.ArticleService) *ArticleHandler {
 // @Failure 401 {object} Response
 // @Router /articles [post]
 func (h *ArticleHandler) Create(c *gin.Context) {
-	userID := c.GetUint("user_id")
-
 	var req request.CreateArticleRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		RespondWithError(c, apperrors.NewBadRequest("无效的请求体", nil))
@@ -52,6 +50,7 @@ func (h *ArticleHandler) Create(c *gin.Context) {
 		status = "draft"
 	}
 
+	// 单用户模式，authorID 固定为 1
 	article, err := h.articleService.Create(
 		c.Request.Context(),
 		req.Title,
@@ -62,7 +61,7 @@ func (h *ArticleHandler) Create(c *gin.Context) {
 		req.CategoryID,
 		req.TagIDs,
 		status,
-		userID,
+		1, // 固定 authorID
 	)
 	if err != nil {
 		RespondWithError(c, err)
@@ -140,7 +139,6 @@ func (h *ArticleHandler) GetList(c *gin.Context) {
 		return
 	}
 
-	// 设置默认值
 	if query.Page == 0 {
 		query.Page = 1
 	}
@@ -234,7 +232,6 @@ func (h *ArticleHandler) Search(c *gin.Context) {
 // @Failure 404 {object} Response
 // @Router /articles/{id} [put]
 func (h *ArticleHandler) Update(c *gin.Context) {
-	userID := c.GetUint("user_id")
 	idStr := c.Param("id")
 
 	id, err := strconv.ParseUint(idStr, 10, 32)
@@ -258,7 +255,6 @@ func (h *ArticleHandler) Update(c *gin.Context) {
 	article, err := h.articleService.Update(
 		c.Request.Context(),
 		uint(id),
-		userID,
 		req.Version,
 		req.Title,
 		req.Slug,
@@ -287,7 +283,6 @@ func (h *ArticleHandler) Update(c *gin.Context) {
 // @Failure 404 {object} Response
 // @Router /articles/{id} [delete]
 func (h *ArticleHandler) Delete(c *gin.Context) {
-	userID := c.GetUint("user_id")
 	idStr := c.Param("id")
 
 	id, err := strconv.ParseUint(idStr, 10, 32)
@@ -296,7 +291,7 @@ func (h *ArticleHandler) Delete(c *gin.Context) {
 		return
 	}
 
-	if err := h.articleService.Delete(c.Request.Context(), uint(id), userID); err != nil {
+	if err := h.articleService.Delete(c.Request.Context(), uint(id)); err != nil {
 		RespondWithError(c, err)
 		return
 	}

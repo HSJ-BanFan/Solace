@@ -12,19 +12,17 @@ import (
 
 // Router 路由器，持有所有处理器和服务
 type Router struct {
-	authHandler    *handler.AuthHandler
-	userHandler    *handler.UserHandler
-	articleHandler *handler.ArticleHandler
+	authHandler     *handler.AuthHandler
+	articleHandler  *handler.ArticleHandler
 	categoryHandler *handler.CategoryHandler
-	tagHandler     *handler.TagHandler
-	ownerHandler   *handler.OwnerHandler
-	authService    service.AuthService
+	tagHandler      *handler.TagHandler
+	ownerHandler    *handler.OwnerHandler
+	authService     service.AuthService
 }
 
 // NewRouter 创建路由器并注入所有依赖
 func NewRouter(
 	authHandler *handler.AuthHandler,
-	userHandler *handler.UserHandler,
 	articleHandler *handler.ArticleHandler,
 	categoryHandler *handler.CategoryHandler,
 	tagHandler *handler.TagHandler,
@@ -32,13 +30,12 @@ func NewRouter(
 	authService service.AuthService,
 ) *Router {
 	return &Router{
-		authHandler:    authHandler,
-		userHandler:    userHandler,
-		articleHandler: articleHandler,
+		authHandler:     authHandler,
+		articleHandler:  articleHandler,
 		categoryHandler: categoryHandler,
-		tagHandler:     tagHandler,
-		ownerHandler:   ownerHandler,
-		authService:    authService,
+		tagHandler:      tagHandler,
+		ownerHandler:    ownerHandler,
+		authService:     authService,
 	}
 }
 
@@ -67,7 +64,7 @@ func (r *Router) Setup(mode string) *gin.Engine {
 		// 站长信息（公开）
 		v1.GET("/owner", r.ownerHandler.GetOwner)
 
-		// 认证路由（公开）- 移除注册
+		// 认证路由（公开）
 		auth := v1.Group("/auth")
 		{
 			auth.POST("/login", r.authHandler.Login)
@@ -105,13 +102,6 @@ func (r *Router) Setup(mode string) *gin.Engine {
 		protected := v1.Group("")
 		protected.Use(middleware.Auth(r.authService))
 		{
-			// 用户路由
-			users := protected.Group("/users")
-			{
-				users.GET("/me", r.userHandler.GetMe)
-				users.PUT("/me", r.userHandler.UpdateMe)
-			}
-
 			// 受保护的文章路由
 			protectedArticles := protected.Group("/articles")
 			{
