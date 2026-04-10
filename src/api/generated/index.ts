@@ -20,11 +20,9 @@ export type { request_RefreshTokenRequest } from './models/request_RefreshTokenR
 export { request_UpdateArticleRequest } from './models/request_UpdateArticleRequest';
 export type { request_UpdateCategoryRequest } from './models/request_UpdateCategoryRequest';
 export type { request_UpdateTagRequest } from './models/request_UpdateTagRequest';
-export type { request_UpdateUserRequest } from './models/request_UpdateUserRequest';
 
 export { ArticleService } from './services/ArticleService';
 export { AuthService } from './services/AuthService';
 export { CategoryService } from './services/CategoryService';
 export { OwnerService } from './services/OwnerService';
 export { TagService } from './services/TagService';
-export { UserService } from './services/UserService';

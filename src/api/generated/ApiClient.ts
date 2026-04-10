@@ -10,7 +10,6 @@ import { AuthService } from './services/AuthService';
 import { CategoryService } from './services/CategoryService';
 import { OwnerService } from './services/OwnerService';
 import { TagService } from './services/TagService';
-import { UserService } from './services/UserService';
 type HttpRequestConstructor = new (config: OpenAPIConfig) => BaseHttpRequest;
 export class ApiClient {
   public readonly article: ArticleService;
@@ -18,7 +17,6 @@ export class ApiClient {
   public readonly category: CategoryService;
   public readonly owner: OwnerService;
   public readonly tag: TagService;
-  public readonly user: UserService;
   public readonly request: BaseHttpRequest;
   constructor(config?: Partial<OpenAPIConfig>, HttpRequest: HttpRequestConstructor = FetchHttpRequest) {
     this.request = new HttpRequest({
@@ -37,7 +35,6 @@ export class ApiClient {
     this.category = new CategoryService(this.request);
     this.owner = new OwnerService(this.request);
     this.tag = new TagService(this.request);
-    this.user = new UserService(this.request);
   }
 }
 

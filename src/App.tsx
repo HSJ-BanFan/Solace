@@ -5,7 +5,6 @@
  * - QueryClientProvider: React Query 状态管理
  * - BrowserRouter: 路由管理
  * - ThemeInitializer: 主题初始化
- * - UserInitializer: 用户信息初始化
  * - Routes: 路由配置
  */
 
@@ -25,7 +24,7 @@ import {
   AdminTagsPage,
 } from '@/pages';
 import { useAuthStore, useThemeStore } from '@/stores';
-import { useCurrentUser, useAutoHideScrollbar } from '@/hooks';
+import { useAutoHideScrollbar } from '@/hooks';
 import { useEffect } from 'react';
 
 /** 受保护路由 - 未登录时跳转到登录页 */
@@ -54,20 +53,6 @@ function ThemeInitializer() {
   return null;
 }
 
-/** 用户初始化组件 - 刷新后恢复用户信息 */
-function UserInitializer() {
-  const { isAuthenticated, setUser } = useAuthStore();
-  const { data: user } = useCurrentUser();
-
-  useEffect(() => {
-    if (isAuthenticated && user) {
-      setUser(user);
-    }
-  }, [isAuthenticated, user, setUser]);
-
-  return null;
-}
-
 /** 滚动条控制器 - 滚动时显示，闲置后隐藏 */
 function ScrollbarController() {
   useAutoHideScrollbar(5000); // 5秒后隐藏
@@ -89,7 +74,6 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
         <ThemeInitializer />
-        <UserInitializer />
         <ScrollbarController />
         <Routes>
           {/* 公开路由 - 主布局 */}
