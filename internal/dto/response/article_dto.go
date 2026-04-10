@@ -11,7 +11,6 @@ type ArticleResponse struct {
 	Summary     string            `json:"summary,omitempty"`
 	CoverImage  string            `json:"cover_image,omitempty"`
 	AuthorID    uint              `json:"author_id"`
-	Author      *UserResponse     `json:"author,omitempty"`
 	Category    *CategoryResponse `json:"category,omitempty"`
 	Tags        []*TagResponse    `json:"tags,omitempty"`
 	Status      string            `json:"status"`
@@ -41,7 +40,6 @@ type ArticleSummary struct {
 	Slug        string            `json:"slug"`
 	Summary     string            `json:"summary,omitempty"`
 	CoverImage  string            `json:"cover_image,omitempty"`
-	Author      *UserResponse     `json:"author,omitempty"`
 	Category    *CategoryResponse `json:"category,omitempty"`
 	Tags        []*TagResponse    `json:"tags,omitempty"`
 	Status      string            `json:"status"`

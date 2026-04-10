@@ -2,11 +2,12 @@ package config
 
 import (
 	"fmt"
+	"os"
 	"sync"
 	"time"
 
 	"gin-quickstart/internal/pkg/hash"
-	
+	"github.com/BurntSushi/toml"
 )
 
 // Config 应用配置结构体
@@ -81,7 +82,11 @@ func Load() *Config {
 }
 
 // getConfigPath 获取配置文件路径
+// 优先级：CONFIG_PATH 环境变量 > 默认 config.toml
 func getConfigPath() string {
+	if path := os.Getenv("CONFIG_PATH"); path != "" {
+		return path
+	}
 	return "config.toml"
 }
 
