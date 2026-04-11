@@ -72,7 +72,8 @@ type AdminConfig struct {
 
 // GitHubConfig GitHub API 配置
 type GitHubConfig struct {
-	Token string `toml:"token"`
+	Token    string `toml:"token"`
+	Username string `toml:"username"`
 }
 
 // Load 从 TOML 文件加载配置
@@ -157,4 +158,5 @@ func (c *Config) AdminGitHub() string       { return c.Admin.GitHub }
 func (c *Config) AdminPasswordHash() string { return c.GetAdminPasswordHash() }
 
 // GitHub 配置访问器
-func (c *Config) GitHubToken() string { return c.GitHub.Token }
+func (c *Config) GitHubToken() string    { return c.GitHub.Token }
+func (c *Config) GitHubUsername() string { return c.GitHub.Username }

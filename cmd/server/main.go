@@ -83,7 +83,7 @@ func main() {
 	// 初始化处理器
 	authHandler := handler.NewAuthHandler(authService)
 	ownerHandler := handler.NewOwnerHandler(ownerService)
-	githubHandler := handler.NewGitHubHandler(githubService, ownerService)
+	githubHandler := handler.NewGitHubHandler(githubService, cfg)
 	articleHandler := handler.NewArticleHandler(articleService)
 	categoryHandler := handler.NewCategoryHandler(categoryService)
 	tagHandler := handler.NewTagHandler(tagService)
