@@ -7,6 +7,8 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"sort"
+	"strconv"
 	"strings"
 	"time"
 
@@ -19,11 +21,16 @@ type GitHubService interface {
 	GetContributions(ctx context.Context, username string, from, to time.Time) (*ContributionsResponse, error)
 }
 
-// ContributionsResponse 贡献数据响应（稀疏格式）
+// ContributionsGroup 单年贡献数据
+type ContributionsGroup struct {
+	Year          int            `json:"year"`
+	Contributions map[string]int `json:"contributions"` // key: MM-DD, value: count
+}
+
+// ContributionsResponse 贡献数据响应（按年份分组）
 type ContributionsResponse struct {
-	Year          int            `json:"year"`          // 数据年份
-	Total         int            `json:"total"`         // 总贡献数
-	Contributions map[string]int `json:"contributions"` // 有贡献的日期，key: MM-DD, value: count
+	Total  int                   `json:"total"`  // 过去一年总贡献数
+	Groups []*ContributionsGroup `json:"groups"` // 按年份分组
 }
 
 // githubService GitHub 服务实现
@@ -128,29 +135,44 @@ func (s *githubService) GetContributions(ctx context.Context, username string, f
 		return nil, apperrors.NewBadRequest(result.Errors[0].Message, nil)
 	}
 
-	// 转换数据格式（稀疏格式：只返回有贡献的日期）
-	contributions := make(map[string]int)
+	// 转换数据格式（按年份分组）
+	yearGroups := make(map[int]*ContributionsGroup)
 	total := 0
 	for _, week := range result.Data.User.ContributionsCollection.ContributionCalendar.Weeks {
 		for _, day := range week.ContributionDays {
 			if day.ContributionCount > 0 {
-				// 只取 MM-DD 部分
+				// 解析日期 YYYY-MM-DD
 				dateParts := strings.Split(day.Date, "-")
-				if len(dateParts) == 3 {
-					key := dateParts[1] + "-" + dateParts[2] // MM-DD
-					contributions[key] = day.ContributionCount
+				if len(dateParts) != 3 {
+					continue
 				}
+				year, err := strconv.Atoi(dateParts[0])
+				if err != nil {
+					continue
+				}
+
+				if yearGroups[year] == nil {
+					yearGroups[year] = &ContributionsGroup{
+						Year:          year,
+						Contributions: make(map[string]int),
+					}
+				}
+				// key 只保留 MM-DD（年份已在 group.year）
+				key := dateParts[1] + "-" + dateParts[2]
+				yearGroups[year].Contributions[key] = day.ContributionCount
 				total += day.ContributionCount
 			}
 		}
 	}
 
-	// 提取年份
-	year := to.Year()
+	// 按年份降序排列
+	groups := make([]*ContributionsGroup, 0, len(yearGroups))
+	for _, g := range yearGroups {
+		groups = append(groups, g)
+	}
+	sort.Slice(groups, func(i, j int) bool {
+		return groups[i].Year > groups[j].Year
+	})
 
-	return &ContributionsResponse{
-		Year:          year,
-		Total:         total,
-		Contributions: contributions,
-	}, nil
+	return &ContributionsResponse{Total: total, Groups: groups}, nil
 }

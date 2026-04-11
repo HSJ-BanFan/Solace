@@ -715,7 +715,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/handler.Response"
+                            "$ref": "#/definitions/service.ContributionsResponse"
                         }
                     },
                     "400": {
@@ -1214,6 +1214,37 @@ const docTemplate = `{
                     "type": "string",
                     "maxLength": 50,
                     "minLength": 1
+                }
+            }
+        },
+        "service.ContributionsGroup": {
+            "type": "object",
+            "properties": {
+                "contributions": {
+                    "description": "key: MM-DD, value: count",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "integer"
+                    }
+                },
+                "year": {
+                    "type": "integer"
+                }
+            }
+        },
+        "service.ContributionsResponse": {
+            "type": "object",
+            "properties": {
+                "groups": {
+                    "description": "按年份分组",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/service.ContributionsGroup"
+                    }
+                },
+                "total": {
+                    "description": "过去一年总贡献数",
+                    "type": "integer"
                 }
             }
         }

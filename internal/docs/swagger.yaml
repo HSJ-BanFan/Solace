@@ -171,6 +171,27 @@ definitions:
         minLength: 1
         type: string
     type: object
+  service.ContributionsGroup:
+    properties:
+      contributions:
+        additionalProperties:
+          type: integer
+        description: 'key: MM-DD, value: count'
+        type: object
+      year:
+        type: integer
+    type: object
+  service.ContributionsResponse:
+    properties:
+      groups:
+        description: 按年份分组
+        items:
+          $ref: '#/definitions/service.ContributionsGroup'
+        type: array
+      total:
+        description: 过去一年总贡献数
+        type: integer
+    type: object
 host: localhost:8080
 info:
   contact:
@@ -635,7 +656,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/handler.Response'
+            $ref: '#/definitions/service.ContributionsResponse'
         "400":
           description: Bad Request
           schema:

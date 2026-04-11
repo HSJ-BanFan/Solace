@@ -4,7 +4,7 @@ import (
 	"time"
 
 	apperrors "gin-quickstart/internal/pkg/errors"
-	"gin-quickstart/internal/s
+	"gin-quickstart/internal/service"
 	"github.com/gin-gonic/gin"
 )
 
@@ -26,7 +26,7 @@ func NewGitHubHandler(githubService service.GitHubService, ownerService service.
 // @Summary 获取 GitHub 贡献日历
 // @Tags github
 // @Produce json
-// @Success 200 {object} Response
+// @Success 200 {object} service.ContributionsResponse
 // @Failure 400 {object} Response
 // @Failure 500 {object} Response
 // @Router /github/contributions [get]
