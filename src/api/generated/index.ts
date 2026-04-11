@@ -20,6 +20,8 @@ export type { request_RefreshTokenRequest } from './models/request_RefreshTokenR
 export { request_UpdateArticleRequest } from './models/request_UpdateArticleRequest';
 export type { request_UpdateCategoryRequest } from './models/request_UpdateCategoryRequest';
 export type { request_UpdateTagRequest } from './models/request_UpdateTagRequest';
+export type { service_ContributionsGroup } from './models/service_ContributionsGroup';
+export type { service_ContributionsResponse } from './models/service_ContributionsResponse';
 
 export { ArticleService } from './services/ArticleService';
 export { AuthService } from './services/AuthService';

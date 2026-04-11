@@ -5,7 +5,8 @@
  */
 
 import { useMemo, useState, useEffect } from 'react';
-import { useGitHubContributions, extractGitHubUsername } from '@/hooks';
+import { useGitHubContributions, extractGitHubUsername } from '@/hooks/api/github';
+import type { ContributionsGroup } from '@/hooks/api/github';
 import { useOwner } from '@/hooks';
 
 interface ContributionCalendarProps {
@@ -20,7 +21,6 @@ interface CalendarCell {
   count: number;
   level: number;
   isToday: boolean;
-  isEmpty: boolean;
 }
 
 // 中文月份
@@ -39,58 +39,55 @@ function getFirstDayOfMonth(year: number, month: number): number {
   return new Date(year, month, 1).getDay();
 }
 
-// 构建日历格子
-function buildCalendarCells(
+// 根据 count 计算 level (0-4)，四分位算法
+function calculateLevel(count: number, maxCount: number): number {
+  if (count === 0 || maxCount === 0) return 0;
+  const quartile = maxCount / 4;
+  if (count <= quartile) return 1;
+  if (count <= quartile * 2) return 2;
+  if (count <= quartile * 3) return 3;
+  return 4;
+}
+
+// 日历构建结果（合并返回避免重复循环）
+interface CalendarBuildResult {
+  cells: CalendarCell[];
+  monthTotal: number;
+}
+
+// 构建日历格子（一次循环同时计算格子数据和月贡献总数）
+function buildCalendar(
   year: number,
   month: number,
-  contributionsMap: Map<string, { count: number; level: number }>
-): CalendarCell[] {
+  maxCount: number,
+  yearGroup: ContributionsGroup | undefined
+): CalendarBuildResult {
   const today = new Date();
   const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
 
   const daysInMonth = getDaysInMonth(year, month);
   const cells: CalendarCell[] = [];
+  let monthTotal = 0;
+
+  const monthStr = String(month + 1).padStart(2, '0');
 
   for (let day = 1; day <= daysInMonth; day++) {
-    const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-    const contribution = contributionsMap.get(dateStr);
+    const dayStr = String(day).padStart(2, '0');
+    const key = `${monthStr}-${dayStr}`; // MM-DD（年份从 yearGroup.year 获取）
+    const count = yearGroup?.contributions?.[key] ?? 0;
+
+    monthTotal += count;
 
     cells.push({
       day,
-      date: dateStr,
-      count: contribution?.count ?? 0,
-      level: contribution?.level ?? 0,
-      isToday: dateStr === todayStr,
-      isEmpty: false,
+      date: `${year}-${monthStr}-${dayStr}`,
+      count,
+      level: calculateLevel(count, maxCount),
+      isToday: `${year}-${monthStr}-${dayStr}` === todayStr,
     });
   }
 
-  return cells;
-}
-
-// 计算总贡献数
-function getTotalContributions(contributions: { date: string; count: number; level: number }[]): number {
-  return contributions.reduce((sum, day) => sum + day.count, 0);
-}
-
-// 获取月份贡献数
-function getMonthContributions(
-  year: number,
-  month: number,
-  contributionsMap: Map<string, { count: number; level: number }>
-): number {
-  const daysInMonth = getDaysInMonth(year, month);
-  let total = 0;
-
-  for (let day = 1; day <= daysInMonth; day++) {
-    const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-    const contribution = contributionsMap.get(dateStr);
-    if (contribution) {
-      total += contribution.count;
-    }
-  }
-
-  return total;
+  return { cells, monthTotal };
 }
 
 export function ContributionCalendar({ className, style }: ContributionCalendarProps) {
@@ -100,7 +97,7 @@ export function ContributionCalendar({ className, style }: ContributionCalendarP
     [owner?.github_url]
   );
 
-  const { data: contributions, isLoading, error } = useGitHubContributions();
+  const { data: sparseData, isLoading, error } = useGitHubContributions();
 
   // 当前年月
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
@@ -108,7 +105,6 @@ export function ContributionCalendar({ className, style }: ContributionCalendarP
 
   // 检测是否为深色模式
   const [isDark, setIsDark] = useState(false);
-  // 监听 hue 变化
   const [hue, setHue] = useState('250');
 
   useEffect(() => {
@@ -129,37 +125,36 @@ export function ContributionCalendar({ className, style }: ContributionCalendarP
     return () => observer.disconnect();
   }, []);
 
-  // 构建贡献数据 Map（快速查找）
-  const contributionsMap = useMemo(() => {
-    const map = new Map<string, { count: number; level: number }>();
-    if (contributions) {
-      contributions.forEach((day) => {
-        map.set(day.date, { count: day.count, level: day.level });
-      });
+  // 预计算 maxCount（所有年份的贡献合并计算）
+  const maxCount = useMemo(() => {
+    if (!sparseData?.groups) return 1;
+    const allCounts: number[] = [];
+    for (const group of sparseData.groups) {
+      if (group.contributions) {
+        allCounts.push(...Object.values(group.contributions));
+      }
     }
-    return map;
-  }, [contributions]);
+    return Math.max(...allCounts, 1);
+  }, [sparseData]);
 
-  // 日历格子
-  const cells = useMemo(() => {
-    return buildCalendarCells(currentYear, currentMonth, contributionsMap);
-  }, [currentYear, currentMonth, contributionsMap]);
+  // 获取当前年份对应的分组
+  const currentYearGroup = useMemo(() => {
+    if (!sparseData?.groups) return undefined;
+    return sparseData.groups.find(g => g.year === currentYear);
+  }, [sparseData, currentYear]);
+
+  // 日历构建（一次循环同时返回 cells 和 monthTotal）
+  const { cells, monthTotal } = useMemo(() => {
+    return buildCalendar(currentYear, currentMonth, maxCount, currentYearGroup);
+  }, [currentYear, currentMonth, maxCount, currentYearGroup]);
 
   // 月初空白格数
   const emptyCellsCount = useMemo(() => {
     return getFirstDayOfMonth(currentYear, currentMonth);
   }, [currentYear, currentMonth]);
 
-  // 总贡献数
-  const totalContributions = useMemo(() => {
-    if (!contributions) return 0;
-    return getTotalContributions(contributions);
-  }, [contributions]);
-
-  // 当月贡献数
-  const monthContributions = useMemo(() => {
-    return getMonthContributions(currentYear, currentMonth, contributionsMap);
-  }, [currentYear, currentMonth, contributionsMap]);
+  // 当前年份总贡献数（从顶层 total 获取）
+  const yearTotal = sparseData?.total ?? 0;
 
   // 是否显示"返回今天"
   const isBackToTodayVisible = useMemo(() => {
@@ -167,25 +162,20 @@ export function ContributionCalendar({ className, style }: ContributionCalendarP
     return currentYear !== today.getFullYear() || currentMonth !== today.getMonth();
   }, [currentYear, currentMonth]);
 
-  // 获取格子颜色（使用 useMemo 缓存，依赖 isDark 和 hue）
+  // 获取格子颜色
   const getCellBg = useMemo(() => {
     return (cell: CalendarCell): string => {
-      if (cell.count > 0) {
-        // 有贡献的格子，根据 level 显示不同深度的主题色
+      if (cell.level > 0) {
         if (isDark) {
-          // 深色模式：level 越高越亮
           const lightness = 0.35 + cell.level * 0.08;
           const chroma = 0.03 + cell.level * 0.015;
           return `oklch(${lightness} ${chroma} ${hue})`;
         } else {
-          // 浅色模式：level 越高越深，但保持淡雅
           const lightness = 0.92 - cell.level * 0.06;
           const chroma = 0.025 + cell.level * 0.01;
           return `oklch(${lightness} ${chroma} ${hue})`;
         }
       }
-
-      // 无贡献的格子
       return isDark ? 'oklch(0.25 0.008 ' + hue + ')' : 'oklch(0.96 0.008 ' + hue + ')';
     };
   }, [isDark, hue]);
@@ -217,15 +207,13 @@ export function ContributionCalendar({ className, style }: ContributionCalendarP
     setCurrentMonth(today.getMonth());
   };
 
-  // 骨架屏日历格子（模拟真实日历结构）
+  // 骨架屏
   const renderSkeletonCalendar = () => {
-    // 模拟当前月份的周数（通常 4-6 周）
     const weeksCount = 5;
     const totalCells = weeksCount * 7;
 
     return (
       <>
-        {/* 标题栏骨架 */}
         <div className="flex justify-between items-center mb-2 mt-2 px-4">
           <div className="font-bold text-base text-90 relative ml-4 flex items-center before:w-1 before:h-4 before:rounded-md before:bg-[var(--primary)] before:absolute before:-left-4 before:top-[5.5px]">
             <div className="h-5 w-20 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
@@ -243,9 +231,7 @@ export function ContributionCalendar({ className, style }: ContributionCalendarP
           </div>
         </div>
 
-        {/* 日历网格 */}
         <div className="px-4">
-          {/* 星期标签骨架 */}
           <div className="grid grid-cols-7 gap-1 mb-1">
             {WEEK_DAYS.map((day) => (
               <div key={day} className="text-center text-[10px] text-neutral-400 dark:text-neutral-500 font-medium py-0.5">
@@ -254,7 +240,6 @@ export function ContributionCalendar({ className, style }: ContributionCalendarP
             ))}
           </div>
 
-          {/* 日期格子骨架 */}
           <div className="grid grid-cols-7 gap-1">
             {Array.from({ length: totalCells }).map((_, idx) => (
               <div
@@ -267,7 +252,6 @@ export function ContributionCalendar({ className, style }: ContributionCalendarP
           </div>
         </div>
 
-        {/* 底部统计骨架 */}
         <div className="px-4 mt-2 flex items-center justify-between">
           <div className="h-3 w-16 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
           <div className="h-3 w-20 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
@@ -276,7 +260,6 @@ export function ContributionCalendar({ className, style }: ContributionCalendarP
     );
   };
 
-  // Owner 加载中
   if (ownerLoading) {
     return (
       <div className={`card-base pb-4 ${className || ''}`} style={style}>
@@ -297,7 +280,7 @@ export function ContributionCalendar({ className, style }: ContributionCalendarP
     );
   }
 
-  if (error || !contributions || contributions.length === 0) {
+  if (error || !sparseData) {
     return null;
   }
 
@@ -403,10 +386,10 @@ export function ContributionCalendar({ className, style }: ContributionCalendarP
       {/* 底部统计 */}
       <div className="px-4 mt-2 flex items-center justify-between text-[10px] text-neutral-400 dark:text-neutral-500">
         <span>
-          当月 <span className="font-medium text-[var(--primary)]">{monthContributions}</span> 次
+          当月 <span className="font-medium text-[var(--primary)]">{monthTotal}</span> 次
         </span>
         <span>
-          过去一年 <span className="font-medium text-[var(--primary)]">{totalContributions}</span> 次
+          过去一年 <span className="font-medium text-[var(--primary)]">{yearTotal}</span> 次
         </span>
       </div>
     </div>

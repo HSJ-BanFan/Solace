@@ -45,4 +45,4 @@ export { useLogin, useLogout } from './auth';
 
 // GitHub 贡献日历
 export { useGitHubContributions, extractGitHubUsername } from './github';
-export type { ContributionDay } from './github';
+export type { ContributionsResponse, ContributionsGroup } from './github';
