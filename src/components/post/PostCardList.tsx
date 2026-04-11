@@ -1,11 +1,10 @@
 /**
  * 文章卡片列表组件
  *
- * 移动端布局规则：
+ * 布局规则（移动端和PC端统一）：
  * - 有封面的卡片：占满整行
  * - 无封面的卡片：相邻配对，两列布局
  * - 无封面卡片如果下一个也有封面或是最后一个，则单独占满整行
- * - 桌面端：单列布局
  */
 
 import { PostCard } from './PostCard';
@@ -42,20 +41,21 @@ export function PostCardList({ articles, className = '' }: PostCardListProps) {
   }
 
   return (
-    <div className={`grid grid-cols-2 md:grid-cols-1 gap-3 md:gap-4 ${className}`}>
+    <div className={`grid grid-cols-2 gap-3 md:gap-4 ${className}`}>
       {articles.map((article, index) => {
         const hasCover = Boolean(article.cover_image);
 
         // 有封面占整行，无封面根据配对情况决定
         const shouldSpanHalfRow = !hasCover && halfRowIndices.has(index);
         const colSpanClass = shouldSpanHalfRow
-          ? 'md:col-span-1' // 配对成功，占半行
-          : 'col-span-2 md:col-span-1'; // 占整行
+          ? '' // 配对成功，占半行（grid-cols-2 默认行为）
+          : 'col-span-2'; // 占整行
 
         return (
           <PostCard
             key={article.id}
             article={article}
+            isHalfRow={shouldSpanHalfRow}
             className={`content-appear ${colSpanClass}`}
             style={{ animationDelay: `${index * 40}ms` }}
           />
