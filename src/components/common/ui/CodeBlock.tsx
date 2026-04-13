@@ -208,13 +208,13 @@ export const CodeBlock = memo(function CodeBlock({
 
       {/* 代码区域：行号 + 代码 */}
       <div className="flex relative">
-        {/* 行号列 */}
+        {/* 行号列 - 宽度根据行数自适应 */}
         <div
-          className="flex-shrink-0 py-3 pr-2 pl-2.5 text-right select-none border-r"
+          className="flex-shrink-0 py-3 pr-2 pl-2 text-center select-none border-r"
           style={{
             backgroundColor: theme.lineNumBg,
             borderColor: theme.border,
-            minWidth: '2.5rem',
+            minWidth: `${String(lineCount).length + 2}ch`,
             color: theme.lineNumColor,
           }}
         >

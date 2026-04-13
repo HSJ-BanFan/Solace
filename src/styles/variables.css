@@ -129,16 +129,16 @@
 
 	/* === 其他 === */
 	--selection-bg: oklch(0.35 0.1 var(--hue));
-	--codeblock-bg: #282c34; /* One Dark 背景色 */
-	--codeblock-header-bg: #21252b;
-	--codeblock-line-bg: #21252b;
+	--codeblock-bg: oklch(0.3 0.025 var(--hue));
+	--codeblock-header-bg: oklch(0.25 0.02 var(--hue));
+	--codeblock-line-bg: oklch(0.25 0.02 var(--hue));
 	--codeblock-border: rgba(255, 255, 255, 0.08);
-	--codeblock-lang-color: #abb2bf;
-	--codeblock-line-color: #5c6370;
-	--codeblock-btn-bg: #3e4451;
-	--codeblock-btn-hover: #4e5666;
-	--codeblock-btn-color: #abb2bf;
-	--codeblock-topbar-bg: oklch(0.15 0.012 var(--hue));
+	--codeblock-lang-color: oklch(0.65 0.08 var(--hue));
+	--codeblock-line-color: oklch(0.5 0.06 var(--hue));
+	--codeblock-btn-bg: oklch(0.35 0.03 var(--hue));
+	--codeblock-btn-hover: oklch(0.4 0.04 var(--hue));
+	--codeblock-btn-color: oklch(0.75 0.08 var(--hue));
+	--codeblock-topbar-bg: oklch(0.2 0.02 var(--hue));
 	--inline-code-color: oklch(0.8 0.15 var(--hue));
 
 	/* === TOC 目录 === */
