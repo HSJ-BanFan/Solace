@@ -143,3 +143,27 @@ export function useDeleteArticle() {
 		},
 	});
 }
+
+/** 获取随机文章 */
+export function useRandomArticles(limit = 5) {
+	return useQuery({
+		queryKey: ["articles", "random", limit],
+		queryFn: async () => {
+			const response = await apiClient.article.getArticlesRandom(limit);
+			return extractData<ArticleSummary[]>(response);
+		},
+		staleTime: 5 * 60 * 1000, // 5 分钟内不重新请求
+	});
+}
+
+/** 获取最近文章 */
+export function useRecentArticles(limit = 5) {
+	return useQuery({
+		queryKey: ["articles", "recent", limit],
+		queryFn: async () => {
+			const response = await apiClient.article.getArticlesRecent(limit);
+			return extractData<ArticleSummary[]>(response);
+		},
+		staleTime: 5 * 60 * 1000, // 5 分钟内不重新请求
+	});
+}

@@ -72,6 +72,40 @@ export class ArticleService {
     });
   }
   /**
+   * 获取随机文章
+   * @param limit 数量
+   * @returns handler_Response OK
+   * @throws ApiError
+   */
+  public getArticlesRandom(
+    limit: number = 5,
+  ): CancelablePromise<handler_Response> {
+    return this.httpRequest.request({
+      method: 'GET',
+      url: '/articles/random',
+      query: {
+        'limit': limit,
+      },
+    });
+  }
+  /**
+   * 获取最近文章
+   * @param limit 数量
+   * @returns handler_Response OK
+   * @throws ApiError
+   */
+  public getArticlesRecent(
+    limit: number = 5,
+  ): CancelablePromise<handler_Response> {
+    return this.httpRequest.request({
+      method: 'GET',
+      url: '/articles/recent',
+      query: {
+        'limit': limit,
+      },
+    });
+  }
+  /**
    * 搜索文章
    * @param q 搜索关键词
    * @param page 页码

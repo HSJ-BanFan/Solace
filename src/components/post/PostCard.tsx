@@ -37,7 +37,7 @@ export function PostCard({ article, isHalfRow = false, className, style }: PostC
             {summary}
           </p>
           <div className="flex flex-wrap gap-1.5 mt-1.5">
-            <TagList tags={article.tags} maxTags={3} />
+            <TagList tags={article.tags} maxTags={3} interactive={false} />
           </div>
         </div>
         {hasCover && (

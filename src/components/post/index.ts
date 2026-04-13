@@ -8,3 +8,4 @@ export { PostMeta } from './PostMeta';
 export { MarkdownRenderer } from './MarkdownRenderer';
 export { LicenseBlock } from './LicenseBlock';
 export type { LicenseBlockProps } from './LicenseBlock';
+export { RecommendedPosts } from './RecommendedPosts';

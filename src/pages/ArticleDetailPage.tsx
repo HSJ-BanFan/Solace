@@ -1,6 +1,6 @@
 import { useParams, Link } from 'react-router-dom';
 import { useArticleBySlug } from '@/hooks';
-import { PostMeta, MarkdownRenderer, ErrorDisplay, NotFoundDisplay, ArticleDetailSkeleton, LazyImage, SafeIcon, LicenseBlock } from '@/components';
+import { PostMeta, MarkdownRenderer, ErrorDisplay, NotFoundDisplay, ArticleDetailSkeleton, LazyImage, SafeIcon, LicenseBlock, RecommendedPosts } from '@/components';
 import type { TocHeading } from '@/components/widget/TableOfContents';
 import { formatDate } from '@/utils';
 import { useEffect, useCallback } from 'react';
@@ -69,6 +69,12 @@ export function ArticleDetailPage() {
             )}
           </div>
         </div>
+      </div>
+
+      {/* 推荐文章 */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <RecommendedPosts mode="random" excludeId={article.id} limit={5} />
+        <RecommendedPosts mode="recent" excludeId={article.id} limit={5} />
       </div>
     </article>
   );

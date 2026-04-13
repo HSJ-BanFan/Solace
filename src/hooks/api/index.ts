@@ -14,6 +14,8 @@ export {
   useCreateArticle,
   useUpdateArticle,
   useDeleteArticle,
+  useRandomArticles,
+  useRecentArticles,
 } from './articles';
 
 // 分类相关
