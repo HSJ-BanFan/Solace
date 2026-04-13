@@ -1,6 +1,6 @@
 import { useParams, Link } from 'react-router-dom';
 import { useArticleBySlug } from '@/hooks';
-import { PostMeta, MarkdownRenderer, ErrorDisplay, NotFoundDisplay, ArticleDetailSkeleton, LazyImage, SafeIcon } from '@/components';
+import { PostMeta, MarkdownRenderer, ErrorDisplay, NotFoundDisplay, ArticleDetailSkeleton, LazyImage, SafeIcon, LicenseBlock } from '@/components';
 import type { TocHeading } from '@/components/widget/TableOfContents';
 import { formatDate } from '@/utils';
 import { useEffect, useCallback } from 'react';
@@ -38,6 +38,14 @@ export function ArticleDetailPage() {
           <LazyImage src={article.cover_image} alt={article.title} className="w-full h-full object-cover rounded-xl" wrapperClassName="w-full aspect-video rounded-xl overflow-hidden mb-6" effect="blur" />
         )}
         <MarkdownRenderer content={article.content} className="mt-6" onHeadingsExtracted={handleHeadings} />
+
+        {/* 版权声明 */}
+        <LicenseBlock
+          title={article.title}
+          url={window.location.href}
+          publishedAt={article.published_at || article.created_at}
+        />
+
         <div className="border-t border-[var(--border-light)] mt-8 pt-4">
           <div className="flex items-center justify-between text-50 text-sm">
             {/* 左下角：更新时间 */}
