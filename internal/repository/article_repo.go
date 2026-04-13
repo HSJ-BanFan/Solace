@@ -334,3 +334,41 @@ func (r *articleRepo) SyncTags(ctx context.Context, articleID uint, tagIDs []uin
 
 	return r.db.WithContext(ctx).Model(&article).Association("Tags").Replace(tags)
 }
+
+// FindRandom 获取随机文章（仅已发布）
+func (r *articleRepo) FindRandom(ctx context.Context, limit int) ([]*model.Article, error) {
+	var articles []*model.Article
+
+	err := r.db.WithContext(ctx).
+		Select("id, title, slug, summary, cover_image, category_id, published_at").
+		Preload("Category").
+		Preload("Tags").
+		Where("status = ?", model.StatusPublished).
+		Order("RANDOM()").
+		Limit(limit).
+		Find(&articles).Error
+
+	if err != nil {
+		return nil, err
+	}
+	return articles, nil
+}
+
+// FindRecent 获取最近文章（仅已发布，按发布时间降序）
+func (r *articleRepo) FindRecent(ctx context.Context, limit int) ([]*model.Article, error) {
+	var articles []*model.Article
+
+	err := r.db.WithContext(ctx).
+		Select("id, title, slug, summary, cover_image, category_id, published_at").
+		Preload("Category").
+		Preload("Tags").
+		Where("status = ?", model.StatusPublished).
+		Order("published_at DESC").
+		Limit(limit).
+		Find(&articles).Error
+
+	if err != nil {
+		return nil, err
+	}
+	return articles, nil
+}

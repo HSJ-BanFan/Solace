@@ -18,6 +18,8 @@ type ArticleRepository interface {
 	FindBySlugWithNav(ctx context.Context, slug string) (*model.Article, *model.Article, *model.Article, error)
 	GetArchive(ctx context.Context) ([]*model.Article, error)
 	Search(ctx context.Context, query string, limit, offset int) ([]*model.Article, int64, error)
+	FindRandom(ctx context.Context, limit int) ([]*model.Article, error)
+	FindRecent(ctx context.Context, limit int) ([]*model.Article, error)
 	Create(ctx context.Context, article *model.Article) error
 	CreateWithTags(ctx context.Context, article *model.Article, tagIDs []uint) error
 	Update(ctx context.Context, article *model.Article) error

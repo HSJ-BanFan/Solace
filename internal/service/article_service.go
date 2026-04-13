@@ -31,6 +31,8 @@ type ArticleService interface {
 	GetList(ctx context.Context, page, pageSize int, status string, authorID *uint, categorySlug, tagSlug string) (*response.ArticleListResponse, error)
 	GetArchive(ctx context.Context) (*response.ArchiveResponse, error)
 	Search(ctx context.Context, query string, page, pageSize int) (*response.ArticleListResponse, error)
+	GetRandom(ctx context.Context, limit int) ([]*response.ArticleSummary, error)
+	GetRecent(ctx context.Context, limit int) ([]*response.ArticleSummary, error)
 	Update(ctx context.Context, id uint, version int, title, articleSlug, content, summary, coverImage string, categoryID *uint, tagIDs []uint, status string) (*response.ArticleResponse, error)
 	Delete(ctx context.Context, id uint) error
 }
@@ -46,6 +48,8 @@ type articleRepository interface {
 	FindBySlugWithNav(ctx context.Context, slug string) (*model.Article, *model.Article, *model.Article, error)
 	GetArchive(ctx context.Context) ([]*model.Article, error)
 	Search(ctx context.Context, query string, limit, offset int) ([]*model.Article, int64, error)
+	FindRandom(ctx context.Context, limit int) ([]*model.Article, error)
+	FindRecent(ctx context.Context, limit int) ([]*model.Article, error)
 	Create(ctx context.Context, article *model.Article) error
 	CreateWithTags(ctx context.Context, article *model.Article, tagIDs []uint) error
 	Update(ctx context.Context, article *model.Article) error
@@ -280,6 +284,34 @@ func (s *articleService) Search(ctx context.Context, query string, page, pageSiz
 		PageSize: pageSize,
 		Total:    total,
 	}, nil
+}
+
+func (s *articleService) GetRandom(ctx context.Context, limit int) ([]*response.ArticleSummary, error) {
+	articles, err := s.articleRepo.FindRandom(ctx, limit)
+	if err != nil {
+		return nil, err
+	}
+
+	items := make([]*response.ArticleSummary, len(articles))
+	for i, article := range articles {
+		items[i] = toArticleSummary(article)
+	}
+
+	return items, nil
+}
+
+func (s *articleService) GetRecent(ctx context.Context, limit int) ([]*response.ArticleSummary, error) {
+	articles, err := s.articleRepo.FindRecent(ctx, limit)
+	if err != nil {
+		return nil, err
+	}
+
+	items := make([]*response.ArticleSummary, len(articles))
+	for i, article := range articles {
+		items[i] = toArticleSummary(article)
+	}
+
+	return items, nil
 }
 
 func (s *articleService) Update(ctx context.Context, id uint, version int, title, articleSlug, content, summary, coverImage string, categoryID *uint, tagIDs []uint, status string) (*response.ArticleResponse, error) {

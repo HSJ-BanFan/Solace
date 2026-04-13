@@ -298,3 +298,47 @@ func (h *ArticleHandler) Delete(c *gin.Context) {
 
 	RespondWithNoContent(c)
 }
+
+// GetRandom 获取随机文章
+// @Summary 获取随机文章
+// @Tags article
+// @Produce json
+// @Param limit query int false "数量" default(5)
+// @Success 200 {object} Response
+// @Router /articles/random [get]
+func (h *ArticleHandler) GetRandom(c *gin.Context) {
+	limit, _ := strconv.Atoi(c.DefaultQuery("limit", "5"))
+	if limit < 1 || limit > 20 {
+		limit = 5
+	}
+
+	articles, err := h.articleService.GetRandom(c.Request.Context(), limit)
+	if err != nil {
+		RespondWithError(c, err)
+		return
+	}
+
+	RespondWithSuccess(c, articles)
+}
+
+// GetRecent 获取最近文章
+// @Summary 获取最近文章
+// @Tags article
+// @Produce json
+// @Param limit query int false "数量" default(5)
+// @Success 200 {object} Response
+// @Router /articles/recent [get]
+func (h *ArticleHandler) GetRecent(c *gin.Context) {
+	limit, _ := strconv.Atoi(c.DefaultQuery("limit", "5"))
+	if limit < 1 || limit > 20 {
+		limit = 5
+	}
+
+	articles, err := h.articleService.GetRecent(c.Request.Context(), limit)
+	if err != nil {
+		RespondWithError(c, err)
+		return
+	}
+
+	RespondWithSuccess(c, articles)
+}

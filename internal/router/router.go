@@ -100,6 +100,8 @@ func (r *Router) Setup(mode string) *gin.Engine {
 			articles.GET("", r.articleHandler.GetList)
 			articles.GET("/archive", r.articleHandler.GetArchive)
 			articles.GET("/search", r.articleHandler.Search)
+			articles.GET("/random", r.articleHandler.GetRandom)
+			articles.GET("/recent", r.articleHandler.GetRecent)
 			articles.GET("/:id", r.articleHandler.GetByID)
 			articles.GET("/slug/:slug", r.articleHandler.GetBySlug)
 		}

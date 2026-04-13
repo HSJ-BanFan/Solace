@@ -139,6 +139,62 @@
                 }
             }
         },
+        "/articles/random": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "article"
+                ],
+                "summary": "获取随机文章",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "default": 5,
+                        "description": "数量",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/articles/recent": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "article"
+                ],
+                "summary": "获取最近文章",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "default": 5,
+                        "description": "数量",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handler.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/articles/search": {
             "get": {
                 "produces": [
