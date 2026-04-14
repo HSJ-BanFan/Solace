@@ -11,6 +11,11 @@ export function ArticleDetailPage() {
   const { data: article, isLoading, error } = useArticleBySlug(slug ?? '');
   const { setHeadings, clearHeadings, setArticleLoading } = useTocStore();
 
+  // 切换文章时平滑滚动到顶部
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [slug]);
+
   useEffect(() => { setArticleLoading(isLoading); }, [isLoading, setArticleLoading]);
   useEffect(() => { return () => { clearHeadings(); setArticleLoading(false); }; }, [clearHeadings, setArticleLoading]);
 
