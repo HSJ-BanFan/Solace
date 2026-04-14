@@ -2,7 +2,7 @@
  * remark 插件：解析 :::gallery 容器语法
  *
  * 将 Markdown 中的：
- * :::gallery{rowHeight=250}
+ * :::gallery{rowHeight=250 columns=3}
  * ![alt](src)
  * :::
  *
@@ -31,6 +31,9 @@ export const remarkGallery: Plugin<[], Root> = function () {
       const attributes = node.attributes || {};
       const rowHeight = attributes.rowHeight
         ? parseInt(attributes.rowHeight, 10)
+        : undefined;
+      const columns = attributes.columns
+        ? parseInt(attributes.columns, 10)
         : undefined;
 
       // 提取图片
@@ -61,6 +64,7 @@ export const remarkGallery: Plugin<[], Root> = function () {
         hProperties: {
           'data-photos': JSON.stringify(photos),
           ...(rowHeight ? { 'data-row-height': String(rowHeight) } : {}),
+          ...(columns ? { 'data-columns': String(columns) } : {}),
         },
       };
 

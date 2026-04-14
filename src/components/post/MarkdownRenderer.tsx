@@ -250,20 +250,24 @@ const TableCell = memo(function TableCell({ children }: { children?: ReactNode }
 const Gallery = memo(function Gallery({
   'data-photos': photosJson,
   'data-row-height': rowHeightStr,
+  'data-columns': columnsStr,
 }: {
   'data-photos'?: string;
   'data-row-height'?: string;
+  'data-columns'?: string;
 }) {
   if (!photosJson) return null;
 
   try {
     const photos = JSON.parse(photosJson);
     const rowHeight = rowHeightStr ? parseInt(rowHeightStr, 10) : undefined;
+    const columns = columnsStr ? parseInt(columnsStr, 10) : undefined;
 
     return (
       <ImageGallery
         photos={photos}
         targetRowHeight={rowHeight}
+        columns={columns}
       />
     );
   } catch {
