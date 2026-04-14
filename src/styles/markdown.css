@@ -116,6 +116,19 @@
 	display: block;
 }
 
+/* Gallery 内部图片不需要额外的 margin */
+.custom-md gallery img,
+.custom-md .react-photo-album--image {
+	margin: 0;
+	border-radius: var(--radius-medium);
+}
+
+/* 相册整体：第一行顶部和最后一行底部保留间距 */
+.custom-md gallery,
+.custom-md .react-photo-album {
+	margin: 1.5rem 0;
+}
+
 /* === 表格样式 === */
 .custom-md table {
 	width: 100%;

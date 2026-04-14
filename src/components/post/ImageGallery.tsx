@@ -152,7 +152,7 @@ export const ImageGallery = memo(function ImageGallery({
   }));
 
   return (
-    <div className={`my-4 ${className}`}>
+    <div className={className}>
       <RowsPhotoAlbum
         photos={processedPhotos}
         targetRowHeight={targetRowHeight}
