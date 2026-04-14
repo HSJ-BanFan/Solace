@@ -2,20 +2,43 @@
  * 代码块组件
  *
  * 特性：
- * - 语法高亮
+ * - 语法高亮 (按需加载语言，优化包体积)
  * - 行号显示
  * - 一键复制
  * - 深色/浅色主题切换
+ *
+ * 语言按需加载：js, ts, python, go, java, html, sql, json
+ * 其他语言使用 text 模式（无高亮）
  */
 
 import { memo, useState, useCallback, useMemo, useRef, useEffect } from 'react';
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import {
-  oneDark,
-  oneLight,
-} from 'react-syntax-highlighter/dist/esm/styles/prism';
+import { Light as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { oneDark, oneLight } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { useDarkMode } from '@/hooks';
 import { SafeIcon } from '@/components/common/ui';
+
+// 按需导入语言包
+import js from 'react-syntax-highlighter/dist/esm/languages/hljs/javascript';
+import ts from 'react-syntax-highlighter/dist/esm/languages/hljs/typescript';
+import python from 'react-syntax-highlighter/dist/esm/languages/hljs/python';
+import go from 'react-syntax-highlighter/dist/esm/languages/hljs/go';
+import java from 'react-syntax-highlighter/dist/esm/languages/hljs/java';
+import html from 'react-syntax-highlighter/dist/esm/languages/hljs/htmlbars';
+import sql from 'react-syntax-highlighter/dist/esm/languages/hljs/sql';
+import json from 'react-syntax-highlighter/dist/esm/languages/hljs/json';
+
+// 注册支持的语言
+SyntaxHighlighter.registerLanguage('javascript', js);
+SyntaxHighlighter.registerLanguage('js', js);
+SyntaxHighlighter.registerLanguage('typescript', ts);
+SyntaxHighlighter.registerLanguage('ts', ts);
+SyntaxHighlighter.registerLanguage('python', python);
+SyntaxHighlighter.registerLanguage('py', python);
+SyntaxHighlighter.registerLanguage('go', go);
+SyntaxHighlighter.registerLanguage('java', java);
+SyntaxHighlighter.registerLanguage('html', html);
+SyntaxHighlighter.registerLanguage('sql', sql);
+SyntaxHighlighter.registerLanguage('json', json);
 
 interface CodeBlockProps {
   children: string;
@@ -23,51 +46,43 @@ interface CodeBlockProps {
   className?: string;
 }
 
+/** 支持的语言列表（已注册） */
+const SUPPORTED_LANGS = new Set([
+  'javascript', 'js', 'typescript', 'ts', 'python', 'py', 'go', 'java', 'html', 'sql', 'json'
+]);
+
 /** 语言显示名称 */
 const LANGUAGE_NAMES: Record<string, string> = {
   js: 'JavaScript',
+  javascript: 'JavaScript',
   ts: 'TypeScript',
+  typescript: 'TypeScript',
   py: 'Python',
+  python: 'Python',
   go: 'Go',
-  rs: 'Rust',
   java: 'Java',
-  kt: 'Kotlin',
-  c: 'C',
-  cpp: 'C++',
-  cs: 'C#',
-  rb: 'Ruby',
-  php: 'PHP',
-  swift: 'Swift',
   html: 'HTML',
+  sql: 'SQL',
+  json: 'JSON',
   css: 'CSS',
-  scss: 'SCSS',
-  sass: 'Sass',
-  vue: 'Vue',
-  svelte: 'Svelte',
-  jsx: 'JSX',
-  tsx: 'TSX',
   sh: 'Shell',
   bash: 'Bash',
-  sql: 'SQL',
-  lua: 'Lua',
-  json: 'JSON',
   yaml: 'YAML',
-  yml: 'YAML',
-  xml: 'XML',
-  toml: 'TOML',
-  md: 'Markdown',
-  dockerfile: 'Dockerfile',
-  graphql: 'GraphQL',
-  diff: 'Diff',
-  r: 'R',
-  matlab: 'MATLAB',
-  perl: 'Perl',
+  markdown: 'Markdown',
+  text: 'Text',
 };
 
+/** 获取语言显示名称 */
 function getLanguageName(lang: string): string {
   if (!lang) return 'Code';
   const normalized = lang.toLowerCase().replace('language-', '');
   return LANGUAGE_NAMES[normalized] || normalized.toUpperCase();
+}
+
+/** 获取实际使用的语言（不支持的语言回退到 text） */
+function getActualLang(lang: string): string {
+  const normalized = lang.toLowerCase().replace('language-', '');
+  return SUPPORTED_LANGS.has(normalized) ? normalized : 'text';
 }
 
 /** Mac 窗口控制按钮 */
@@ -112,6 +127,7 @@ export const CodeBlock = memo(function CodeBlock({
   const langMatch = className?.match(/language-(\w+)/);
   const lang = langMatch?.[1] || language || 'text';
   const langDisplay = getLanguageName(lang);
+  const actualLang = getActualLang(lang);
 
   // 更新代码内容和行数
   useEffect(() => {
@@ -234,7 +250,7 @@ export const CodeBlock = memo(function CodeBlock({
         {/* 代码内容 */}
         <div className="flex-1 overflow-x-auto scrollbar-hide group-hover:scrollbar-default transition-all relative code-content-wrapper">
           <SyntaxHighlighter
-            language={lang}
+            language={actualLang}
             style={isDark ? oneDark : oneLight}
             customStyle={CUSTOM_STYLE}
             codeTagProps={{ style: CODE_TAG_STYLE }}

@@ -23,5 +23,23 @@ export default defineConfig(({ mode }) => {
         },
       },
     },
+    build: {
+      rollupOptions: {
+        output: {
+          manualChunks: {
+            // React 核心 - 基础框架
+            'vendor-react': ['react', 'react-dom', 'react-router-dom'],
+            // 状态管理
+            'vendor-query': ['@tanstack/react-query', 'zustand'],
+            // Markdown 渲染 - 较大，单独拆分
+            'vendor-markdown': ['react-markdown', 'remark-gfm', 'remark-directive', 'unist-util-visit'],
+            // 代码高亮 - 最大的包，单独拆分
+            'vendor-highlight': ['react-syntax-highlighter'],
+            // 图片相关组件
+            'vendor-image': ['react-lazy-load-image-component', 'react-photo-album', 'yet-another-react-lightbox'],
+          },
+        },
+      },
+    },
   }
 })

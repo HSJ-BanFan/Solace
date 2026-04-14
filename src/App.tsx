@@ -6,26 +6,32 @@
  * - BrowserRouter: 路由管理
  * - ThemeInitializer: 主题初始化
  * - Routes: 路由配置
+ *
+ * 性能优化：
+ * - 路由级懒加载，减少首屏 JS 体积
+ * - React Query 缓存优化
  */
 
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { MainLayout, AuthLayout, AdminLayout } from '@/layouts';
-import {
-  HomePage,
-  ArticleDetailPage,
-  ArchivePage,
-  CategoryPage,
-  TagPage,
-  LoginPage,
-  AdminArticlesPage,
-  ArticleEditorPage,
-  AdminCategoriesPage,
-  AdminTagsPage,
-} from '@/pages';
+import { lazy, Suspense, useEffect } from 'react';
 import { useAuthStore, useThemeStore } from '@/stores';
 import { useAutoHideScrollbar } from '@/hooks';
-import { useEffect } from 'react';
+import { MainLayout, AuthLayout, AdminLayout } from '@/layouts';
+import { PostCardSkeletonList } from '@/components';
+
+// 路由懒加载 - 按页面分割代码
+// 使用 .then() 提取命名导出，避免修改每个页面文件
+const HomePage = lazy(() => import('@/pages/HomePage').then(m => ({ default: m.HomePage })));
+const ArticleDetailPage = lazy(() => import('@/pages/ArticleDetailPage').then(m => ({ default: m.ArticleDetailPage })));
+const ArchivePage = lazy(() => import('@/pages/ArchivePage').then(m => ({ default: m.ArchivePage })));
+const CategoryPage = lazy(() => import('@/pages/CategoryPage').then(m => ({ default: m.CategoryPage })));
+const TagPage = lazy(() => import('@/pages/TagPage').then(m => ({ default: m.TagPage })));
+const LoginPage = lazy(() => import('@/pages/auth/LoginPage').then(m => ({ default: m.LoginPage })));
+const AdminArticlesPage = lazy(() => import('@/pages/admin/AdminArticlesPage').then(m => ({ default: m.AdminArticlesPage })));
+const ArticleEditorPage = lazy(() => import('@/pages/admin/ArticleEditorPage').then(m => ({ default: m.ArticleEditorPage })));
+const AdminCategoriesPage = lazy(() => import('@/pages/admin/AdminCategoriesPage').then(m => ({ default: m.AdminCategoriesPage })));
+const AdminTagsPage = lazy(() => import('@/pages/admin/AdminTagsPage').then(m => ({ default: m.AdminTagsPage })));
 
 /** 受保护路由 - 未登录时跳转到登录页 */
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -63,8 +69,10 @@ function ScrollbarController() {
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 5 * 60 * 1000, // 5分钟
+      staleTime: 5 * 60 * 1000, // 5分钟内数据视为新鲜
+      gcTime: 30 * 60 * 1000, // 缓存保留30分钟
       retry: 1,
+      refetchOnWindowFocus: false, // 窗口聚焦不自动刷新
     },
   },
 });
@@ -78,16 +86,40 @@ function App() {
         <Routes>
           {/* 公开路由 - 主布局 */}
           <Route element={<MainLayout />}>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/articles/:slug" element={<ArticleDetailPage />} />
-            <Route path="/archive" element={<ArchivePage />} />
-            <Route path="/categories/:slug" element={<CategoryPage />} />
-            <Route path="/tags/:slug" element={<TagPage />} />
+            <Route path="/" element={
+              <Suspense fallback={<PostCardSkeletonList count={10} />}>
+                <HomePage />
+              </Suspense>
+            } />
+            <Route path="/articles/:slug" element={
+              <Suspense fallback={<PostCardSkeletonList count={1} />}>
+                <ArticleDetailPage />
+              </Suspense>
+            } />
+            <Route path="/archive" element={
+              <Suspense fallback={<PostCardSkeletonList count={5} />}>
+                <ArchivePage />
+              </Suspense>
+            } />
+            <Route path="/categories/:slug" element={
+              <Suspense fallback={<PostCardSkeletonList count={10} />}>
+                <CategoryPage />
+              </Suspense>
+            } />
+            <Route path="/tags/:slug" element={
+              <Suspense fallback={<PostCardSkeletonList count={10} />}>
+                <TagPage />
+              </Suspense>
+            } />
           </Route>
 
           {/* 认证路由 - 登录布局 */}
           <Route element={<AuthLayout />}>
-            <Route path="/login" element={<LoginPage />} />
+            <Route path="/login" element={
+              <Suspense fallback={<div className="flex items-center justify-center min-h-screen">加载中...</div>}>
+                <LoginPage />
+              </Suspense>
+            } />
           </Route>
 
           {/* 管理路由 - 需要登录 */}
@@ -98,11 +130,31 @@ function App() {
               </ProtectedRoute>
             }
           >
-            <Route path="/admin" element={<AdminArticlesPage />} />
-            <Route path="/admin/articles/new" element={<ArticleEditorPage />} />
-            <Route path="/admin/articles/:id/edit" element={<ArticleEditorPage />} />
-            <Route path="/admin/categories" element={<AdminCategoriesPage />} />
-            <Route path="/admin/tags" element={<AdminTagsPage />} />
+            <Route path="/admin" element={
+              <Suspense fallback={<PostCardSkeletonList count={10} />}>
+                <AdminArticlesPage />
+              </Suspense>
+            } />
+            <Route path="/admin/articles/new" element={
+              <Suspense fallback={<div className="flex items-center justify-center min-h-screen">加载中...</div>}>
+                <ArticleEditorPage />
+              </Suspense>
+            } />
+            <Route path="/admin/articles/:id/edit" element={
+              <Suspense fallback={<div className="flex items-center justify-center min-h-screen">加载中...</div>}>
+                <ArticleEditorPage />
+              </Suspense>
+            } />
+            <Route path="/admin/categories" element={
+              <Suspense fallback={<PostCardSkeletonList count={5} />}>
+                <AdminCategoriesPage />
+              </Suspense>
+            } />
+            <Route path="/admin/tags" element={
+              <Suspense fallback={<PostCardSkeletonList count={5} />}>
+                <AdminTagsPage />
+              </Suspense>
+            } />
           </Route>
 
           {/* 回退路由 */}
