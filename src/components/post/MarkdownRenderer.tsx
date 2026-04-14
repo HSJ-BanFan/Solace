@@ -6,6 +6,7 @@
  * - 代码高亮
  * - 标题锚点
  * - 目录提取
+ * - 图片画廊 (:::gallery 容器语法)
  *
  * 性能优化：
  * - 静态组件定义移到外部，避免重复创建
@@ -15,9 +16,12 @@
 
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import remarkDirective from 'remark-directive';
 import React, { memo, useEffect, useMemo, type ReactNode } from 'react';
 import type { TocHeading } from '@/components/widget/TableOfContents';
 import { CodeBlock, LazyImage } from '@/components/common/ui';
+import { ImageGallery } from '@/components/post/ImageGallery';
+import { remarkGallery } from '@/lib/remark/gallery';
 
 interface MarkdownRendererProps {
   content: string;
@@ -242,6 +246,31 @@ const TableCell = memo(function TableCell({ children }: { children?: ReactNode }
   return <td className="px-4 py-2 text-75">{children}</td>;
 });
 
+/** Gallery 组件 - 渲染 gallery 节点 */
+const Gallery = memo(function Gallery({
+  'data-photos': photosJson,
+  'data-row-height': rowHeightStr,
+}: {
+  'data-photos'?: string;
+  'data-row-height'?: string;
+}) {
+  if (!photosJson) return null;
+
+  try {
+    const photos = JSON.parse(photosJson);
+    const rowHeight = rowHeightStr ? parseInt(rowHeightStr, 10) : undefined;
+
+    return (
+      <ImageGallery
+        photos={photos}
+        targetRowHeight={rowHeight}
+      />
+    );
+  } catch {
+    return null;
+  }
+});
+
 /** Markdown 组件映射 */
 const MARKDOWN_COMPONENTS = {
   h1: createHeadingComponent('h1'),
@@ -264,6 +293,7 @@ const MARKDOWN_COMPONENTS = {
   tr: TableRow,
   th: TableHeaderCell,
   td: TableCell,
+  gallery: Gallery,
 } as const;
 
 export const MarkdownRenderer = memo(function MarkdownRenderer({
@@ -281,7 +311,7 @@ export const MarkdownRenderer = memo(function MarkdownRenderer({
   return (
     <div className={`custom-md ${className}`}>
       <ReactMarkdown
-        remarkPlugins={[remarkGfm]}
+        remarkPlugins={[remarkGfm, remarkDirective, remarkGallery]}
         components={MARKDOWN_COMPONENTS}
       >
         {content}
