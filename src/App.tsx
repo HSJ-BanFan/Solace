@@ -59,6 +59,39 @@ function ThemeInitializer() {
   return null;
 }
 
+/** 开屏加载动画 - 仅首次加载显示，淡出后移除 */
+function SplashScreen() {
+  useEffect(() => {
+    // 检查是否已显示过开屏动画
+    if (sessionStorage.getItem('splashShown')) {
+      const splash = document.getElementById('splash');
+      if (splash) {
+        splash.classList.add('hidden');
+      }
+      return;
+    }
+
+    // 标记已显示
+    sessionStorage.setItem('splashShown', 'true');
+
+    // 等待应用加载完成后淡出
+    const timer = setTimeout(() => {
+      const splash = document.getElementById('splash');
+      if (splash) {
+        splash.classList.add('fade-out');
+        // 淡出动画完成后移除 DOM
+        setTimeout(() => {
+          splash.classList.add('hidden');
+        }, 500);
+      }
+    }, 800); // 最少显示 800ms
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  return null;
+}
+
 /** 滚动条控制器 - 滚动时显示，闲置后隐藏 */
 function ScrollbarController() {
   useAutoHideScrollbar(5000); // 5秒后隐藏
@@ -83,6 +116,7 @@ function App() {
       <BrowserRouter>
         <ThemeInitializer />
         <ScrollbarController />
+        <SplashScreen />
         <Routes>
           {/* 公开路由 - 主布局 */}
           <Route element={<MainLayout />}>
