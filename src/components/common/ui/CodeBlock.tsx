@@ -13,7 +13,7 @@
 
 import { memo, useState, useCallback, useMemo, useRef, useEffect } from 'react';
 import { Light as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { oneDark, oneLight } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import { atomOneDark, atomOneLight } from 'react-syntax-highlighter/dist/esm/styles/hljs';
 import { useDarkMode } from '@/hooks';
 import { SafeIcon } from '@/components/common/ui';
 
@@ -251,7 +251,7 @@ export const CodeBlock = memo(function CodeBlock({
         <div className="flex-1 overflow-x-auto scrollbar-hide group-hover:scrollbar-default transition-all relative code-content-wrapper">
           <SyntaxHighlighter
             language={actualLang}
-            style={isDark ? oneDark : oneLight}
+            style={isDark ? atomOneDark : atomOneLight}
             customStyle={CUSTOM_STYLE}
             codeTagProps={{ style: CODE_TAG_STYLE }}
             PreTag="div"
