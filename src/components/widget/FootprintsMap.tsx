@@ -13,19 +13,59 @@ import type { FootprintCity } from "@/types";
 import { useThemeStore } from "@/stores/theme";
 
 // 缓存版本号（GeoJSON 数据结构变化时递增）
-const CACHE_VERSION = 1;
+const CACHE_VERSION = 2;
 const CACHE_KEY = `footprints_geojson_v${CACHE_VERSION}`;
 
-// 中国省份 GeoJSON（详细版，包含省级划分）
-const chinaGeoJsonUrl =
-	"https://geo.datav.aliyun.com/areas_v3/bound/100000_full.json";
+// 中国省份 GeoJSON（jsdelivr CDN）
+const chinaGeoJsonUrl = "https://cdn.jsdelivr.net/npm/china-geojson@1.0.0/src/geojson/china.json";
 
-// 市级 GeoJSON URL 模板
-const cityGeoJsonUrlTemplate =
-	"https://geo.datav.aliyun.com/areas_v3/bound/{adcode}_full.json";
+// 省份名称到拼音文件名映射
+const PROVINCE_FILE_MAP: Record<string, string> = {
+	"北京": "bei_jing",
+	"天津": "tian_jin",
+	"河北": "he_bei",
+	"山西": "shan_xi_1",
+	"内蒙古": "nei_meng_gu",
+	"辽宁": "liao_ning",
+	"吉林": "ji_lin",
+	"黑龙江": "hei_long_jiang",
+	"上海": "shang_hai",
+	"江苏": "jiang_su",
+	"浙江": "zhe_jiang",
+	"安徽": "an_hui",
+	"福建": "fu_jian",
+	"江西": "jiang_xi",
+	"山东": "shan_dong",
+	"河南": "he_nan",
+	"湖北": "hu_bei",
+	"湖南": "hu_nan",
+	"广东": "guang_dong",
+	"广西": "guang_xi",
+	"海南": "hai_nan",
+	"重庆": "chong_qing",
+	"四川": "si_chuan",
+	"贵州": "gui_zhou",
+	"云南": "yun_nan",
+	"西藏": "xi_zang",
+	"陕西": "shan_xi_2",
+	"甘肃": "gan_su",
+	"青海": "qing_hai",
+	"宁夏": "ning_xia",
+	"新疆": "xin_jiang",
+	"台湾": "tai_wan",
+	"香港": "xiang_gang",
+	"澳门": "ao_men",
+};
 
-// 直辖市 adcode
-const MUNICIPALITY_ADCODES = new Set(["110000", "120000", "310000", "500000"]);
+// 直辖市名称
+const MUNICIPALITY_NAMES = new Set(["北京", "天津", "上海", "重庆"]);
+
+// 获取省级 GeoJSON URL
+function getProvinceGeoJsonUrl(name: string): string | null {
+	const fileName = PROVINCE_FILE_MAP[name];
+	if (!fileName) return null;
+	return `https://cdn.jsdelivr.net/npm/china-geojson@1.0.0/src/geojson/${fileName}_geo.json`;
+}
 
 // 预计算的色调映射表（已排序，用于二分查找）
 const HUE_TABLE: ReadonlyArray<readonly [number, string, string]> = [
@@ -271,13 +311,13 @@ function findProvinceByCoords(
 	tree: RTreeNode,
 	lat: number,
 	lng: number
-): { name: string; adcode: string } | null {
+): { name: string } | null {
 	const candidates = queryRTree(tree, lng, lat);
 
 	for (const f of candidates) {
 		for (const polygon of f.coords) {
 			if (pointInPolygon(lng, lat, polygon)) {
-				return { name: f.name, adcode: f.adcode };
+				return { name: f.name };
 			}
 		}
 	}
@@ -289,8 +329,8 @@ interface FootprintsMapProps {
 	cities: FootprintCity[];
 }
 
-// 提取城市区域映射的逻辑
-function computeCityRegionMap(
+// 查找城市对应的区域名
+function findCityRegion(
 	cacheData: CacheData | null,
 	citiesWithCoords: Array<FootprintCity & { coords: NonNullable<FootprintCity["coords"]> }>
 ): Map<string, string> {
@@ -298,29 +338,25 @@ function computeCityRegionMap(
 
 	const result = new Map<string, string>();
 
-	// 处理直辖市
-	for (const f of cacheData.china.features) {
-		const adcodeStr = String(f.properties?.adcode || "");
-		if (MUNICIPALITY_ADCODES.has(adcodeStr)) {
-			const name = f.properties?.name || "";
-			// 直辖市下查找城市
-			const chinaFeatures = parseFeatures(cacheData.china);
-			const chinaTree = buildRTree(chinaFeatures);
+	// 构建中国省级 R-Tree（用于直辖市）
+	const chinaFeatures = parseFeatures(cacheData.china);
+	const chinaTree = buildRTree(chinaFeatures);
 
-			for (const city of citiesWithCoords) {
-				const found = findProvinceByCoords(chinaTree, city.coords.lat, city.coords.lng);
-				if (found && found.adcode === adcodeStr) {
-					result.set(city.name, name);
-				}
-			}
+	// 处理直辖市：直辖市本身就是一个区域
+	for (const city of citiesWithCoords) {
+		const found = findProvinceByCoords(chinaTree, city.coords.lat, city.coords.lng);
+		if (found && MUNICIPALITY_NAMES.has(found.name)) {
+			result.set(city.name, found.name);
 		}
 	}
 
-	// 处理普通省份
+	// 处理普通省份：在省级市级数据中查找
 	for (const [, features] of Object.entries(cacheData.provinceFeatures)) {
+		if (features.length === 0) continue;
 		const tree = buildRTree(features);
 
 		for (const city of citiesWithCoords) {
+			if (result.has(city.name)) continue;
 			const candidates = queryRTree(tree, city.coords.lng, city.coords.lat);
 			for (const f of candidates) {
 				for (const polygon of f.coords) {
@@ -377,7 +413,10 @@ export function FootprintsMap({ cities }: FootprintsMapProps) {
 			// 加载中国地图
 			let chinaGeoJson: GeoJSON;
 			try {
-				const response = await fetch(chinaGeoJsonUrl);
+				let response = await fetch(chinaGeoJsonUrl);
+				if (!response.ok) {
+					throw new Error("加载中国地图数据失败");
+				}
 				chinaGeoJson = await response.json();
 				// eslint-disable-next-line @typescript-eslint/no-explicit-any
 				echarts.registerMap("china", chinaGeoJson as any);
@@ -390,29 +429,31 @@ export function FootprintsMap({ cities }: FootprintsMapProps) {
 			const chinaFeatures = parseFeatures(chinaGeoJson);
 			const chinaTree = buildRTree(chinaFeatures);
 
-			// 一次性查找所有城市对应的省份
-			const provinceMap = new Map<string, { name: string; adcode: string }>();
+			// 查找所有城市对应的省份
+			const provinceMap = new Map<string, string>();
 			const citiesByProvince = new Map<string, typeof citiesWithCoords>();
 
 			for (const city of citiesWithCoords) {
 				const province = findProvinceByCoords(chinaTree, city.coords.lat, city.coords.lng);
-				if (province && province.adcode) {
-					provinceMap.set(province.adcode, province);
-					const list = citiesByProvince.get(province.adcode);
+				if (province && province.name) {
+					provinceMap.set(province.name, province.name);
+					const list = citiesByProvince.get(province.name);
 					if (list) list.push(city);
-					else citiesByProvince.set(province.adcode, [city]);
+					else citiesByProvince.set(province.name, [city]);
 				}
 			}
 
-			// 并行加载所有省级 GeoJSON
-			const provinceAdcodes = [...provinceMap.keys()].filter(a => !MUNICIPALITY_ADCODES.has(a));
-			const fetchPromises = provinceAdcodes.map(async adcode => {
+			// 并行加载所有省级 GeoJSON（排除直辖市）
+			const provinceNames = [...provinceMap.keys()].filter(n => !MUNICIPALITY_NAMES.has(n));
+			const fetchPromises = provinceNames.map(async name => {
 				try {
-					const response = await fetch(cityGeoJsonUrlTemplate.replace("{adcode}", adcode));
+					const url = getProvinceGeoJsonUrl(name);
+					if (!url) return { name, features: [] as Feature[], rawFeatures: [] as GeoJSON["features"] };
+					const response = await fetch(url);
 					const geoJson: GeoJSON = await response.json();
-					return { adcode, features: parseFeatures(geoJson), rawFeatures: geoJson.features };
+					return { name, features: parseFeatures(geoJson), rawFeatures: geoJson.features };
 				} catch {
-					return { adcode, features: [] as Feature[], rawFeatures: [] as GeoJSON["features"] };
+					return { name, features: [] as Feature[], rawFeatures: [] as GeoJSON["features"] };
 				}
 			});
 
@@ -420,22 +461,12 @@ export function FootprintsMap({ cities }: FootprintsMapProps) {
 
 			// 构建省级 feature 映射
 			const provinceFeatures: Record<string, Feature[]> = {};
-			for (const { adcode, features } of provinceResults) {
-				provinceFeatures[adcode] = features;
+			for (const { name, features } of provinceResults) {
+				provinceFeatures[name] = features;
 			}
 
-			// 过滤直辖市下级区域
-			const filteredChinaFeatures = chinaGeoJson.features.filter(f => {
-				const adcode = String(f.properties?.adcode || "");
-				if (adcode.length !== 6) return true;
-				for (const m of MUNICIPALITY_ADCODES) {
-					if (adcode.startsWith(m.slice(0, 4)) && adcode !== m) return false;
-				}
-				return true;
-			});
-
-			// 合并所有 features
-			const mergedFeatures = [...filteredChinaFeatures];
+			// 合并所有 features（直辖市用中国地图的省级边界）
+			const mergedFeatures = [...chinaGeoJson.features];
 			for (const { rawFeatures } of provinceResults) {
 				mergedFeatures.push(...rawFeatures);
 			}
@@ -479,7 +510,7 @@ export function FootprintsMap({ cities }: FootprintsMapProps) {
 
 	// 查找城市对应的区域名
 	const cityRegionMap = useMemo(() => {
-		return computeCityRegionMap(cacheRef.current, citiesWithCoords);
+		return findCityRegion(cacheRef.current, citiesWithCoords);
 	}, [citiesWithCoords, isReady]);
 
 	// 预计算散点数据
@@ -600,7 +631,7 @@ export function FootprintsMap({ cities }: FootprintsMapProps) {
 				},
 				map: "china_merged",
 				roam: true,
-				zoom: 10,
+				zoom: 6,
 				center,
 				regions,
 				itemStyle: {
