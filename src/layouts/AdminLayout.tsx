@@ -18,7 +18,6 @@ import { useAuthStore } from '@/stores';
 /** 侧边栏导航项 */
 const navItems = [
   { name: '文章管理', path: '/admin', icon: 'material-symbols:article-outline-rounded' },
-  { name: '新建文章', path: '/admin/articles/new', icon: 'material-symbols:add-rounded' },
   { name: '页面管理', path: '/admin/pages', icon: 'material-symbols:web-outline-rounded' },
   { name: '分类管理', path: '/admin/categories', icon: 'material-symbols:category-outline-rounded' },
   { name: '标签管理', path: '/admin/tags', icon: 'material-symbols:label-outline-rounded' },
@@ -35,6 +34,12 @@ export function AdminLayout() {
     }
     if (path === '/admin/pages') {
       return location.pathname.startsWith('/admin/pages');
+    }
+    if (path === '/admin/categories') {
+      return location.pathname.startsWith('/admin/categories');
+    }
+    if (path === '/admin/tags') {
+      return location.pathname.startsWith('/admin/tags');
     }
     return location.pathname === path;
   };
