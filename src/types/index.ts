@@ -252,14 +252,30 @@ export interface AboutFrontmatter {
 	timeline?: TimelineEvent[];
 }
 
+/** GitHub 仓库信息（API 返回） */
+export interface GitHubRepoInfo {
+	name: string;
+	description: string | null;
+	html_url: string;
+	stargazers_count: number;
+	forks_count: number;
+	language: string | null;
+	owner: {
+		login: string;
+		avatar_url: string;
+	};
+}
+
 /** 项目 */
 export interface Project {
 	name: string;
 	description: string;
 	tech: string[];
 	github?: string;
+	githubRepo?: string;
 	demo?: string;
 	cover?: string;
+	avatar?: string;
 	status: "active" | "archived";
 	highlights?: string[];
 }

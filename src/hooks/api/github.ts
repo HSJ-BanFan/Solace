@@ -3,6 +3,7 @@ import { apiClient } from "@/api";
 import { extractData } from "./utils";
 import { useOwner } from "./owner";
 import type { service_ContributionsResponse, service_ContributionsGroup } from "@/api/generated";
+import type { GitHubRepoInfo } from "@/types";
 
 /**
  * 从 GitHub URL 中提取用户名
@@ -24,7 +25,6 @@ export function useGitHubContributions() {
 		queryKey: ["github-contributions", githubUsername],
 		queryFn: async (): Promise<service_ContributionsResponse> => {
 			const response = await apiClient.github.getGithubContributions();
-			// 实际响应被包装在 { success, data } 中，需要提取 data
 			return extractData<service_ContributionsResponse>(response as unknown as {
 				success?: boolean;
 				data?: service_ContributionsResponse;
@@ -32,6 +32,28 @@ export function useGitHubContributions() {
 			});
 		},
 		enabled: !!githubUsername,
+		staleTime: 60 * 60 * 1000,
+		gcTime: 24 * 60 * 60 * 1000,
+		retry: 1,
+	});
+}
+
+/**
+ * 获取单个 GitHub 仓库信息（直接调用 GitHub API，使用 no-referrer 避免 CORS）
+ */
+export function useGitHubRepo(repo: string | undefined) {
+	return useQuery({
+		queryKey: ["github-repo", repo],
+		queryFn: async (): Promise<GitHubRepoInfo> => {
+			const response = await fetch(`https://api.github.com/repos/${repo}`, {
+				referrerPolicy: "no-referrer",
+			});
+			if (!response.ok) {
+				throw new Error("获取仓库信息失败");
+			}
+			return response.json();
+		},
+		enabled: !!repo,
 		staleTime: 60 * 60 * 1000,
 		gcTime: 24 * 60 * 60 * 1000,
 		retry: 1,
