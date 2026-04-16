@@ -11,9 +11,9 @@ import type { PageTemplate } from "@/types";
 // 模板类型选项
 const templateOptions: { value: PageTemplate; label: string; description: string }[] = [
 	{ value: "default", label: "默认", description: "普通 Markdown 页面" },
-	{ value: "about", label: "关于我", description: "时间线 + 个人介绍" },
+	{ value: "about", label: "关于我", description: "时间线 + 个人介绍（支持 YYYY-MM-DD）" },
 	{ value: "projects", label: "项目展示", description: "项目卡片列表" },
-	{ value: "footprints", label: "我的足迹", description: "城市足迹地图" },
+	{ value: "footprints", label: "我的足迹", description: "地图 + 城市足迹列表" },
 ];
 
 // 模板示例 frontmatter
@@ -21,11 +21,11 @@ const templateExamples: Record<PageTemplate, string> = {
 	default: "",
 	about: `---
 timeline:
-  - date: "2024-03"
+  - date: "2024-03-15"
     title: "开始写博客"
     description: "搭建个人博客系统"
     type: "milestone"
-  - date: "2023-09"
+  - date: "2023-09-01"
     title: "入职某公司"
     type: "work"
 ---
@@ -53,13 +53,20 @@ projects:
 cities:
   - name: "北京"
     country: "中国"
-    visited_at: "2024-03"
+    visited_at: "2024-03-15"
+    coords: { lat: 39.9042, lng: 116.4074 }
     highlights: ["故宫", "长城"]
     notes: "第一次去北京"
   - name: "上海"
     country: "中国"
-    visited_at: "2023-12"
+    visited_at: "2023-12-20"
+    coords: { lat: 31.2304, lng: 121.4737 }
     highlights: ["外滩", "东方明珠"]
+  - name: "东京"
+    country: "日本"
+    visited_at: "2024-01-10"
+    coords: { lat: 35.6762, lng: 139.6503 }
+    highlights: ["浅草寺", "秋叶原"]
 ---
 
 ## 旅行记录

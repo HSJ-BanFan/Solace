@@ -47,7 +47,6 @@ export function PageDetailPage() {
 					<AboutTemplate
 						frontmatter={frontmatter as AboutFrontmatter}
 						markdown={markdown}
-						page={page}
 					/>
 				);
 			case "projects":

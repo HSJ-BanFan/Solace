@@ -15,3 +15,4 @@ export { ContributionCalendar } from "./ContributionCalendar";
 export { Timeline } from "./Timeline";
 export { ProjectCard } from "./ProjectCard";
 export { FootprintCard } from "./FootprintCard";
+export { FootprintsMap } from "./FootprintsMap";

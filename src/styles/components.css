@@ -464,30 +464,4 @@
 	.timeline-link:hover .timeline-link-icon {
 		transform: translateX(3px);
 	}
-
-	/* === 足迹地图标记 === */
-	.custom-marker {
-		background: transparent;
-		border: none;
-	}
-
-	.marker-pin {
-		width: 24px;
-		height: 24px;
-		background: var(--primary);
-		border-radius: 50% 50% 50% 0;
-		transform: rotate(-45deg);
-		border: 2px solid var(--card-bg);
-		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-	}
-
-	/* Leaflet popup 样式 */
-	.leaflet-popup-content-wrapper {
-		border-radius: 0.75rem;
-	}
-
-	.leaflet-popup-content {
-		margin: 0.5rem 0.75rem;
-		font-size: 0.875rem;
-	}
 }

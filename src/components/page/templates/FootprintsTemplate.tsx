@@ -2,9 +2,11 @@
  * 我的足迹模板
  *
  * 用于 template 类型为 "footprints" 的页面
+ * 支持地图显示城市足迹
  */
 
 import { MarkdownRenderer, SafeIcon } from "@/components";
+import { FootprintsMap } from "@/components/widget/FootprintsMap";
 import { FootprintCard } from "@/components/widget/FootprintCard";
 import type { FootprintsFrontmatter, FootprintCity } from "@/types";
 
@@ -21,6 +23,9 @@ export function FootprintsTemplate({
 
 	// 过滤无效数据
 	const validCities = cities.filter((c) => c && c.country && c.name);
+
+	// 有坐标的城市
+	const citiesWithCoords = validCities.filter((c) => c.coords);
 
 	// 统计国家和城市数量
 	const countries = [...new Set(validCities.map((c) => c.country))];
@@ -57,6 +62,17 @@ export function FootprintsTemplate({
 			{markdown && (
 				<div className="card-base p-6 md:p-8">
 					<MarkdownRenderer content={markdown} />
+				</div>
+			)}
+
+			{/* 地图展示 */}
+			{citiesWithCoords.length > 0 && (
+				<div className="card-base p-4 md:p-6">
+					<h2 className="text-90 text-xl font-bold mb-4 flex items-center gap-2">
+						<SafeIcon icon="material-symbols:map-outline-rounded" />
+						足迹地图
+					</h2>
+					<FootprintsMap cities={validCities} />
 				</div>
 			)}
 
