@@ -12,3 +12,6 @@ export { Tags } from "./Tags";
 export { SearchModal } from "./SearchModal";
 export { TableOfContents, type TocHeading } from "./TableOfContents";
 export { ContributionCalendar } from "./ContributionCalendar";
+export { Timeline } from "./Timeline";
+export { ProjectCard } from "./ProjectCard";
+export { FootprintCard } from "./FootprintCard";

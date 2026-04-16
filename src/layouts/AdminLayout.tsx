@@ -19,6 +19,7 @@ import { useAuthStore } from '@/stores';
 const navItems = [
   { name: '文章管理', path: '/admin', icon: 'material-symbols:article-outline-rounded' },
   { name: '新建文章', path: '/admin/articles/new', icon: 'material-symbols:add-rounded' },
+  { name: '页面管理', path: '/admin/pages', icon: 'material-symbols:web-outline-rounded' },
   { name: '分类管理', path: '/admin/categories', icon: 'material-symbols:category-outline-rounded' },
   { name: '标签管理', path: '/admin/tags', icon: 'material-symbols:label-outline-rounded' },
 ];
@@ -31,6 +32,9 @@ export function AdminLayout() {
   const isActive = (path: string) => {
     if (path === '/admin') {
       return location.pathname === '/admin' || location.pathname.startsWith('/admin/articles');
+    }
+    if (path === '/admin/pages') {
+      return location.pathname.startsWith('/admin/pages');
     }
     return location.pathname === path;
   };

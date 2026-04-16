@@ -32,6 +32,9 @@ const AdminArticlesPage = lazy(() => import('@/pages/admin/AdminArticlesPage').t
 const ArticleEditorPage = lazy(() => import('@/pages/admin/ArticleEditorPage').then(m => ({ default: m.ArticleEditorPage })));
 const AdminCategoriesPage = lazy(() => import('@/pages/admin/AdminCategoriesPage').then(m => ({ default: m.AdminCategoriesPage })));
 const AdminTagsPage = lazy(() => import('@/pages/admin/AdminTagsPage').then(m => ({ default: m.AdminTagsPage })));
+const AdminPagesPage = lazy(() => import('@/pages/admin/AdminPagesPage').then(m => ({ default: m.AdminPagesPage })));
+const PageEditorPage = lazy(() => import('@/pages/admin/PageEditorPage').then(m => ({ default: m.PageEditorPage })));
+const PageDetailPage = lazy(() => import('@/pages/PageDetailPage').then(m => ({ default: m.PageDetailPage })));
 
 /** 受保护路由 - 未登录时跳转到登录页 */
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -145,6 +148,11 @@ function App() {
                 <TagPage />
               </Suspense>
             } />
+            <Route path="/pages/:slug" element={
+              <Suspense fallback={<PostCardSkeletonList count={1} />}>
+                <PageDetailPage />
+              </Suspense>
+            } />
           </Route>
 
           {/* 认证路由 - 登录布局 */}
@@ -187,6 +195,21 @@ function App() {
             <Route path="/admin/tags" element={
               <Suspense fallback={<PostCardSkeletonList count={5} />}>
                 <AdminTagsPage />
+              </Suspense>
+            } />
+            <Route path="/admin/pages" element={
+              <Suspense fallback={<PostCardSkeletonList count={5} />}>
+                <AdminPagesPage />
+              </Suspense>
+            } />
+            <Route path="/admin/pages/new" element={
+              <Suspense fallback={<div className="flex items-center justify-center min-h-screen">加载中...</div>}>
+                <PageEditorPage />
+              </Suspense>
+            } />
+            <Route path="/admin/pages/:id/edit" element={
+              <Suspense fallback={<div className="flex items-center justify-center min-h-screen">加载中...</div>}>
+                <PageEditorPage />
               </Suspense>
             } />
           </Route>

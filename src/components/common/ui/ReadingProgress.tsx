@@ -76,7 +76,7 @@ export function ReadingProgress({ show = true, articleRef }: ReadingProgressProp
     };
   }, [show, articleRef, hasScrolled]);
 
-  if (!show) return null;
+  if (!show || progress >= 100) return null;
 
   return (
     <div className="fixed top-0 left-0 right-0 h-1 z-[100]">

@@ -4,12 +4,13 @@
 
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/stores';
-import { useClickOutside } from '@/hooks';
+import { useClickOutside, useNavPages } from '@/hooks';
 import { ThemeToggle, SafeIcon } from '@/components/common/ui';
 import { SearchModal, HuePicker } from '@/components/widget';
 import { useState, useRef, useMemo } from 'react';
 
-const navLinks = [
+// 固定导航链接
+const staticNavLinks = [
   { name: '首页', path: '/', icon: 'material-symbols:home-outline-rounded' },
   { name: '归档', path: '/archive', icon: 'material-symbols:archive-outline-rounded' },
 ];
@@ -88,6 +89,9 @@ export function Navbar() {
   const [showHuePicker, setShowHuePicker] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
 
+  // 获取动态导航页面
+  const { data: navPages } = useNavPages();
+
   const huePickerRef = useRef<HTMLDivElement>(null);
   const mobileMenuRef = useRef<HTMLDivElement>(null);
   const mobileMenuBtnRef = useRef<HTMLButtonElement>(null);
@@ -102,11 +106,21 @@ export function Navbar() {
 
   const closeMobileMenu = () => setShowMobileMenu(false);
 
+  // 合并静态导航链接和动态页面链接
+  const navLinks = useMemo(() => {
+    const pageLinks = (navPages || []).map((page) => ({
+      name: page.title,
+      path: `/pages/${page.slug}`,
+      icon: 'material-symbols:web-outline-rounded',
+    }));
+    return [...staticNavLinks, ...pageLinks];
+  }, [navPages]);
+
   const mobileMenuItems = useMemo(() =>
     isAuthenticated
       ? [...navLinks, { name: '管理后台', path: '/admin' }, { name: '退出登录', path: 'logout', icon: 'material-symbols:logout-rounded' }]
       : [...navLinks, { name: '登录', path: '/login' }],
-    [isAuthenticated]
+    [isAuthenticated, navLinks]
   );
 
   return (

@@ -48,3 +48,14 @@ export { useLogin, useLogout } from './auth';
 // GitHub 贡献日历
 export { useGitHubContributions, extractGitHubUsername } from './github';
 export type { ContributionsResponse, ContributionsGroup } from './github';
+
+// 页面相关
+export {
+  usePages,
+  usePage,
+  usePageBySlug,
+  useNavPages,
+  useCreatePage,
+  useUpdatePage,
+  useDeletePage,
+} from './pages';

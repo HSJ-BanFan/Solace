@@ -190,3 +190,104 @@ export interface PostCardArticle {
 	created_at: string;
 	updated_at: string;
 }
+
+// ============ 页面类型 ============
+
+/** 页面模板类型 */
+export type PageTemplate = "default" | "about" | "projects" | "footprints";
+
+/** 页面详情 */
+export interface Page {
+	id: number;
+	title: string;
+	slug: string;
+	template: PageTemplate;
+	content: string;
+	summary?: string;
+	cover_image?: string;
+	status: "draft" | "published";
+	order: number;
+	show_in_nav: boolean;
+	version: number;
+	created_at: string;
+	updated_at: string;
+}
+
+/** 页面列表项（不含 content） */
+export interface PageListItem {
+	id: number;
+	title: string;
+	slug: string;
+	template: PageTemplate;
+	summary?: string;
+	cover_image?: string;
+	status: "draft" | "published";
+	order: number;
+	show_in_nav: boolean;
+	created_at: string;
+	updated_at: string;
+}
+
+/** 导航页面项（精简） */
+export interface NavPage {
+	slug: string;
+	title: string;
+	order: number;
+}
+
+// ============ Frontmatter 类型 ============
+
+/** 时间线事件 */
+export interface TimelineEvent {
+	date: string;
+	title: string;
+	description?: string;
+	icon?: string;
+	type: "work" | "education" | "milestone" | "award";
+	link?: { url: string; label: string };
+}
+
+/** 关于我模板 frontmatter */
+export interface AboutFrontmatter {
+	timeline?: TimelineEvent[];
+}
+
+/** 项目 */
+export interface Project {
+	name: string;
+	description: string;
+	tech: string[];
+	github?: string;
+	demo?: string;
+	cover?: string;
+	status: "active" | "archived";
+	highlights?: string[];
+}
+
+/** 项目模板 frontmatter */
+export interface ProjectsFrontmatter {
+	projects?: Project[];
+}
+
+/** 城市足迹 */
+export interface FootprintCity {
+	name: string;
+	country: string;
+	visited_at?: string;
+	duration?: string;
+	highlights?: string[];
+	coords?: { lat: number; lng: number };
+	photos?: string[];
+	notes?: string;
+}
+
+/** 足迹模板 frontmatter */
+export interface FootprintsFrontmatter {
+	cities?: FootprintCity[];
+}
+
+/** 解析后的内容 */
+export interface ParsedContent<T> {
+	frontmatter: T;
+	markdown: string;
+}
