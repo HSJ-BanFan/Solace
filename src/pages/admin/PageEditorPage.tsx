@@ -53,12 +53,14 @@ projects:
 cities:
   - name: "北京"
     country: "中国"
+    province: "北京市"
     visited_at: "2024-03-15"
     coords: { lat: 39.9042, lng: 116.4074 }
     highlights: ["故宫", "长城"]
     notes: "第一次去北京"
   - name: "上海"
     country: "中国"
+    province: "上海市"
     visited_at: "2023-12-20"
     coords: { lat: 31.2304, lng: 121.4737 }
     highlights: ["外滩", "东方明珠"]

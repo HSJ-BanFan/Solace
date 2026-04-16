@@ -27,17 +27,17 @@ export function FootprintsTemplate({
 	// 有坐标的城市
 	const citiesWithCoords = validCities.filter((c) => c.coords);
 
-	// 统计国家和城市数量
-	const countries = [...new Set(validCities.map((c) => c.country))];
+	// 统计省份数量
+	const provinces = [...new Set(validCities.map((c) => c.province || c.country))];
 
-	// 按国家分组
-	const citiesByCountry: Record<string, FootprintCity[]> = {};
+	// 按省份分组
+	const citiesByProvince: Record<string, FootprintCity[]> = {};
 	for (const city of validCities) {
-		const country = city.country;
-		if (!citiesByCountry[country]) {
-			citiesByCountry[country] = [];
+		const province = city.province || city.country;
+		if (!citiesByProvince[province]) {
+			citiesByProvince[province] = [];
 		}
-		citiesByCountry[country].push(city);
+		citiesByProvince[province].push(city);
 	}
 
 	return (
@@ -52,9 +52,9 @@ export function FootprintsTemplate({
 					</span>{" "}
 					个城市，踏足{" "}
 					<span className="text-[var(--primary)] font-bold">
-						{countries.length}
+						{provinces.length}
 					</span>{" "}
-					个国家/地区
+					个省/地区
 				</p>
 			</div>
 
@@ -76,21 +76,21 @@ export function FootprintsTemplate({
 				</div>
 			)}
 
-			{/* 按国家分组显示 */}
-			{countries.map((country) => {
-				const countryCities = citiesByCountry[country] || [];
+			{/* 按省份分组显示 */}
+			{provinces.map((province) => {
+				const provinceCities = citiesByProvince[province] || [];
 				return (
-					<div key={country} className="card-base p-6 md:p-8">
+					<div key={province} className="card-base p-6 md:p-8">
 						<h2 className="text-90 text-xl font-bold mb-4 flex items-center gap-2">
-							<SafeIcon icon="material-symbols:flag-outline-rounded" />
-							{country}
+							<SafeIcon icon="material-symbols:location-city-outline-rounded" />
+							{province}
 							<span className="text-50 text-sm">
-								({countryCities.length})
+								({provinceCities.length})
 							</span>
 						</h2>
 						<div className="space-y-3">
-							{countryCities.map((city, idx) => (
-								<FootprintCard key={`${country}-${city.name}-${idx}`} city={city} />
+							{provinceCities.map((city, idx) => (
+								<FootprintCard key={`${province}-${city.name}-${idx}`} city={city} />
 							))}
 						</div>
 					</div>

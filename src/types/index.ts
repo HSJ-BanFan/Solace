@@ -289,6 +289,7 @@ export interface ProjectsFrontmatter {
 export interface FootprintCity {
 	name: string;
 	country: string;
+	province?: string;
 	visited_at?: string;
 	duration?: string;
 	highlights?: string[];
