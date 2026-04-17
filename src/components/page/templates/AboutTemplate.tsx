@@ -14,8 +14,15 @@ interface AboutTemplateProps {
 }
 
 export function AboutTemplate({ frontmatter, markdown }: AboutTemplateProps) {
-	return (
+return (
 		<div className="space-y-6 fade-in-up">
+			{/* Markdown 正文 */}
+			{markdown && (
+				<div className="card-base p-6 md:p-8">
+					<MarkdownRenderer content={markdown} />
+				</div>
+			)}
+
 			{/* 时间线 */}
 			{frontmatter.timeline && frontmatter.timeline.length > 0 && (
 				<div className="card-base p-6 md:p-8">
@@ -24,13 +31,6 @@ export function AboutTemplate({ frontmatter, markdown }: AboutTemplateProps) {
 						我的历程
 					</h2>
 					<Timeline events={frontmatter.timeline} />
-				</div>
-			)}
-
-			{/* Markdown 正文 */}
-			{markdown && (
-				<div className="card-base p-6 md:p-8">
-					<MarkdownRenderer content={markdown} />
 				</div>
 			)}
 		</div>

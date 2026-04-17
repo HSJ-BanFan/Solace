@@ -51,7 +51,7 @@ export const LicenseBlock = memo(function LicenseBlock({
 	// 优先使用传入的 author，否则使用站长昵称
 	const displayAuthor = author || owner?.nickname || "博主";
 	return (
-		<div className="relative overflow-hidden bg-[var(--btn-regular-bg)] py-5 px-6 rounded-xl mt-8">
+		<div className="relative overflow-hidden bg-[var(--btn-regular-bg)] py-3 px-4 md:py-5 md:px-6 rounded-xl mt-8">
 			{/* 文章标题 */}
 			<div className="font-bold text-75 mb-1">{title}</div>
 
@@ -66,18 +66,18 @@ export const LicenseBlock = memo(function LicenseBlock({
 			</a>
 
 			{/* 信息行：作者、发布时间、许可证 */}
-			<div className="flex gap-6 mt-3 flex-wrap">
+			<div className="flex gap-4 md:gap-6 mt-2 md:mt-3 flex-wrap">
 				{/* 作者 */}
 				<div>
 					<div className="text-30 text-xs mb-0.5">作者</div>
-					<div className="text-75">{displayAuthor}</div>
+					<div className="text-75 text-sm">{displayAuthor}</div>
 				</div>
 
 				{/* 发布时间 */}
 				{publishedAt && (
 					<div>
 						<div className="text-30 text-xs mb-0.5">发布于</div>
-						<div className="text-75">{formatDate(publishedAt)}</div>
+						<div className="text-75 text-sm">{formatDate(publishedAt)}</div>
 					</div>
 				)}
 
@@ -88,7 +88,7 @@ export const LicenseBlock = memo(function LicenseBlock({
 						href={licenseUrl}
 						target="_blank"
 						rel="noopener noreferrer"
-						className="text-[var(--primary)] hover:underline"
+						className="text-[var(--primary)] hover:underline text-sm"
 					>
 						{licenseName}
 					</a>
@@ -99,7 +99,7 @@ export const LicenseBlock = memo(function LicenseBlock({
 			<SafeIcon
 				icon="fa6-brands:creative-commons"
 				size="12rem"
-				className="absolute pointer-events-none right-6 top-1/2 -translate-y-1/2 text-black/5 dark:text-white/5"
+				className="absolute pointer-events-none right-6 top-1/2 -translate-y-1/2 text-black/5 dark:text-white/5 hidden md:block"
 			/>
 		</div>
 	);

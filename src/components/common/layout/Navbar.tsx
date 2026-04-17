@@ -397,7 +397,7 @@ export function Navbar() {
 			>
 				<div className="absolute h-8 -left-4 -right-4 -top-8 bg-[var(--page-bg)]" />
 
-				<div className="card-base !overflow-visible h-[4.5rem] !rounded-t-none flex items-center justify-between px-4">
+				<div className="card-base !overflow-visible h-[4.5rem] flex items-center justify-between px-4">
 					<BrandLogo />
 
 					<nav className="hidden md:flex">
