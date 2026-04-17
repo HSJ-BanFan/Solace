@@ -132,7 +132,7 @@ function RightSidebar() {
 	);
 }
 
-/** 移动端底部侧边栏内容 - Mizuki 风格 */
+/** 移动端底部侧边栏内容 */
 function MobileBottomSidebar() {
 	return (
 		<div className="lg:hidden flex flex-col gap-4 mt-4">
