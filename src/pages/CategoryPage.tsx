@@ -23,7 +23,7 @@ function ArticleListPage({ type }: { type: "category" | "tag" }) {
 	const { slug } = useParams<{ slug: string }>();
 	const [searchParams, setSearchParams] = useSearchParams();
 	const page = parseInt(searchParams.get("page") || "1", 10);
-	const pageSize = 10;
+	const pageSize = 8;
 
 	const { data, isLoading, isFetching } = useArticles({
 		page,

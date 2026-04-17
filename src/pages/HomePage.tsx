@@ -19,7 +19,7 @@ export function HomePage() {
 	// 从 URL 参数获取当前页码，默认为第1页
 	const [searchParams, setSearchParams] = useSearchParams();
 	const page = parseInt(searchParams.get("page") || "1", 10);
-	const pageSize = 10; // 每页显示文章数
+	const pageSize = 8; // 每页显示文章数
 
 	// 获取已发布文章列表，包含加载状态和数据
 	const { data, isLoading, isFetching, error } = useArticles({
