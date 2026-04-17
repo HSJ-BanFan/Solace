@@ -33,6 +33,7 @@ function ArticleListPage({ type }: { type: "category" | "tag" }) {
 
 	const handlePageChange = (newPage: number) => {
 		setSearchParams({ page: String(newPage) });
+		window.scrollTo({ top: 0, behavior: "smooth" });
 	};
 
 	if (!slug) {

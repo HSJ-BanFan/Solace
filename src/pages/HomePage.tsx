@@ -28,9 +28,10 @@ export function HomePage() {
 		status: "published",
 	});
 
-	// 页码变更处理：更新 URL 参数
+	// 页码变更处理：更新 URL 参数，滚动到顶部
 	const handlePageChange = (newPage: number) => {
 		setSearchParams({ page: String(newPage) });
+		window.scrollTo({ top: 0, behavior: "smooth" });
 	};
 
 	// 错误状态

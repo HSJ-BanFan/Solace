@@ -2,16 +2,23 @@
  * 代码块组件
  *
  * 特性：
- * - 语法高亮 (按需加载语言，优化包体积)
+ * - 语法高亮 (动态加载语言包，优化首屏体积)
  * - 行号显示
  * - 一键复制
  * - 深色/浅色主题切换
  *
- * 语言按需加载：js, ts, python, go, java, html, sql, json
+ * 语言动态加载：js, ts, python, go, java, html, sql, json
  * 其他语言使用 text 模式（无高亮）
  */
 
-import { memo, useState, useCallback, useMemo, useRef, useEffect } from "react";
+import {
+	memo,
+ useState,
+	useCallback,
+	useMemo,
+ useRef,
+ useEffect,
+} from "react";
 import { Light as SyntaxHighlighter } from "react-syntax-highlighter";
 import {
 	atomOneDark,
@@ -20,28 +27,30 @@ import {
 import { useDarkMode } from "@/hooks";
 import { SafeIcon } from "@/components/common/ui";
 
-// 按需导入语言包
-import js from "react-syntax-highlighter/dist/esm/languages/hljs/javascript";
-import ts from "react-syntax-highlighter/dist/esm/languages/hljs/typescript";
-import python from "react-syntax-highlighter/dist/esm/languages/hljs/python";
-import go from "react-syntax-highlighter/dist/esm/languages/hljs/go";
-import java from "react-syntax-highlighter/dist/esm/languages/hljs/java";
-import html from "react-syntax-highlighter/dist/esm/languages/hljs/htmlbars";
-import sql from "react-syntax-highlighter/dist/esm/languages/hljs/sql";
-import json from "react-syntax-highlighter/dist/esm/languages/hljs/json";
+// 语言包映射表 - 动态导入路径
+const LANGUAGE_MODULES: Record<string, () => Promise<{ default: unknown }>> = {
+	javascript: () =>
+		import("react-syntax-highlighter/dist/esm/languages/hljs/javascript"),
+	js: () =>
+		import("react-syntax-highlighter/dist/esm/languages/hljs/javascript"),
+	typescript: () =>
+		import("react-syntax-highlighter/dist/esm/languages/hljs/typescript"),
+	ts: () =>
+		import("react-syntax-highlighter/dist/esm/languages/hljs/typescript"),
+	python: () =>
+		import("react-syntax-highlighter/dist/esm/languages/hljs/python"),
+	py: () =>
+		import("react-syntax-highlighter/dist/esm/languages/hljs/python"),
+	go: () => import("react-syntax-highlighter/dist/esm/languages/hljs/go"),
+	java: () => import("react-syntax-highlighter/dist/esm/languages/hljs/java"),
+	html: () =>
+		import("react-syntax-highlighter/dist/esm/languages/hljs/htmlbars"),
+	sql: () => import("react-syntax-highlighter/dist/esm/languages/hljs/sql"),
+	json: () => import("react-syntax-highlighter/dist/esm/languages/hljs/json"),
+};
 
-// 注册支持的语言
-SyntaxHighlighter.registerLanguage("javascript", js);
-SyntaxHighlighter.registerLanguage("js", js);
-SyntaxHighlighter.registerLanguage("typescript", ts);
-SyntaxHighlighter.registerLanguage("ts", ts);
-SyntaxHighlighter.registerLanguage("python", python);
-SyntaxHighlighter.registerLanguage("py", python);
-SyntaxHighlighter.registerLanguage("go", go);
-SyntaxHighlighter.registerLanguage("java", java);
-SyntaxHighlighter.registerLanguage("html", html);
-SyntaxHighlighter.registerLanguage("sql", sql);
-SyntaxHighlighter.registerLanguage("json", json);
+// 已加载语言缓存
+const loadedLanguages = new Set<string>();
 
 interface CodeBlockProps {
 	children: string;
@@ -49,20 +58,8 @@ interface CodeBlockProps {
 	className?: string;
 }
 
-/** 支持的语言列表（已注册） */
-const SUPPORTED_LANGS = new Set([
-	"javascript",
-	"js",
-	"typescript",
-	"ts",
-	"python",
-	"py",
-	"go",
-	"java",
-	"html",
-	"sql",
-	"json",
-]);
+/** 支持的语言列表（可动态加载） */
+const SUPPORTED_LANGS = new Set(Object.keys(LANGUAGE_MODULES));
 
 /** 语言显示名称 */
 const LANGUAGE_NAMES: Record<string, string> = {
@@ -133,6 +130,7 @@ export const CodeBlock = memo(function CodeBlock({
 }: CodeBlockProps) {
 	const [copied, setCopied] = useState(false);
 	const [lineCount, setLineCount] = useState(0);
+	const [languageLoaded, setLanguageLoaded] = useState(false);
 	const isDark = useDarkMode();
 	const codeRef = useRef<string>(children);
 
@@ -147,6 +145,31 @@ export const CodeBlock = memo(function CodeBlock({
 		codeRef.current = children;
 		setLineCount(children.split("\n").length);
 	}, [children]);
+
+	// 动态加载语言包
+	useEffect(() => {
+		if (actualLang === "text" || loadedLanguages.has(actualLang)) {
+			setLanguageLoaded(true);
+			return;
+		}
+
+		const loader = LANGUAGE_MODULES[actualLang];
+		if (!loader) {
+			setLanguageLoaded(true);
+			return;
+		}
+
+		loader()
+			.then((module) => {
+				SyntaxHighlighter.registerLanguage(actualLang, module.default);
+				loadedLanguages.add(actualLang);
+				setLanguageLoaded(true);
+			})
+			.catch(() => {
+				// 加载失败，回退到 text
+				setLanguageLoaded(true);
+			});
+	}, [actualLang]);
 
 	// 复制处理
 	const handleCopy = useCallback(async () => {
@@ -185,6 +208,45 @@ export const CodeBlock = memo(function CodeBlock({
 					},
 		[isDark],
 	);
+
+	// 语言包加载中的 fallback - 显示无高亮的代码
+	if (!languageLoaded && actualLang !== "text") {
+		return (
+			<div
+				className="code-block group my-6 rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300"
+				style={{
+					border: `1px solid ${theme.border}`,
+					backgroundColor: theme.bg,
+				}}
+			>
+				<div
+					className="flex items-center justify-between px-3 py-1"
+					style={{
+						backgroundColor: theme.headerBg,
+						borderBottom: `1px solid ${theme.border}`,
+					}}
+				>
+					<WindowControls />
+					<span
+						className="text-[0.7rem] font-medium tracking-wider"
+						style={{ color: "var(--codeblock-lang-color, #888)" }}
+					>
+						{langDisplay}
+					</span>
+				</div>
+				<pre
+					className="p-3 overflow-x-auto text-sm font-mono"
+					style={{
+						fontFamily:
+							"'JetBrains Mono Variable', ui-monospace, monospace",
+						background: "transparent",
+					}}
+				>
+					<code>{children}</code>
+				</pre>
+			</div>
+		);
+	}
 
 	return (
 		<div
