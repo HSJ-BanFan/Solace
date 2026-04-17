@@ -10,6 +10,7 @@ import { AuthService } from './services/AuthService';
 import { CategoryService } from './services/CategoryService';
 import { GithubService } from './services/GithubService';
 import { OwnerService } from './services/OwnerService';
+import { PageService } from './services/PageService';
 import { TagService } from './services/TagService';
 type HttpRequestConstructor = new (config: OpenAPIConfig) => BaseHttpRequest;
 export class ApiClient {
@@ -18,6 +19,7 @@ export class ApiClient {
   public readonly category: CategoryService;
   public readonly github: GithubService;
   public readonly owner: OwnerService;
+  public readonly page: PageService;
   public readonly tag: TagService;
   public readonly request: BaseHttpRequest;
   constructor(config?: Partial<OpenAPIConfig>, HttpRequest: HttpRequestConstructor = FetchHttpRequest) {
@@ -37,6 +39,7 @@ export class ApiClient {
     this.category = new CategoryService(this.request);
     this.github = new GithubService(this.request);
     this.owner = new OwnerService(this.request);
+    this.page = new PageService(this.request);
     this.tag = new TagService(this.request);
   }
 }

@@ -18,7 +18,6 @@ export function useArticles(params: {
 	page?: number;
 	pageSize?: number;
 	status?: string;
-	authorId?: number;
 	category?: string;
 	tag?: string;
 }) {
@@ -29,7 +28,6 @@ export function useArticles(params: {
 				params.page ?? 1,
 				params.pageSize ?? 10,
 				params.status,
-				params.authorId,
 				params.category,
 				params.tag,
 			);

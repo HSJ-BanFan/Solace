@@ -83,7 +83,7 @@ export function clearAuthStorage() {
 
 /**
  * 执行 Token 刷新
- * 调用后端 refresh 接口获取新的 access_token 和 refresh_token
+ * 使用不带 TOKEN 的临时客户端，避免循环依赖
  */
 async function doRefreshToken(): Promise<string | null> {
   const refreshToken = getStoredRefreshToken();
@@ -93,22 +93,12 @@ async function doRefreshToken(): Promise<string | null> {
   }
 
   try {
-    const response = await fetch(`${getApiBase()}/auth/refresh`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ refresh_token: refreshToken }),
-    });
+    // 创建不带 TOKEN 的临时客户端，避免循环调用 getOrRefreshToken
+    const tempClient = new ApiClient({ BASE: getApiBase() });
+    const response = await tempClient.auth.postAuthRefresh({ refresh_token: refreshToken });
 
-    if (!response.ok) {
-      clearAuthStorage();
-      return null;
-    }
-
-    const data = await response.json();
-    if (data.success && data.data) {
-      const { access_token, refresh_token } = data.data;
+    if (response.success && response.data) {
+      const { access_token, refresh_token } = response.data;
       updateStoredTokens(access_token, refresh_token);
 
       // 通知 zustand 状态更新

@@ -3,53 +3,50 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { handler_Response } from '../models/handler_Response';
-import type { request_CreateArticleRequest } from '../models/request_CreateArticleRequest';
-import type { request_UpdateArticleRequest } from '../models/request_UpdateArticleRequest';
+import type { request_CreatePageRequest } from '../models/request_CreatePageRequest';
+import type { request_UpdatePageRequest } from '../models/request_UpdatePageRequest';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import type { BaseHttpRequest } from '../core/BaseHttpRequest';
-export class ArticleService {
+export class PageService {
   constructor(public readonly httpRequest: BaseHttpRequest) {}
   /**
-   * 获取文章列表
+   * 获取页面列表
    * @param page 页码
    * @param pageSize 每页数量
    * @param status 按状态筛选
-   * @param category 按分类slug筛选
-   * @param tag 按标签slug筛选
+   * @param template 按模板筛选
    * @returns handler_Response OK
    * @throws ApiError
    */
-  public getArticles(
+  public getPages(
     page: number = 1,
     pageSize: number = 10,
     status?: string,
-    category?: string,
-    tag?: string,
+    template?: string,
   ): CancelablePromise<handler_Response> {
     return this.httpRequest.request({
       method: 'GET',
-      url: '/articles',
+      url: '/pages',
       query: {
         'page': page,
         'pageSize': pageSize,
         'status': status,
-        'category': category,
-        'tag': tag,
+        'template': template,
       },
     });
   }
   /**
-   * 创建文章
-   * @param request 文章数据
+   * 创建页面
+   * @param request 页面数据
    * @returns handler_Response Created
    * @throws ApiError
    */
-  public postArticles(
-    request: request_CreateArticleRequest,
+  public postPages(
+    request: request_CreatePageRequest,
   ): CancelablePromise<handler_Response> {
     return this.httpRequest.request({
       method: 'POST',
-      url: '/articles',
+      url: '/pages',
       body: request,
       errors: {
         400: `Bad Request`,
@@ -58,85 +55,28 @@ export class ArticleService {
     });
   }
   /**
-   * 获取归档列表
+   * 获取导航页面列表
    * @returns handler_Response OK
    * @throws ApiError
    */
-  public getArticlesArchive(): CancelablePromise<handler_Response> {
+  public getPagesNav(): CancelablePromise<handler_Response> {
     return this.httpRequest.request({
       method: 'GET',
-      url: '/articles/archive',
+      url: '/pages/nav',
     });
   }
   /**
-   * 获取随机文章
-   * @param limit 数量
+   * 根据 Slug 获取页面
+   * @param slug 页面 Slug
    * @returns handler_Response OK
    * @throws ApiError
    */
-  public getArticlesRandom(
-    limit: number = 5,
-  ): CancelablePromise<handler_Response> {
-    return this.httpRequest.request({
-      method: 'GET',
-      url: '/articles/random',
-      query: {
-        'limit': limit,
-      },
-    });
-  }
-  /**
-   * 获取最近文章
-   * @param limit 数量
-   * @returns handler_Response OK
-   * @throws ApiError
-   */
-  public getArticlesRecent(
-    limit: number = 5,
-  ): CancelablePromise<handler_Response> {
-    return this.httpRequest.request({
-      method: 'GET',
-      url: '/articles/recent',
-      query: {
-        'limit': limit,
-      },
-    });
-  }
-  /**
-   * 搜索文章
-   * @param q 搜索关键词
-   * @param page 页码
-   * @param pageSize 每页数量
-   * @returns handler_Response OK
-   * @throws ApiError
-   */
-  public getArticlesSearch(
-    q: string,
-    page: number = 1,
-    pageSize: number = 10,
-  ): CancelablePromise<handler_Response> {
-    return this.httpRequest.request({
-      method: 'GET',
-      url: '/articles/search',
-      query: {
-        'q': q,
-        'page': page,
-        'pageSize': pageSize,
-      },
-    });
-  }
-  /**
-   * 根据 Slug 获取文章
-   * @param slug 文章 Slug
-   * @returns handler_Response OK
-   * @throws ApiError
-   */
-  public getArticlesSlug(
+  public getPagesSlug(
     slug: string,
   ): CancelablePromise<handler_Response> {
     return this.httpRequest.request({
       method: 'GET',
-      url: '/articles/slug/{slug}',
+      url: '/pages/slug/{slug}',
       path: {
         'slug': slug,
       },
@@ -146,17 +86,17 @@ export class ArticleService {
     });
   }
   /**
-   * 根据 ID 获取文章
-   * @param id 文章ID
+   * 根据 ID 获取页面
+   * @param id 页面ID
    * @returns handler_Response OK
    * @throws ApiError
    */
-  public getArticles1(
+  public getPages1(
     id: number,
   ): CancelablePromise<handler_Response> {
     return this.httpRequest.request({
       method: 'GET',
-      url: '/articles/{id}',
+      url: '/pages/{id}',
       path: {
         'id': id,
       },
@@ -166,19 +106,19 @@ export class ArticleService {
     });
   }
   /**
-   * 更新文章
-   * @param id 文章ID
-   * @param request 文章数据
+   * 更新页面
+   * @param id 页面ID
+   * @param request 页面数据
    * @returns handler_Response OK
    * @throws ApiError
    */
-  public putArticles(
+  public putPages(
     id: number,
-    request: request_UpdateArticleRequest,
+    request: request_UpdatePageRequest,
   ): CancelablePromise<handler_Response> {
     return this.httpRequest.request({
       method: 'PUT',
-      url: '/articles/{id}',
+      url: '/pages/{id}',
       path: {
         'id': id,
       },
@@ -191,17 +131,17 @@ export class ArticleService {
     });
   }
   /**
-   * 删除文章
-   * @param id 文章ID
+   * 删除页面
+   * @param id 页面ID
    * @returns void
    * @throws ApiError
    */
-  public deleteArticles(
+  public deletePages(
     id: number,
   ): CancelablePromise<void> {
     return this.httpRequest.request({
       method: 'DELETE',
-      url: '/articles/{id}',
+      url: '/pages/{id}',
       path: {
         'id': id,
       },

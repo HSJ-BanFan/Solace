@@ -5,24 +5,13 @@
  */
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { apiClient } from "@/api";
 import { extractData, extractPagedData } from "./utils";
-import { getApiBase } from "@/config/runtime";
 import type { Page, PageListItem, NavPage } from "@/types";
-
-// API 基础 URL
-const API_BASE = getApiBase();
-
-/** 从 zustand persist storage 中获取 token */
-function getAuthToken(): string | null {
-	const stored = localStorage.getItem("auth-storage");
-	if (!stored) return null;
-	try {
-		const parsed = JSON.parse(stored);
-		return parsed?.state?.accessToken || null;
-	} catch {
-		return null;
-	}
-}
+import type {
+	request_CreatePageRequest,
+	request_UpdatePageRequest,
+} from "@/api";
 
 /** 获取页面列表（管理用） */
 export function usePages(params?: {
@@ -34,23 +23,13 @@ export function usePages(params?: {
 	return useQuery({
 		queryKey: ["pages", params],
 		queryFn: async () => {
-			const token = getAuthToken();
-			const query = new URLSearchParams();
-			query.set("page", String(params?.page ?? 1));
-			query.set("pageSize", String(params?.pageSize ?? 10));
-			if (params?.status) query.set("status", params.status);
-			if (params?.template) query.set("template", params.template);
-
-			const response = await fetch(
-				`${API_BASE}/pages?${query.toString()}`,
-				{
-					headers: {
-						Authorization: `Bearer ${token}`,
-					},
-				},
+			const response = await apiClient.page.getPages(
+				params?.page ?? 1,
+				params?.pageSize ?? 10,
+				params?.status,
+				params?.template,
 			);
-			const data = await response.json();
-			return extractPagedData<PageListItem>(data);
+			return extractPagedData<PageListItem>(response);
 		},
 	});
 }
@@ -60,14 +39,8 @@ export function usePage(id: number) {
 	return useQuery({
 		queryKey: ["page", id],
 		queryFn: async () => {
-			const token = getAuthToken();
-			const response = await fetch(`${API_BASE}/pages/${id}`, {
-				headers: {
-					Authorization: `Bearer ${token}`,
-				},
-			});
-			const data = await response.json();
-			return extractData<Page>(data);
+			const response = await apiClient.page.getPages1(id);
+			return extractData<Page>(response);
 		},
 		enabled: id > 0,
 	});
@@ -78,9 +51,8 @@ export function usePageBySlug(slug: string) {
 	return useQuery({
 		queryKey: ["page", slug],
 		queryFn: async () => {
-			const response = await fetch(`${API_BASE}/pages/slug/${slug}`);
-			const data = await response.json();
-			return extractData<Page>(data);
+			const response = await apiClient.page.getPagesSlug(slug);
+			return extractData<Page>(response);
 		},
 		enabled: slug.length > 0,
 	});
@@ -91,11 +63,10 @@ export function useNavPages() {
 	return useQuery({
 		queryKey: ["nav-pages"],
 		queryFn: async () => {
-			const response = await fetch(`${API_BASE}/pages/nav`);
-			const data = await response.json();
-			return extractData<NavPage[]>(data);
+			const response = await apiClient.page.getPagesNav();
+			return extractData<NavPage[]>(response);
 		},
-		staleTime: 10 * 60 * 1000, // 10 分钟内不重新请求
+		staleTime: 10 * 60 * 1000,
 	});
 }
 
@@ -104,28 +75,9 @@ export function useCreatePage() {
 	const queryClient = useQueryClient();
 
 	return useMutation({
-		mutationFn: async (data: {
-			title: string;
-			slug?: string;
-			template?: string;
-			content?: string;
-			summary?: string;
-			cover_image?: string;
-			status?: string;
-			order?: number;
-			show_in_nav?: boolean;
-		}) => {
-			const token = getAuthToken();
-			const response = await fetch(`${API_BASE}/pages`, {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-					Authorization: `Bearer ${token}`,
-				},
-				body: JSON.stringify(data),
-			});
-			const json = await response.json();
-			return extractData<Page>(json);
+		mutationFn: async (data: request_CreatePageRequest) => {
+			const response = await apiClient.page.postPages(data);
+			return extractData<Page>(response);
 		},
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ["pages"] });
@@ -144,30 +96,10 @@ export function useUpdatePage() {
 			data,
 		}: {
 			id: number;
-			data: {
-				title?: string;
-				slug?: string;
-				template?: string;
-				content?: string;
-				summary?: string;
-				cover_image?: string;
-				status?: string;
-				order?: number;
-				show_in_nav?: boolean;
-				version: number;
-			};
+			data: request_UpdatePageRequest;
 		}) => {
-			const token = getAuthToken();
-			const response = await fetch(`${API_BASE}/pages/${id}`, {
-				method: "PUT",
-				headers: {
-					"Content-Type": "application/json",
-					Authorization: `Bearer ${token}`,
-				},
-				body: JSON.stringify(data),
-			});
-			const json = await response.json();
-			return extractData<Page>(json);
+			const response = await apiClient.page.putPages(id, data);
+			return extractData<Page>(response);
 		},
 		onSuccess: (_, { id }) => {
 			queryClient.invalidateQueries({ queryKey: ["pages"] });
@@ -183,13 +115,7 @@ export function useDeletePage() {
 
 	return useMutation({
 		mutationFn: async (id: number) => {
-			const token = getAuthToken();
-			await fetch(`${API_BASE}/pages/${id}`, {
-				method: "DELETE",
-				headers: {
-					Authorization: `Bearer ${token}`,
-				},
-			});
+			await apiClient.page.deletePages(id);
 		},
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ["pages"] });

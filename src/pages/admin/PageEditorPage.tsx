@@ -6,20 +6,23 @@ import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { usePage, useCreatePage, useUpdatePage } from "@/hooks";
 import { PageHeader, LoadingButton, InputField, TextAreaField } from "@/components";
-import type { PageTemplate } from "@/types";
+import { request_CreatePageRequest } from "@/api";
+
+type PageTemplate = request_CreatePageRequest.template;
+type PageStatus = request_CreatePageRequest.status;
 
 // 模板类型选项
-const templateOptions: { value: PageTemplate; label: string; description: string }[] = [
-	{ value: "default", label: "默认", description: "普通 Markdown 页面" },
-	{ value: "about", label: "关于我", description: "时间线 + 个人介绍（支持 YYYY-MM-DD）" },
-	{ value: "projects", label: "项目展示", description: "项目卡片列表" },
-	{ value: "footprints", label: "我的足迹", description: "地图 + 城市足迹列表" },
+const templateOptions: { value: request_CreatePageRequest.template; label: string; description: string }[] = [
+	{ value: request_CreatePageRequest.template.DEFAULT, label: "默认", description: "普通 Markdown 页面" },
+	{ value: request_CreatePageRequest.template.ABOUT, label: "关于我", description: "时间线 + 个人介绍（支持 YYYY-MM-DD）" },
+	{ value: request_CreatePageRequest.template.PROJECTS, label: "项目展示", description: "项目卡片列表" },
+	{ value: request_CreatePageRequest.template.FOOTPRINTS, label: "我的足迹", description: "地图 + 城市足迹列表" },
 ];
 
 // 模板示例 frontmatter
-const templateExamples: Record<PageTemplate, string> = {
-	default: "",
-	about: `---
+const templateExamples: Record<request_CreatePageRequest.template, string> = {
+	[request_CreatePageRequest.template.DEFAULT]: "",
+	[request_CreatePageRequest.template.ABOUT]: `---
 timeline:
   - date: "2024-03-15"
     title: "开始写博客"
@@ -33,7 +36,7 @@ timeline:
 ## 关于我
 
 欢迎来到我的博客！`,
-	projects: `---
+	[request_CreatePageRequest.template.PROJECTS]: `---
 projects:
   - name: "个人博客"
     description: "基于 React + Go 的博客系统"
@@ -49,7 +52,7 @@ projects:
 ## 项目介绍
 
 这里是我的开源项目。`,
-	footprints: `---
+	[request_CreatePageRequest.template.FOOTPRINTS]: `---
 cities:
   - name: "北京"
     country: "中国"
@@ -87,11 +90,11 @@ export function PageEditorPage() {
 
 	const [title, setTitle] = useState("");
 	const [slug, setSlug] = useState("");
-	const [template, setTemplate] = useState<PageTemplate>("default");
+	const [template, setTemplate] = useState<PageTemplate>(request_CreatePageRequest.template.DEFAULT);
 	const [content, setContent] = useState("");
 	const [summary, setSummary] = useState("");
 	const [coverImage, setCoverImage] = useState("");
-	const [status, setStatus] = useState<"draft" | "published">("draft");
+	const [status, setStatus] = useState<PageStatus>(request_CreatePageRequest.status.DRAFT);
 	const [order, setOrder] = useState(0);
 	const [showInNav, setShowInNav] = useState(true);
 	const [error, setError] = useState("");
@@ -101,11 +104,11 @@ export function PageEditorPage() {
 		if (existingPage) {
 			setTitle(existingPage.title);
 			setSlug(existingPage.slug || "");
-			setTemplate(existingPage.template);
+			setTemplate(existingPage.template as PageTemplate);
 			setContent(existingPage.content);
 			setSummary(existingPage.summary || "");
 			setCoverImage(existingPage.cover_image || "");
-			setStatus(existingPage.status);
+			setStatus(existingPage.status as PageStatus);
 			setOrder(existingPage.order);
 			setShowInNav(existingPage.show_in_nav);
 		}
@@ -296,9 +299,9 @@ export function PageEditorPage() {
 					<div className="flex gap-2">
 						<button
 							type="button"
-							onClick={() => setStatus("draft")}
+							onClick={() => setStatus(request_CreatePageRequest.status.DRAFT)}
 							className={`rounded-[var(--radius-medium)] py-2 px-4 text-sm font-medium transition-all scale-animation ripple ${
-								status === "draft"
+								status === request_CreatePageRequest.status.DRAFT
 									? "bg-gradient-to-r from-[var(--klein-blue)] to-[var(--klein-blue-light)] text-white"
 									: "btn-regular"
 							}`}
@@ -307,9 +310,9 @@ export function PageEditorPage() {
 						</button>
 						<button
 							type="button"
-							onClick={() => setStatus("published")}
+							onClick={() => setStatus(request_CreatePageRequest.status.PUBLISHED)}
 							className={`rounded-[var(--radius-medium)] py-2 px-4 text-sm font-medium transition-all scale-animation ripple ${
-								status === "published"
+								status === request_CreatePageRequest.status.PUBLISHED
 									? "bg-gradient-to-r from-[var(--klein-blue)] to-[var(--klein-blue-light)] text-white"
 									: "btn-regular"
 							}`}
