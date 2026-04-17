@@ -40,46 +40,6 @@ export class CategoryService {
     });
   }
   /**
-   * 根据Slug获取分类
-   * @param slug 分类Slug
-   * @returns handler_Response OK
-   * @throws ApiError
-   */
-  public getCategoriesSlug(
-    slug: string,
-  ): CancelablePromise<handler_Response> {
-    return this.httpRequest.request({
-      method: 'GET',
-      url: '/categories/slug/{slug}',
-      path: {
-        'slug': slug,
-      },
-      errors: {
-        404: `Not Found`,
-      },
-    });
-  }
-  /**
-   * 根据ID获取分类
-   * @param id 分类ID
-   * @returns handler_Response OK
-   * @throws ApiError
-   */
-  public getCategories1(
-    id: number,
-  ): CancelablePromise<handler_Response> {
-    return this.httpRequest.request({
-      method: 'GET',
-      url: '/categories/{id}',
-      path: {
-        'id': id,
-      },
-      errors: {
-        404: `Not Found`,
-      },
-    });
-  }
-  /**
    * 更新分类
    * @param id 分类ID
    * @param request 分类数据

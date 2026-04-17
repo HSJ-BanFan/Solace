@@ -19,20 +19,6 @@ export function useTags() {
 }
 
 /**
- * 获取单个标签（按 slug）
- */
-export function useTagBySlug(slug: string) {
-	return useQuery({
-		queryKey: ["tag", slug],
-		queryFn: async () => {
-			const response = await apiClient.tag.getTagsSlug(slug);
-			return extractData<Tag>(response);
-		},
-		enabled: slug.length > 0,
-	});
-}
-
-/**
  * 创建标签
  */
 export function useCreateTag() {

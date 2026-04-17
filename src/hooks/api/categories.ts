@@ -19,20 +19,6 @@ export function useCategories() {
 }
 
 /**
- * 获取单个分类（按 slug）
- */
-export function useCategoryBySlug(slug: string) {
-  return useQuery({
-    queryKey: ['category', slug],
-    queryFn: async () => {
-      const response = await apiClient.category.getCategoriesSlug(slug);
-      return extractData<Category>(response);
-    },
-    enabled: slug.length > 0,
-  });
-}
-
-/**
  * 创建分类
  */
 export function useCreateCategory() {

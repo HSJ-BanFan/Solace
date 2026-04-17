@@ -29,7 +29,7 @@ import { Navbar, Footer } from '@/components/common';
 import { TableOfContents, Profile, Categories, Tags } from '@/components/widget';
 import { BackToTop } from '@/components/common/ui';
 import { useTocStore } from '@/stores';
-import { useMediaQuery } from '@/hooks';
+import { useMediaQuery, useOwner, useCategories, useTags } from '@/hooks';
 import { useMemo, lazy, Suspense } from 'react';
 
 // 懒加载 ContributionCalendar - 避免 GitHub API 阻塞首屏渲染
@@ -129,6 +129,11 @@ function MobileBottomSidebar() {
 export function MainLayout() {
   const { headings } = useTocStore();
   const location = useLocation();
+
+  // 预加载全局数据 - 所有子组件直接从缓存获取，避免并发请求
+  useOwner();
+  useCategories();
+  useTags();
 
   // 响应式断点检测
   const isLgOrLarger = useMediaQuery('(min-width: 1024px)');

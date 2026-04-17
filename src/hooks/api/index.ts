@@ -21,7 +21,6 @@ export {
 // 分类相关
 export {
   useCategories,
-  useCategoryBySlug,
   useCreateCategory,
   useUpdateCategory,
   useDeleteCategory,
@@ -30,7 +29,6 @@ export {
 // 标签相关
 export {
   useTags,
-  useTagBySlug,
   useCreateTag,
   useUpdateTag,
   useDeleteTag,

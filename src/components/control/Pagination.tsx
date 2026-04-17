@@ -32,7 +32,7 @@ export function Pagination({ page, pageSize, total, onPageChange }: PaginationPr
       <button
         onClick={() => onPageChange(page - 1)}
         disabled={page === 1}
-        className={`btn-card rounded-[var(--radius-medium)] h-10 w-10 scale-animation ripple ${
+        className={`btn-regular h-9 w-9 ${
           page === 1 ? 'opacity-50 cursor-not-allowed' : ''
         }`}
         aria-label="上一页"
@@ -45,7 +45,7 @@ export function Pagination({ page, pageSize, total, onPageChange }: PaginationPr
         <>
           <button
             onClick={() => onPageChange(1)}
-            className="btn-card rounded-[var(--radius-medium)] h-10 min-w-[2.5rem] px-3 scale-animation ripple"
+            className="btn-regular h-9 min-w-[2.25rem] px-2.5"
           >
             1
           </button>
@@ -58,10 +58,8 @@ export function Pagination({ page, pageSize, total, onPageChange }: PaginationPr
         <button
           key={p}
           onClick={() => onPageChange(p)}
-          className={`rounded-[var(--radius-medium)] h-10 min-w-[2.5rem] px-3 scale-animation ripple ${
-            p === page
-              ? 'text-white font-bold bg-gradient-to-r from-[var(--klein-blue)] to-[var(--klein-blue-light)] shadow-lg'
-              : 'btn-card'
+          className={`btn-regular h-9 min-w-[2.25rem] px-2.5 ${
+            p === page ? 'border-[var(--primary)] bg-[var(--btn-regular-bg-active)]' : ''
           }`}
         >
           {p}
@@ -74,7 +72,7 @@ export function Pagination({ page, pageSize, total, onPageChange }: PaginationPr
           {end < totalPages - 1 && <span className="text-30 px-1">...</span>}
           <button
             onClick={() => onPageChange(totalPages)}
-            className="btn-card rounded-[var(--radius-medium)] h-10 min-w-[2.5rem] px-3 scale-animation ripple"
+            className="btn-regular h-9 min-w-[2.25rem] px-2.5"
           >
             {totalPages}
           </button>
@@ -85,7 +83,7 @@ export function Pagination({ page, pageSize, total, onPageChange }: PaginationPr
       <button
         onClick={() => onPageChange(page + 1)}
         disabled={page === totalPages}
-        className={`btn-card rounded-[var(--radius-medium)] h-10 w-10 scale-animation ripple ${
+        className={`btn-regular h-9 w-9 ${
           page === totalPages ? 'opacity-50 cursor-not-allowed' : ''
         }`}
         aria-label="下一页"

@@ -40,46 +40,6 @@ export class TagService {
     });
   }
   /**
-   * 根据Slug获取标签
-   * @param slug 标签Slug
-   * @returns handler_Response OK
-   * @throws ApiError
-   */
-  public getTagsSlug(
-    slug: string,
-  ): CancelablePromise<handler_Response> {
-    return this.httpRequest.request({
-      method: 'GET',
-      url: '/tags/slug/{slug}',
-      path: {
-        'slug': slug,
-      },
-      errors: {
-        404: `Not Found`,
-      },
-    });
-  }
-  /**
-   * 根据ID获取标签
-   * @param id 标签ID
-   * @returns handler_Response OK
-   * @throws ApiError
-   */
-  public getTags1(
-    id: number,
-  ): CancelablePromise<handler_Response> {
-    return this.httpRequest.request({
-      method: 'GET',
-      url: '/tags/{id}',
-      path: {
-        'id': id,
-      },
-      errors: {
-        404: `Not Found`,
-      },
-    });
-  }
-  /**
    * 更新标签
    * @param id 标签ID
    * @param request 标签数据
