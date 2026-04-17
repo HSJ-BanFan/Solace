@@ -6,21 +6,22 @@ import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { usePage, useCreatePage, useUpdatePage } from "@/hooks";
 import { PageHeader, LoadingButton, InputField, TextAreaField } from "@/components";
+import { ProjectsEditor, TimelineEditor, FootprintsEditor } from "@/components/admin";
 import { request_CreatePageRequest } from "@/api";
+import { parseFrontmatter, stringifyFrontmatter } from "@/utils/frontmatter";
+import type { Project, TimelineEvent, FootprintCity, ProjectsFrontmatter, AboutFrontmatter, FootprintsFrontmatter } from "@/types";
 
 type PageTemplate = request_CreatePageRequest.template;
 type PageStatus = request_CreatePageRequest.status;
 
-// 模板类型选项
-const templateOptions: { value: request_CreatePageRequest.template; label: string; description: string }[] = [
+const templateOptions: { value: PageTemplate; label: string; description: string }[] = [
 	{ value: request_CreatePageRequest.template.DEFAULT, label: "默认", description: "普通 Markdown 页面" },
-	{ value: request_CreatePageRequest.template.ABOUT, label: "关于我", description: "时间线 + 个人介绍（支持 YYYY-MM-DD）" },
+	{ value: request_CreatePageRequest.template.ABOUT, label: "关于我", description: "时间线 + 个人介绍" },
 	{ value: request_CreatePageRequest.template.PROJECTS, label: "项目展示", description: "项目卡片列表" },
 	{ value: request_CreatePageRequest.template.FOOTPRINTS, label: "我的足迹", description: "地图 + 城市足迹列表" },
 ];
 
-// 模板示例 frontmatter
-const templateExamples: Record<request_CreatePageRequest.template, string> = {
+const templateExamples: Record<PageTemplate, string> = {
 	[request_CreatePageRequest.template.DEFAULT]: "",
 	[request_CreatePageRequest.template.ABOUT]: `---
 timeline:
@@ -67,17 +68,19 @@ cities:
     visited_at: "2023-12-20"
     coords: { lat: 31.2304, lng: 121.4737 }
     highlights: ["外滩", "东方明珠"]
-  - name: "东京"
-    country: "日本"
-    visited_at: "2024-01-10"
-    coords: { lat: 35.6762, lng: 139.6503 }
-    highlights: ["浅草寺", "秋叶原"]
 ---
 
 ## 旅行记录
 
 记录我去过的城市。`,
 };
+
+// 判断模板是否需要可视化编辑器
+function isVisualTemplate(template: PageTemplate): boolean {
+	return template === request_CreatePageRequest.template.ABOUT 
+		|| template === request_CreatePageRequest.template.PROJECTS 
+		|| template === request_CreatePageRequest.template.FOOTPRINTS;
+}
 
 export function PageEditorPage() {
 	const { id } = useParams<{ id: string }>();
@@ -99,6 +102,12 @@ export function PageEditorPage() {
 	const [showInNav, setShowInNav] = useState(true);
 	const [error, setError] = useState("");
 
+	// 各模板专用 state
+	const [projects, setProjects] = useState<Project[]>([]);
+	const [timeline, setTimeline] = useState<TimelineEvent[]>([]);
+	const [cities, setCities] = useState<FootprintCity[]>([]);
+	const [markdownContent, setMarkdownContent] = useState("");
+
 	// 加载现有页面数据
 	useEffect(() => {
 		if (existingPage) {
@@ -111,14 +120,98 @@ export function PageEditorPage() {
 			setStatus(existingPage.status as PageStatus);
 			setOrder(existingPage.order);
 			setShowInNav(existingPage.show_in_nav);
+
+			// 解析对应模板的内容
+			if (existingPage.template === "projects") {
+				const parsed = parseFrontmatter<ProjectsFrontmatter>(existingPage.content);
+				setProjects(parsed.frontmatter.projects || []);
+				setMarkdownContent(parsed.markdown);
+			} else if (existingPage.template === "about") {
+				const parsed = parseFrontmatter<AboutFrontmatter>(existingPage.content);
+				setTimeline(parsed.frontmatter.timeline || []);
+				setMarkdownContent(parsed.markdown);
+			} else if (existingPage.template === "footprints") {
+				const parsed = parseFrontmatter<FootprintsFrontmatter>(existingPage.content);
+				setCities(parsed.frontmatter.cities || []);
+				setMarkdownContent(parsed.markdown);
+			}
 		}
 	}, [existingPage]);
 
-	// 模板切换时插入示例内容（仅新建时）
+	// 同步 frontmatter 数据到 content
+	const syncFrontmatter = (frontmatterData: Record<string, unknown>, markdown: string) => {
+		const yamlStr = stringifyFrontmatter(frontmatterData);
+		setContent(yamlStr + markdown);
+	};
+
+	// Projects 数据变更
+	const handleProjectsChange = (newProjects: Project[]) => {
+		setProjects(newProjects);
+		syncFrontmatter({ projects: newProjects }, markdownContent);
+	};
+
+	// Timeline 数据变更
+	const handleTimelineChange = (newTimeline: TimelineEvent[]) => {
+		setTimeline(newTimeline);
+		syncFrontmatter({ timeline: newTimeline }, markdownContent);
+	};
+
+	// Cities 数据变更
+	const handleCitiesChange = (newCities: FootprintCity[]) => {
+		setCities(newCities);
+		syncFrontmatter({ cities: newCities }, markdownContent);
+	};
+
+	// Markdown 内容变更
+	const handleMarkdownChange = (newMarkdown: string) => {
+		setMarkdownContent(newMarkdown);
+		let frontmatterData: Record<string, unknown> = {};
+		if (template === request_CreatePageRequest.template.PROJECTS) {
+			frontmatterData = { projects };
+		} else if (template === request_CreatePageRequest.template.ABOUT) {
+			frontmatterData = { timeline };
+		} else if (template === request_CreatePageRequest.template.FOOTPRINTS) {
+			frontmatterData = { cities };
+		}
+		syncFrontmatter(frontmatterData, newMarkdown);
+	};
+
+	// 模板切换
 	const handleTemplateChange = (newTemplate: PageTemplate) => {
 		setTemplate(newTemplate);
+		
 		if (!isEdit && !content) {
+			// 新建页面：插入示例内容
 			setContent(templateExamples[newTemplate]);
+			
+			if (newTemplate === request_CreatePageRequest.template.PROJECTS) {
+				const parsed = parseFrontmatter<ProjectsFrontmatter>(templateExamples[newTemplate]);
+				setProjects(parsed.frontmatter.projects || []);
+				setMarkdownContent(parsed.markdown);
+			} else if (newTemplate === request_CreatePageRequest.template.ABOUT) {
+				const parsed = parseFrontmatter<AboutFrontmatter>(templateExamples[newTemplate]);
+				setTimeline(parsed.frontmatter.timeline || []);
+				setMarkdownContent(parsed.markdown);
+			} else if (newTemplate === request_CreatePageRequest.template.FOOTPRINTS) {
+				const parsed = parseFrontmatter<FootprintsFrontmatter>(templateExamples[newTemplate]);
+				setCities(parsed.frontmatter.cities || []);
+				setMarkdownContent(parsed.markdown);
+			}
+		} else if (isVisualTemplate(newTemplate)) {
+			// 切换到可视化模板：解析现有内容
+			if (newTemplate === request_CreatePageRequest.template.PROJECTS) {
+				const parsed = parseFrontmatter<ProjectsFrontmatter>(content);
+				setProjects(parsed.frontmatter.projects || []);
+				setMarkdownContent(parsed.markdown);
+			} else if (newTemplate === request_CreatePageRequest.template.ABOUT) {
+				const parsed = parseFrontmatter<AboutFrontmatter>(content);
+				setTimeline(parsed.frontmatter.timeline || []);
+				setMarkdownContent(parsed.markdown);
+			} else if (newTemplate === request_CreatePageRequest.template.FOOTPRINTS) {
+				const parsed = parseFrontmatter<FootprintsFrontmatter>(content);
+				setCities(parsed.frontmatter.cities || []);
+				setMarkdownContent(parsed.markdown);
+			}
 		}
 	};
 
@@ -162,6 +255,20 @@ export function PageEditorPage() {
 		}
 	};
 
+	// 渲染可视化编辑器
+	const renderVisualEditor = () => {
+		if (template === request_CreatePageRequest.template.PROJECTS) {
+			return <ProjectsEditor projects={projects} onChange={handleProjectsChange} />;
+		}
+		if (template === request_CreatePageRequest.template.ABOUT) {
+			return <TimelineEditor timeline={timeline} onChange={handleTimelineChange} />;
+		}
+		if (template === request_CreatePageRequest.template.FOOTPRINTS) {
+			return <FootprintsEditor cities={cities} onChange={handleCitiesChange} />;
+		}
+		return null;
+	};
+
 	return (
 		<div className="space-y-4">
 			<PageHeader
@@ -169,27 +276,15 @@ export function PageEditorPage() {
 				icon={isEdit ? "material-symbols:edit-outline-rounded" : "material-symbols:add-rounded"}
 			/>
 
-			{/* 表单 */}
-			<form
-				onSubmit={handleSubmit}
-				className="card-base p-6 fade-in-up"
-				style={{ animationDelay: "0.1s" }}
-			>
+			<form onSubmit={handleSubmit} className="card-base p-6 fade-in-up" style={{ animationDelay: "0.1s" }}>
 				{error && (
 					<div className="bg-red-500/10 text-red-500 rounded-[var(--radius-medium)] p-3 mb-4 text-sm">
 						{error}
 					</div>
 				)}
 
-				<InputField
-					label="标题"
-					value={title}
-					onChange={setTitle}
-					placeholder="页面标题"
-					required
-				/>
+				<InputField label="标题" value={title} onChange={setTitle} placeholder="页面标题" required />
 
-				{/* Slug 输入 */}
 				<div className="mb-4">
 					<label className="block text-75 text-sm font-medium mb-2">
 						Slug <span className="text-50 text-xs ml-1">(留空自动从标题生成)</span>
@@ -206,7 +301,6 @@ export function PageEditorPage() {
 					</p>
 				</div>
 
-				{/* 模板选择 */}
 				<div className="mb-4">
 					<label className="block text-75 text-sm font-medium mb-2">页面模板</label>
 					<div className="grid grid-cols-1 md:grid-cols-2 gap-2">
@@ -230,42 +324,41 @@ export function PageEditorPage() {
 					</div>
 				</div>
 
-				<InputField
-					label="封面图片"
-					value={coverImage}
-					onChange={setCoverImage}
-					placeholder="https://example.com/cover.jpg"
-					type="url"
-				/>
+				<InputField label="封面图片" value={coverImage} onChange={setCoverImage} placeholder="https://example.com/cover.jpg" type="url" />
 
-				<TextAreaField
-					label="摘要"
-					value={summary}
-					onChange={setSummary}
-					placeholder="页面简要摘要"
-					rows={2}
-				/>
+				<TextAreaField label="摘要" value={summary} onChange={setSummary} placeholder="页面简要摘要" rows={2} />
 
-				{/* 内容编辑器 */}
 				<div className="mb-4">
 					<label className="block text-75 text-sm font-medium mb-2">
 						内容 <span className="text-50 text-xs ml-1">(Markdown + YAML frontmatter)</span>
 					</label>
+
+					{isVisualTemplate(template) && <div className="mb-4">{renderVisualEditor()}</div>}
+
 					<textarea
-						value={content}
-						onChange={(e) => setContent(e.target.value)}
-						placeholder="在这里撰写页面内容..."
-						rows={20}
+						value={isVisualTemplate(template) ? markdownContent : content}
+						onChange={(e) => {
+							if (isVisualTemplate(template)) {
+								handleMarkdownChange(e.target.value);
+							} else {
+								setContent(e.target.value);
+							}
+						}}
+						placeholder={isVisualTemplate(template) ? "在这里撰写页面正文（Markdown）..." : "在这里撰写页面内容..."}
+						rows={isVisualTemplate(template) ? 8 : 20}
 						className="input-base font-mono text-sm"
-						required
+						required={!isVisualTemplate(template)}
 					/>
 					<p className="text-50 text-xs mt-1">
-						{template !== "default" && "根据模板类型，在 YAML frontmatter 中填写结构化数据（--- 包围的部分）。"}
+						{isVisualTemplate(template)
+							? "结构化数据已在上方的可视化编辑器中填写，此处仅编辑正文内容。"
+							: template !== "default"
+								? "根据模板类型，在 YAML frontmatter 中填写结构化数据（--- 包围的部分）。"
+								: ""}
 						正文使用 Markdown 格式。
 					</p>
 				</div>
 
-				{/* 排序和导航设置 */}
 				<div className="mb-4 flex gap-4 flex-wrap">
 					<div className="flex-1 min-w-[120px]">
 						<label className="block text-75 text-sm font-medium mb-2">排序</label>
@@ -287,13 +380,10 @@ export function PageEditorPage() {
 							onChange={(e) => setShowInNav(e.target.checked)}
 							className="w-4 h-4 rounded border-[var(--border-light)]"
 						/>
-						<label htmlFor="showInNav" className="text-75 text-sm">
-							显示在导航中
-						</label>
+						<label htmlFor="showInNav" className="text-75 text-sm">显示在导航中</label>
 					</div>
 				</div>
 
-				{/* 状态 */}
 				<div className="mb-6">
 					<label className="block text-75 text-sm font-medium mb-2">状态</label>
 					<div className="flex gap-2">
@@ -322,7 +412,6 @@ export function PageEditorPage() {
 					</div>
 				</div>
 
-				{/* 操作按钮 */}
 				<div className="flex gap-2">
 					<LoadingButton
 						type="submit"

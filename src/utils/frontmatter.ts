@@ -19,7 +19,7 @@ import type { ParsedContent } from "@/types";
 /**
  * 解析 Markdown 中的 YAML frontmatter
  */
-export function parseFrontmatter<T extends Record<string, unknown>>(
+export function parseFrontmatter<T extends object>(
 	content: string,
 ): ParsedContent<T> {
 	// 统一换行符为 LF
