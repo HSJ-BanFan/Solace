@@ -2,6 +2,17 @@
 export default {
   content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
   darkMode: 'class',
+  // 性能优化：禁用不需要的核心插件
+  corePlugins: {
+    preflight: true, // 保持基础样式重置
+    container: false, // 不使用 container 类
+  },
+  // 性能优化：只保留需要的变体
+  variants: {
+    extend: {
+      // 仅保留实际使用的变体
+    },
+  },
   theme: {
     extend: {
       screens: {

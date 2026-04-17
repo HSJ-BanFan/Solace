@@ -14,6 +14,7 @@
  * - useMemo 缓存标题提取结果
  * - CodeBlock 懒加载，减少首屏 bundle 体积
  * - ImageGallery 懒加载，仅在需要时加载图片画廊组件
+ * - JetBrains Mono 字体懒加载，减少首屏 84KB 字体文件
  */
 
 import ReactMarkdown from "react-markdown";
@@ -30,6 +31,17 @@ import React, {
 import type { TocHeading } from "@/components/widget/TableOfContents";
 import { LazyImage } from "@/components/common/ui";
 import { remarkGallery } from "@/lib/remark/gallery";
+
+// 懒加载 JetBrains Mono 字体 - 仅在首次渲染 Markdown 时加载
+let fontLoaded = false;
+function loadJetBrainsMono() {
+	if (fontLoaded) return;
+	fontLoaded = true;
+	// 动态导入字体 CSS（Vite 会自动处理）
+	import(
+		/* webpackChunkName: "vendor-font" */ "@fontsource-variable/jetbrains-mono/index.css"
+	).catch(() => {});
+}
 
 // 懒加载 CodeBlock - 代码高亮仅在需要时加载 (~70 KB)
 const CodeBlock = lazy(() =>
@@ -453,6 +465,11 @@ export const MarkdownRenderer = memo(function MarkdownRenderer({
 }: MarkdownRendererProps) {
 	// 提取标题并通知父组件 (使用 useMemo 缓存结果)
 	const headings = useMemo(() => extractHeadings(content), [content]);
+
+	// 首次渲染时懒加载 JetBrains Mono 字体
+	useEffect(() => {
+		loadJetBrainsMono();
+	}, []);
 
 	useEffect(() => {
 		onHeadingsExtracted?.(headings);

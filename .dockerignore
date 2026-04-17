@@ -36,4 +36,11 @@ Thumbs.db
 # ESLint
 eslint.config.js
 
-# Vite config (not needed in runtime)
+# Bundle analysis report (不需要在生产环境)
+stats.html
+
+# 开发配置文件（但 tsconfig.json 构建需要）
+# tailwind.config.js
+# vite.config.ts
+# tsconfig.json
+# tsconfig.*.json

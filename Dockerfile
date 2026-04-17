@@ -1,4 +1,4 @@
-# Build stage
+# Build stage - 使用 Node 20 Alpine
 FROM node:20-alpine AS builder
 
 WORKDIR /app
@@ -9,7 +9,7 @@ RUN apk add --no-cache libc6-compat
 # 复制 package 文件
 COPY package*.json ./
 
-# 安装依赖并清理缓存
+# 安装依赖（包括 terser 用于极限压缩）
 RUN npm ci --prefer-offline --no-audit && \
     npm cache clean --force
 
@@ -20,7 +20,8 @@ COPY . .
 ARG VITE_API_BASE=/api/v1
 ENV VITE_API_BASE=$VITE_API_BASE
 
-# 构建
+# 生产环境构建（启用极限压缩）
+ENV NODE_ENV=production
 RUN npm run build
 
 # Runtime stage: 使用 Alpine + 最小化 nginx
@@ -36,7 +37,7 @@ RUN mkdir -p /run/nginx /usr/share/nginx/html
 # 设置时区
 ENV TZ=Asia/Shanghai
 
-# 复制自定义 nginx 配置
+# 复制自定义 nginx 配置（极限 gzip 压缩）
 COPY nginx.conf /etc/nginx/http.d/default.conf
 
 # 复制构建产物
