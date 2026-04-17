@@ -44,11 +44,11 @@
 	--text-30: rgba(150, 150, 150, 0.4);
 
 	/* === 边框与分隔线 === */
-	--border-light: rgba(0, 0, 0, 0.05); /* 更轻的边框 */
-	--border-medium: rgba(0, 0, 0, 0.08);
-	--line-divider: rgba(0, 0, 0, 0.06);
-	--line-color: rgba(0, 0, 0, 0.08);
-	--meta-divider: rgba(0, 0, 0, 0.15);
+	--border-light: rgba(0, 0, 0, 0.08); /* 更轻的边框 */
+	--border-medium: rgba(0, 0, 0, 0.12);
+	--line-divider: rgba(0, 0, 0, 0.1);
+	--line-color: rgba(0, 0, 0, 0.12);
+	--meta-divider: rgba(0, 0, 0, 0.2);
 
 	/* === 链接 === */
 	--link-underline: oklch(0.85 0.08 var(--hue));
@@ -82,7 +82,7 @@
 	/* === 昭和风格 === */
 	--showa-shadow-color: oklch(0.85 0.08 var(--hue));
 	--showa-shadow-offset: 4px;
-	--showa-border-color: oklch(0.85 0.06 var(--hue));
+	--showa-border-color: oklch(0.80 0.08 var(--hue));
 	--showa-title-highlight: oklch(0.92 0.06 var(--hue));
 	--showa-dots-color: oklch(0.88 0.05 var(--hue));
 	--showa-dots-size: 16px;
@@ -124,11 +124,11 @@
 	--text-30: rgba(100, 100, 100, 0.4);
 
 	/* === 边框与分隔线 === */
-	--border-light: rgba(255, 255, 255, 0.06);
-	--border-medium: rgba(255, 255, 255, 0.1);
-	--line-divider: rgba(255, 255, 255, 0.06);
-	--line-color: rgba(255, 255, 255, 0.08);
-	--meta-divider: rgba(255, 255, 255, 0.15);
+	--border-light: rgba(255, 255, 255, 0.1);
+	--border-medium: rgba(255, 255, 255, 0.15);
+	--line-divider: rgba(255, 255, 255, 0.1);
+	--line-color: rgba(255, 255, 255, 0.12);
+	--meta-divider: rgba(255, 255, 255, 0.2);
 
 	/* === 链接 === */
 	--link-underline: oklch(0.4 0.1 var(--hue));
@@ -157,7 +157,7 @@
 	/* === 昭和风格 (深色模式) === */
 	--showa-shadow-color: oklch(0.35 0.08 var(--hue));
 	--showa-shadow-offset: 3px;
-	--showa-border-color: oklch(0.35 0.04 var(--hue));
+	--showa-border-color: oklch(0.38 0.06 var(--hue));
 	--showa-title-highlight: oklch(0.35 0.08 var(--hue));
 	--showa-dots-color: oklch(0.28 0.03 var(--hue));
 }

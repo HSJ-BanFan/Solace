@@ -125,10 +125,10 @@ export function Navbar() {
 
   return (
     <>
-<div id="navbar" className="relative z-50 mt-2">
-		<div className="absolute h-8 left-0 right-0 -top-8 bg-[var(--page-bg)] transition" />
+<div id="navbar" className="relative z-50 mt-2 max-w-[var(--page-width)] mx-auto w-full px-4">
+		<div className="absolute h-8 -left-4 -right-4 -top-8 bg-[var(--page-bg)] transition" />
 
-<div className="card-base !overflow-visible max-w-[var(--page-width)] h-[4.5rem] !rounded-t-none mx-auto flex items-center justify-between px-4">
+<div className="card-base !overflow-visible h-[4.5rem] !rounded-t-none flex items-center justify-between px-4">
 			<Link to="/" className="btn-plain scale-animation rounded-[var(--radius-small)] h-[3.25rem] px-5 font-bold">
 				<div className="flex flex-row text-[var(--primary)] items-center text-md">
 					<SafeIcon icon="material-symbols:home-outline-rounded" size="1.75rem" className="mb-1 mr-2" />
@@ -180,7 +180,7 @@ export function Navbar() {
 			</div>
 		</div>
 
-        <div ref={mobileMenuRef} className={`float-panel absolute top-full left-4 right-4 mt-1 p-2 md:hidden transition-all ${showMobileMenu ? '' : 'float-panel-closed'}`}>
+        <div ref={mobileMenuRef} className={`float-panel absolute top-full left-0 right-0 mt-1 p-2 md:hidden transition-all ${showMobileMenu ? '' : 'float-panel-closed'}`}>
           {mobileMenuItems.map((item) => (
             <MenuItem key={item.path} link={item} onClose={closeMobileMenu} onLogout={handleLogout} />
           ))}
