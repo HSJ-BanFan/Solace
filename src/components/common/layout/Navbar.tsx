@@ -18,11 +18,7 @@ const staticNavLinks = [
 	},
 ];
 
-const adminLink = {
-	name: "管理后台",
-	path: "/admin",
-	icon: "material-symbols:admin-panel-settings-outline-rounded",
-};
+
 
 /** 图标按钮 - 用于工具栏 */
 function IconButton({
@@ -85,6 +81,7 @@ function Toolbar({
 	onToggleMobileMenu,
 	onLogout,
 	huePickerRef,
+	mobileMenuButtonRef,
 	showHuePicker,
 	isAuthenticated,
 }: {
@@ -93,6 +90,7 @@ function Toolbar({
 	onToggleMobileMenu: () => void;
 	onLogout: () => void;
 	huePickerRef: React.RefObject<HTMLDivElement>;
+	mobileMenuButtonRef: React.RefObject<HTMLButtonElement>;
 	showHuePicker: boolean;
 	isAuthenticated: boolean;
 }) {
@@ -130,6 +128,7 @@ function Toolbar({
 			</div>
 
 			<button
+				ref={mobileMenuButtonRef}
 				onClick={onToggleMobileMenu}
 				className="btn-plain scale-animation rounded-[var(--radius-small)] w-11 h-11 md:hidden"
 				aria-label="菜单"
@@ -332,12 +331,14 @@ export function Navbar() {
 
 	const huePickerRef = useRef<HTMLDivElement>(null);
 	const mobileMenuRef = useRef<HTMLDivElement>(null);
+	const mobileMenuButtonRef = useRef<HTMLButtonElement>(null);
 
 	useClickOutside(huePickerRef, () => setShowHuePicker(false), showHuePicker);
 	useClickOutside(
 		mobileMenuRef,
 		() => setShowMobileMenu(false),
 		showMobileMenu,
+		mobileMenuButtonRef,
 	);
 
 	// 回调函数 - 使用 useCallback 避免重复创建
@@ -368,11 +369,8 @@ export function Navbar() {
 		return [...staticNavLinks, ...pageLinks];
 	}, [navPages]);
 
-	// 桌面端导航（包含管理后台）
-	const desktopNavLinks = useMemo(
-		() => (isAuthenticated ? [...navLinks, adminLink] : navLinks),
-		[isAuthenticated, navLinks],
-	);
+	// 桌面端导航
+	const desktopNavLinks = navLinks;
 
 	// 移动端菜单项
 	const mobileMenuItems = useMemo(
@@ -418,6 +416,7 @@ export function Navbar() {
 						onToggleMobileMenu={toggleMobileMenu}
 						onLogout={handleLogout}
 						huePickerRef={huePickerRef}
+						mobileMenuButtonRef={mobileMenuButtonRef}
 						showHuePicker={showHuePicker}
 						isAuthenticated={isAuthenticated}
 					/>
