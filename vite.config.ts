@@ -1,13 +1,18 @@
 import { defineConfig, loadEnv } from 'vite'
 import react from '@vitejs/plugin-react'
 import path from 'path'
+import { visualizer } from 'rollup-plugin-visualizer'
 
 export default defineConfig(({ mode }) => {
   // 加载环境变量
   const env = loadEnv(mode, process.cwd(), '')
 
   return {
-    plugins: [react()],
+    plugins: [
+      react(),
+      // 打包分析工具 - 生成 stats.html 可视化报告
+      visualizer({ open: false, gzipSize: true }),
+    ],
     resolve: {
       alias: {
         '@': path.resolve(__dirname, './src'),
@@ -37,6 +42,8 @@ export default defineConfig(({ mode }) => {
             'vendor-highlight': ['react-syntax-highlighter'],
             // 图片相关组件
             'vendor-image': ['react-lazy-load-image-component', 'react-photo-album', 'yet-another-react-lightbox'],
+            // ECharts 地图 - 按需导入后单独拆分
+            'vendor-echarts': ['echarts'],
           },
         },
       },

@@ -8,9 +8,25 @@
  */
 
 import { useEffect, useRef, useState, useMemo, useCallback } from "react";
-import * as echarts from "echarts";
+// ECharts 按需导入 - 减少 bundle 体积
+import * as echarts from "echarts/core";
+import { MapChart } from "echarts/charts";
+import { ScatterChart, EffectScatterChart } from "echarts/charts";
+import { GeoComponent, TooltipComponent, VisualMapComponent } from "echarts/components";
+import { SVGRenderer } from "echarts/renderers";
 import type { FootprintCity } from "@/types";
 import { useThemeStore } from "@/stores/theme";
+
+// 注册需要的 ECharts 模块
+echarts.use([
+  MapChart,
+  ScatterChart,
+  EffectScatterChart,
+  GeoComponent,
+  TooltipComponent,
+  VisualMapComponent,
+  SVGRenderer,
+]);
 
 // 缓存版本号（GeoJSON 数据结构变化时递增）
 const CACHE_VERSION = 2;
@@ -413,7 +429,7 @@ export function FootprintsMap({ cities }: FootprintsMapProps) {
 			// 加载中国地图
 			let chinaGeoJson: GeoJSON;
 			try {
-				let response = await fetch(chinaGeoJsonUrl);
+				const response = await fetch(chinaGeoJsonUrl);
 				if (!response.ok) {
 					throw new Error("加载中国地图数据失败");
 				}
@@ -616,7 +632,7 @@ export function FootprintsMap({ cities }: FootprintsMapProps) {
 	useEffect(() => {
 		if (!isReady || !chartInstance.current) return;
 
-		const option: echarts.EChartsOption = {
+		const option: echarts.EChartsCoreOption = {
 			backgroundColor: "transparent",
 			tooltip: {
 				trigger: "item",

@@ -18,16 +18,24 @@
  * 响应式：
  * - 移动端：单栏（主内容 + 底部侧边栏内容 + Footer）
  * - 平板：双栏（左侧边栏 + 主内容）
- * - 桌面：三栏（左侧边栏 + 主内容 + 右侧边栏）
+ * - 桂面：三栏（左侧边栏 + 主内容 + 右侧边栏）
+ *
+ * 性能优化：
+ * - ContributionCalendar 懒加载，避免 GitHub API 阻塞首屏
  */
 
 import { Outlet, useLocation } from 'react-router-dom';
 import { Navbar, Footer } from '@/components/common';
-import { TableOfContents, Profile, Categories, Tags, ContributionCalendar } from '@/components/widget';
+import { TableOfContents, Profile, Categories, Tags } from '@/components/widget';
 import { BackToTop } from '@/components/common/ui';
 import { useTocStore } from '@/stores';
 import { useMediaQuery } from '@/hooks';
-import { useMemo } from 'react';
+import { useMemo, lazy, Suspense } from 'react';
+
+// 懒加载 ContributionCalendar - 避免 GitHub API 阻塞首屏渲染
+const ContributionCalendar = lazy(() =>
+  import('@/components/widget/ContributionCalendar').then((m) => ({ default: m.ContributionCalendar }))
+);
 
 /** 左侧边栏组件 */
 interface LeftSidebarProps {
@@ -68,12 +76,34 @@ function LeftSidebar({ isArticlePage, headings }: LeftSidebarProps) {
   );
 }
 
+/** 贡献日历加载占位符 */
+function ContributionCalendarFallback() {
+  return (
+    <div className="card-base pb-3 onload-animation">
+      <div className="flex justify-between items-center mb-1.5 px-3">
+        <div className="font-bold text-base text-90 relative ml-6 mt-3 mb-1.5 before:w-0.5 before:h-3.5 before:rounded-sm before:bg-[var(--primary)] before:absolute before:-left-3 before:top-[4.5px]">
+          <div className="h-4 w-16 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+        </div>
+      </div>
+      <div className="px-3">
+        <div className="grid grid-cols-7 gap-0.5">
+          {Array.from({ length: 35 }).map((_, i) => (
+            <div key={i} className="aspect-square bg-gray-100 dark:bg-gray-800 rounded animate-pulse" />
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 /** 右侧边栏组件 - 显示分类 */
 function RightSidebar() {
   return (
     <aside className="w-64 flex-shrink-0">
       <div className="sticky top-4 flex flex-col w-full gap-4">
-        <ContributionCalendar className="onload-animation" style={{ animationDelay: '100ms' }} />
+        <Suspense fallback={<ContributionCalendarFallback />}>
+          <ContributionCalendar className="onload-animation" style={{ animationDelay: '100ms' }} />
+        </Suspense>
         <Categories className="onload-animation" style={{ animationDelay: '150ms' }} />
       </div>
     </aside>

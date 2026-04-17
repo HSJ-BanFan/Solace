@@ -3,12 +3,29 @@
  *
  * 用于 template 类型为 "footprints" 的页面
  * 支持地图显示城市足迹
+ *
+ * 性能优化：
+ * - FootprintsMap 懒加载，避免首屏加载 ECharts
  */
 
+import { lazy, Suspense } from "react";
 import { MarkdownRenderer, SafeIcon } from "@/components";
-import { FootprintsMap } from "@/components/widget/FootprintsMap";
 import { FootprintCard } from "@/components/widget/FootprintCard";
 import type { FootprintsFrontmatter, FootprintCity } from "@/types";
+
+// 懒加载地图组件 - ECharts 较大，仅在实际需要时加载
+const FootprintsMap = lazy(() =>
+  import("@/components/widget/FootprintsMap").then((m) => ({ default: m.FootprintsMap }))
+);
+
+// 地图加载占位符
+function MapLoadingFallback() {
+  return (
+    <div className="h-[400px] md:h-[500px] w-full rounded-xl bg-[var(--btn-regular-bg)] flex items-center justify-center">
+      <div className="text-50 animate-pulse">加载地图中...</div>
+    </div>
+  );
+}
 
 interface FootprintsTemplateProps {
 	frontmatter: FootprintsFrontmatter;
@@ -65,14 +82,16 @@ export function FootprintsTemplate({
 				</div>
 			)}
 
-			{/* 地图展示 */}
+			{/* 地图展示 - 懒加载 */}
 			{citiesWithCoords.length > 0 && (
 				<div className="card-base p-4 md:p-6">
 					<h2 className="text-90 text-xl font-bold mb-4 flex items-center gap-2">
 						<SafeIcon icon="material-symbols:map-outline-rounded" />
 						足迹地图
 					</h2>
-					<FootprintsMap cities={validCities} />
+					<Suspense fallback={<MapLoadingFallback />}>
+						<FootprintsMap cities={validCities} />
+					</Suspense>
 				</div>
 			)}
 

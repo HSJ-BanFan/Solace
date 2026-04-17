@@ -16,6 +16,8 @@ interface LazyImageProps {
   onClick?: () => void;
   /** 显示加载中骨架屏 */
   showSkeleton?: boolean;
+  /** 图片宽高比（用于预留空间，减少 CLS），如 '16/9' 或 '4/3' */
+  aspectRatio?: string;
 }
 
 /**
@@ -26,9 +28,10 @@ interface LazyImageProps {
  * - 支持模糊占位图效果（blur）
  * - 加载完成后自动淡入
  * - 可选加载中骨架屏动画
+ * - 支持 aspectRatio 预留空间，减少 CLS
  *
  * 使用示例：
- * <LazyImage src="..." alt="封面" effect="blur" wrapperClassName="w-full h-full" showSkeleton />
+ * <LazyImage src="..." alt="封面" effect="blur" wrapperClassName="w-full" aspectRatio="16/9" showSkeleton />
  */
 export const LazyImage = memo(function LazyImage({
   src,
@@ -41,6 +44,7 @@ export const LazyImage = memo(function LazyImage({
   onLoad,
   onClick,
   showSkeleton = true,
+  aspectRatio,
 }: LazyImageProps) {
   const [isLoaded, setIsLoaded] = useState(false);
 
@@ -49,8 +53,11 @@ export const LazyImage = memo(function LazyImage({
     onLoad?.();
   };
 
+  // 使用 aspect-ratio 预留空间，减少 CLS
+  const containerStyle = aspectRatio ? { aspectRatio } : undefined;
+
   return (
-    <div className={`relative ${wrapperClassName}`}>
+    <div className={`relative ${wrapperClassName}`} style={containerStyle}>
       {/* 骨架屏占位 */}
       {showSkeleton && !isLoaded && (
         <div className="absolute inset-0 bg-[var(--card-bg)] animate-pulse flex items-center justify-center">

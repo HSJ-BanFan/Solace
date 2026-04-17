@@ -5,6 +5,14 @@
 		<link rel="icon" type="image/svg+xml" href="/vite.svg" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>Blog</title>
+		<!-- DNS 预解析 - 减少 API 请求延迟 -->
+		<link rel="preconnect" href="https://chinese-fonts-cdn.deno.dev" />
+		<!-- 字体 CSS 预加载 -->
+		<link
+			rel="preload"
+			href="https://chinese-fonts-cdn.deno.dev/packages/mkzyt/dist/猫啃珠圆体/result.css"
+			as="style"
+		/>
 		<link
 			href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
 			rel="stylesheet"
@@ -24,7 +32,10 @@
 				align-items: center;
 				justify-content: center;
 				background: #f8fafc;
-				transition: opacity 0.5s ease-out, visibility 0.5s ease-out, background 0.3s;
+				transition:
+					opacity 0.5s ease-out,
+					visibility 0.5s ease-out,
+					background 0.3s;
 			}
 			.splash-screen.fade-out {
 				opacity: 0;
@@ -41,54 +52,109 @@
 				animation: miku-float 3s ease-in-out infinite;
 			}
 			@keyframes miku-float {
-				0%, 100% { transform: translateY(0); }
-				50% { transform: translateY(-8px); }
+				0%,
+				100% {
+					transform: translateY(0);
+				}
+				50% {
+					transform: translateY(-8px);
+				}
 			}
 			/* 像素字体 */
 			.splash-text {
 				margin-top: 20px;
-				font-family: 'Courier New', monospace;
+				font-family: "Courier New", monospace;
 				font-size: 12px;
 				color: #64748b;
 				letter-spacing: 0.15em;
 			}
 			.splash-text::after {
-				content: '...';
+				content: "...";
 				animation: dots 1.2s steps(4) infinite;
 			}
 			@keyframes dots {
-				0% { content: ''; }
-				25% { content: '.'; }
-				50% { content: '..'; }
-				75% { content: '...'; }
+				0% {
+					content: "";
+				}
+				25% {
+					content: ".";
+				}
+				50% {
+					content: "..";
+				}
+				75% {
+					content: "...";
+				}
 			}
 			/* 浅色主题 - 初音配色 */
-			.splash-character svg .hair { fill: #39C5BB; }
-			.splash-character svg .hair-light { fill: #62e2d0; }
-			.splash-character svg .skin { fill: #FFF1E0; }
-			.splash-character svg .eye { fill: #333333; }
-			.splash-character svg .blush { fill: #FFB6C1; animation: blush-pulse 2s ease-in-out infinite; }
-			.splash-character svg .white { fill: #FFFFFF; }
-			.splash-character svg .tie { fill: #00BFA5; }
-			.splash-character svg .tie-light { fill: #2ed1b9; }
-			.splash-character svg .black { fill: #222222; }
+			.splash-character svg .hair {
+				fill: #39c5bb;
+			}
+			.splash-character svg .hair-light {
+				fill: #62e2d0;
+			}
+			.splash-character svg .skin {
+				fill: #fff1e0;
+			}
+			.splash-character svg .eye {
+				fill: #333333;
+			}
+			.splash-character svg .blush {
+				fill: #ffb6c1;
+				animation: blush-pulse 2s ease-in-out infinite;
+			}
+			.splash-character svg .white {
+				fill: #ffffff;
+			}
+			.splash-character svg .tie {
+				fill: #00bfa5;
+			}
+			.splash-character svg .tie-light {
+				fill: #2ed1b9;
+			}
+			.splash-character svg .black {
+				fill: #222222;
+			}
 			@keyframes blush-pulse {
-				0%, 100% { opacity: 0.8; }
-				50% { opacity: 1; }
+				0%,
+				100% {
+					opacity: 0.8;
+				}
+				50% {
+					opacity: 1;
+				}
 			}
 			/* 深色模式 */
 			html.dark .splash-screen {
 				background: #0f172a;
 			}
-			html.dark .splash-character svg .hair { fill: #5eead4; }
-			html.dark .splash-character svg .hair-light { fill: #99f6e4; }
-			html.dark .splash-character svg .skin { fill: #fef3c7; }
-			html.dark .splash-character svg .eye { fill: #1e293b; }
-			html.dark .splash-character svg .blush { fill: #fda4af; }
-			html.dark .splash-character svg .white { fill: #f1f5f9; }
-			html.dark .splash-character svg .tie { fill: #2dd4bf; }
-			html.dark .splash-character svg .tie-light { fill: #5eead4; }
-			html.dark .splash-character svg .black { fill: #334155; }
+			html.dark .splash-character svg .hair {
+				fill: #5eead4;
+			}
+			html.dark .splash-character svg .hair-light {
+				fill: #99f6e4;
+			}
+			html.dark .splash-character svg .skin {
+				fill: #fef3c7;
+			}
+			html.dark .splash-character svg .eye {
+				fill: #1e293b;
+			}
+			html.dark .splash-character svg .blush {
+				fill: #fda4af;
+			}
+			html.dark .splash-character svg .white {
+				fill: #f1f5f9;
+			}
+			html.dark .splash-character svg .tie {
+				fill: #2dd4bf;
+			}
+			html.dark .splash-character svg .tie-light {
+				fill: #5eead4;
+			}
+			html.dark .splash-character svg .black {
+				fill: #334155;
+			}
 			html.dark .splash-text {
 				color: #94a3b8;
 			}
@@ -97,16 +163,18 @@
 	<body>
 		<script>
 			// 尽早检测主题设置，避免开屏闪烁
-			(function() {
+			(function () {
 				try {
-					const stored = localStorage.getItem('theme-storage');
+					const stored = localStorage.getItem("theme-storage");
 					if (stored) {
 						const { state } = JSON.parse(stored);
-						if (state?.theme === 'dark') {
-							document.documentElement.classList.add('dark');
+						if (state?.theme === "dark") {
+							document.documentElement.classList.add("dark");
 						}
-					} else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-						document.documentElement.classList.add('dark');
+					} else if (
+						window.matchMedia("(prefers-color-scheme: dark)").matches
+					) {
+						document.documentElement.classList.add("dark");
 					}
 				} catch (e) {}
 			})();
@@ -114,134 +182,139 @@
 		<!-- 开屏加载动画 -->
 		<div id="splash" class="splash-screen">
 			<div class="splash-character">
-				<svg viewBox="0 0 96 88" width="96" height="88" style="image-rendering: pixelated;">
+				<svg
+					viewBox="0 0 96 88"
+					width="96"
+					height="88"
+					style="image-rendering: pixelated"
+				>
 					<!-- 像素初音 Fufu - 12x11 网格, 每格 8x8 像素 -->
 
 					<!-- 第1行 -->
-					<rect x="8" y="0" width="8" height="8" class="hair-light"/>
-					<rect x="16" y="0" width="8" height="8" class="hair"/>
-					<rect x="24" y="0" width="8" height="8" class="hair"/>
-					<rect x="32" y="0" width="8" height="8" class="hair"/>
-					<rect x="40" y="0" width="8" height="8" class="hair"/>
-					<rect x="48" y="0" width="8" height="8" class="hair"/>
-					<rect x="56" y="0" width="8" height="8" class="hair"/>
-					<rect x="64" y="0" width="8" height="8" class="hair"/>
-					<rect x="72" y="0" width="8" height="8" class="hair"/>
-					<rect x="80" y="0" width="8" height="8" class="hair-light"/>
+					<rect x="8" y="0" width="8" height="8" class="hair-light" />
+					<rect x="16" y="0" width="8" height="8" class="hair" />
+					<rect x="24" y="0" width="8" height="8" class="hair" />
+					<rect x="32" y="0" width="8" height="8" class="hair" />
+					<rect x="40" y="0" width="8" height="8" class="hair" />
+					<rect x="48" y="0" width="8" height="8" class="hair" />
+					<rect x="56" y="0" width="8" height="8" class="hair" />
+					<rect x="64" y="0" width="8" height="8" class="hair" />
+					<rect x="72" y="0" width="8" height="8" class="hair" />
+					<rect x="80" y="0" width="8" height="8" class="hair-light" />
 
 					<!-- 第2行 -->
-					<rect x="0" y="8" width="8" height="8" class="hair"/>
-					<rect x="8" y="8" width="8" height="8" class="hair"/>
-					<rect x="16" y="8" width="8" height="8" class="hair"/>
-					<rect x="24" y="8" width="8" height="8" class="hair-light"/>
-					<rect x="32" y="8" width="8" height="8" class="hair"/>
-					<rect x="40" y="8" width="8" height="8" class="hair"/>
-					<rect x="48" y="8" width="8" height="8" class="hair"/>
-					<rect x="56" y="8" width="8" height="8" class="hair-light"/>
-					<rect x="64" y="8" width="8" height="8" class="hair"/>
-					<rect x="72" y="8" width="8" height="8" class="hair"/>
-					<rect x="80" y="8" width="8" height="8" class="hair"/>
-					<rect x="88" y="8" width="8" height="8" class="hair"/>
+					<rect x="0" y="8" width="8" height="8" class="hair" />
+					<rect x="8" y="8" width="8" height="8" class="hair" />
+					<rect x="16" y="8" width="8" height="8" class="hair" />
+					<rect x="24" y="8" width="8" height="8" class="hair-light" />
+					<rect x="32" y="8" width="8" height="8" class="hair" />
+					<rect x="40" y="8" width="8" height="8" class="hair" />
+					<rect x="48" y="8" width="8" height="8" class="hair" />
+					<rect x="56" y="8" width="8" height="8" class="hair-light" />
+					<rect x="64" y="8" width="8" height="8" class="hair" />
+					<rect x="72" y="8" width="8" height="8" class="hair" />
+					<rect x="80" y="8" width="8" height="8" class="hair" />
+					<rect x="88" y="8" width="8" height="8" class="hair" />
 
 					<!-- 第3行 -->
-					<rect x="0" y="16" width="8" height="8" class="black"/>
-					<rect x="8" y="16" width="8" height="8" class="hair"/>
-					<rect x="16" y="16" width="8" height="8" class="skin"/>
-					<rect x="24" y="16" width="8" height="8" class="skin"/>
-					<rect x="32" y="16" width="8" height="8" class="skin"/>
-					<rect x="40" y="16" width="8" height="8" class="skin"/>
-					<rect x="48" y="16" width="8" height="8" class="skin"/>
-					<rect x="56" y="16" width="8" height="8" class="skin"/>
-					<rect x="64" y="16" width="8" height="8" class="skin"/>
-					<rect x="72" y="16" width="8" height="8" class="skin"/>
-					<rect x="80" y="16" width="8" height="8" class="hair"/>
-					<rect x="88" y="16" width="8" height="8" class="black"/>
+					<rect x="0" y="16" width="8" height="8" class="black" />
+					<rect x="8" y="16" width="8" height="8" class="hair" />
+					<rect x="16" y="16" width="8" height="8" class="skin" />
+					<rect x="24" y="16" width="8" height="8" class="skin" />
+					<rect x="32" y="16" width="8" height="8" class="skin" />
+					<rect x="40" y="16" width="8" height="8" class="skin" />
+					<rect x="48" y="16" width="8" height="8" class="skin" />
+					<rect x="56" y="16" width="8" height="8" class="skin" />
+					<rect x="64" y="16" width="8" height="8" class="skin" />
+					<rect x="72" y="16" width="8" height="8" class="skin" />
+					<rect x="80" y="16" width="8" height="8" class="hair" />
+					<rect x="88" y="16" width="8" height="8" class="black" />
 
 					<!-- 第4行 - 眼睛 -->
-					<rect x="0" y="24" width="8" height="8" class="hair"/>
-					<rect x="8" y="24" width="8" height="8" class="hair"/>
-					<rect x="16" y="24" width="8" height="8" class="skin"/>
-					<rect x="24" y="24" width="8" height="8" class="eye"/>
-					<rect x="32" y="24" width="8" height="8" class="skin"/>
-					<rect x="40" y="24" width="8" height="8" class="skin"/>
-					<rect x="48" y="24" width="8" height="8" class="skin"/>
-					<rect x="56" y="24" width="8" height="8" class="skin"/>
-					<rect x="64" y="24" width="8" height="8" class="eye"/>
-					<rect x="72" y="24" width="8" height="8" class="skin"/>
-					<rect x="80" y="24" width="8" height="8" class="hair"/>
-					<rect x="88" y="24" width="8" height="8" class="hair"/>
+					<rect x="0" y="24" width="8" height="8" class="hair" />
+					<rect x="8" y="24" width="8" height="8" class="hair" />
+					<rect x="16" y="24" width="8" height="8" class="skin" />
+					<rect x="24" y="24" width="8" height="8" class="eye" />
+					<rect x="32" y="24" width="8" height="8" class="skin" />
+					<rect x="40" y="24" width="8" height="8" class="skin" />
+					<rect x="48" y="24" width="8" height="8" class="skin" />
+					<rect x="56" y="24" width="8" height="8" class="skin" />
+					<rect x="64" y="24" width="8" height="8" class="eye" />
+					<rect x="72" y="24" width="8" height="8" class="skin" />
+					<rect x="80" y="24" width="8" height="8" class="hair" />
+					<rect x="88" y="24" width="8" height="8" class="hair" />
 
 					<!-- 第5行 - 腮红 -->
-					<rect x="0" y="32" width="8" height="8" class="hair"/>
-					<rect x="8" y="32" width="8" height="8" class="hair"/>
-					<rect x="16" y="32" width="8" height="8" class="blush"/>
-					<rect x="24" y="32" width="8" height="8" class="skin"/>
-					<rect x="32" y="32" width="8" height="8" class="skin"/>
-					<rect x="40" y="32" width="8" height="8" class="skin"/>
-					<rect x="48" y="32" width="8" height="8" class="skin"/>
-					<rect x="56" y="32" width="8" height="8" class="skin"/>
-					<rect x="64" y="32" width="8" height="8" class="skin"/>
-					<rect x="72" y="32" width="8" height="8" class="blush"/>
-					<rect x="80" y="32" width="8" height="8" class="hair"/>
-					<rect x="88" y="32" width="8" height="8" class="hair"/>
+					<rect x="0" y="32" width="8" height="8" class="hair" />
+					<rect x="8" y="32" width="8" height="8" class="hair" />
+					<rect x="16" y="32" width="8" height="8" class="blush" />
+					<rect x="24" y="32" width="8" height="8" class="skin" />
+					<rect x="32" y="32" width="8" height="8" class="skin" />
+					<rect x="40" y="32" width="8" height="8" class="skin" />
+					<rect x="48" y="32" width="8" height="8" class="skin" />
+					<rect x="56" y="32" width="8" height="8" class="skin" />
+					<rect x="64" y="32" width="8" height="8" class="skin" />
+					<rect x="72" y="32" width="8" height="8" class="blush" />
+					<rect x="80" y="32" width="8" height="8" class="hair" />
+					<rect x="88" y="32" width="8" height="8" class="hair" />
 
 					<!-- 第6行 -->
-					<rect x="8" y="40" width="8" height="8" class="hair"/>
-					<rect x="16" y="40" width="8" height="8" class="skin"/>
-					<rect x="24" y="40" width="8" height="8" class="skin"/>
-					<rect x="32" y="40" width="8" height="8" class="skin"/>
-					<rect x="40" y="40" width="8" height="8" class="skin"/>
-					<rect x="48" y="40" width="8" height="8" class="skin"/>
-					<rect x="56" y="40" width="8" height="8" class="skin"/>
-					<rect x="64" y="40" width="8" height="8" class="skin"/>
-					<rect x="72" y="40" width="8" height="8" class="skin"/>
-					<rect x="80" y="40" width="8" height="8" class="hair"/>
+					<rect x="8" y="40" width="8" height="8" class="hair" />
+					<rect x="16" y="40" width="8" height="8" class="skin" />
+					<rect x="24" y="40" width="8" height="8" class="skin" />
+					<rect x="32" y="40" width="8" height="8" class="skin" />
+					<rect x="40" y="40" width="8" height="8" class="skin" />
+					<rect x="48" y="40" width="8" height="8" class="skin" />
+					<rect x="56" y="40" width="8" height="8" class="skin" />
+					<rect x="64" y="40" width="8" height="8" class="skin" />
+					<rect x="72" y="40" width="8" height="8" class="skin" />
+					<rect x="80" y="40" width="8" height="8" class="hair" />
 
 					<!-- 第7行 - 领带 -->
-					<rect x="8" y="48" width="8" height="8" class="hair"/>
-					<rect x="16" y="48" width="8" height="8" class="white"/>
-					<rect x="24" y="48" width="8" height="8" class="white"/>
-					<rect x="32" y="48" width="8" height="8" class="tie-light"/>
-					<rect x="40" y="48" width="8" height="8" class="tie"/>
-					<rect x="48" y="48" width="8" height="8" class="tie"/>
-					<rect x="56" y="48" width="8" height="8" class="tie-light"/>
-					<rect x="64" y="48" width="8" height="8" class="white"/>
-					<rect x="72" y="48" width="8" height="8" class="white"/>
-					<rect x="80" y="48" width="8" height="8" class="hair"/>
+					<rect x="8" y="48" width="8" height="8" class="hair" />
+					<rect x="16" y="48" width="8" height="8" class="white" />
+					<rect x="24" y="48" width="8" height="8" class="white" />
+					<rect x="32" y="48" width="8" height="8" class="tie-light" />
+					<rect x="40" y="48" width="8" height="8" class="tie" />
+					<rect x="48" y="48" width="8" height="8" class="tie" />
+					<rect x="56" y="48" width="8" height="8" class="tie-light" />
+					<rect x="64" y="48" width="8" height="8" class="white" />
+					<rect x="72" y="48" width="8" height="8" class="white" />
+					<rect x="80" y="48" width="8" height="8" class="hair" />
 
 					<!-- 第8行 -->
-					<rect x="16" y="56" width="8" height="8" class="white"/>
-					<rect x="24" y="56" width="8" height="8" class="white"/>
-					<rect x="32" y="56" width="8" height="8" class="white"/>
-					<rect x="40" y="56" width="8" height="8" class="tie"/>
-					<rect x="48" y="56" width="8" height="8" class="tie"/>
-					<rect x="56" y="56" width="8" height="8" class="white"/>
-					<rect x="64" y="56" width="8" height="8" class="white"/>
-					<rect x="72" y="56" width="8" height="8" class="white"/>
+					<rect x="16" y="56" width="8" height="8" class="white" />
+					<rect x="24" y="56" width="8" height="8" class="white" />
+					<rect x="32" y="56" width="8" height="8" class="white" />
+					<rect x="40" y="56" width="8" height="8" class="tie" />
+					<rect x="48" y="56" width="8" height="8" class="tie" />
+					<rect x="56" y="56" width="8" height="8" class="white" />
+					<rect x="64" y="56" width="8" height="8" class="white" />
+					<rect x="72" y="56" width="8" height="8" class="white" />
 
 					<!-- 第9行 -->
-					<rect x="16" y="64" width="8" height="8" class="hair"/>
-					<rect x="24" y="64" width="8" height="8" class="hair"/>
-					<rect x="32" y="64" width="8" height="8" class="white"/>
-					<rect x="40" y="64" width="8" height="8" class="white"/>
-					<rect x="48" y="64" width="8" height="8" class="white"/>
-					<rect x="56" y="64" width="8" height="8" class="white"/>
-					<rect x="64" y="64" width="8" height="8" class="hair"/>
-					<rect x="72" y="64" width="8" height="8" class="hair"/>
+					<rect x="16" y="64" width="8" height="8" class="hair" />
+					<rect x="24" y="64" width="8" height="8" class="hair" />
+					<rect x="32" y="64" width="8" height="8" class="white" />
+					<rect x="40" y="64" width="8" height="8" class="white" />
+					<rect x="48" y="64" width="8" height="8" class="white" />
+					<rect x="56" y="64" width="8" height="8" class="white" />
+					<rect x="64" y="64" width="8" height="8" class="hair" />
+					<rect x="72" y="64" width="8" height="8" class="hair" />
 
 					<!-- 第10行 -->
-					<rect x="24" y="72" width="8" height="8" class="hair"/>
-					<rect x="32" y="72" width="8" height="8" class="hair"/>
-					<rect x="40" y="72" width="8" height="8" class="hair"/>
-					<rect x="48" y="72" width="8" height="8" class="hair"/>
-					<rect x="56" y="72" width="8" height="8" class="hair"/>
-					<rect x="64" y="72" width="8" height="8" class="hair"/>
+					<rect x="24" y="72" width="8" height="8" class="hair" />
+					<rect x="32" y="72" width="8" height="8" class="hair" />
+					<rect x="40" y="72" width="8" height="8" class="hair" />
+					<rect x="48" y="72" width="8" height="8" class="hair" />
+					<rect x="56" y="72" width="8" height="8" class="hair" />
+					<rect x="64" y="72" width="8" height="8" class="hair" />
 
 					<!-- 第11行 -->
-					<rect x="32" y="80" width="8" height="8" class="hair-light"/>
-					<rect x="40" y="80" width="8" height="8" class="hair"/>
-					<rect x="48" y="80" width="8" height="8" class="hair"/>
-					<rect x="56" y="80" width="8" height="8" class="hair-light"/>
+					<rect x="32" y="80" width="8" height="8" class="hair-light" />
+					<rect x="40" y="80" width="8" height="8" class="hair" />
+					<rect x="48" y="80" width="8" height="8" class="hair" />
+					<rect x="56" y="80" width="8" height="8" class="hair-light" />
 				</svg>
 			</div>
 			<p class="splash-text">Loading</p>

@@ -12,16 +12,36 @@
  * - 静态组件定义移到外部，避免重复创建
  * - 所有子组件使用 memo 包装
  * - useMemo 缓存标题提取结果
+ * - CodeBlock 懒加载，减少首屏 bundle 体积
+ * - ImageGallery 懒加载，仅在需要时加载图片画廊组件
  */
 
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import remarkDirective from 'remark-directive';
-import React, { memo, useEffect, useMemo, type ReactNode } from 'react';
+import React, { memo, useEffect, useMemo, lazy, Suspense, type ReactNode } from 'react';
 import type { TocHeading } from '@/components/widget/TableOfContents';
-import { CodeBlock, LazyImage } from '@/components/common/ui';
-import { ImageGallery } from '@/components/post/ImageGallery';
+import { LazyImage } from '@/components/common/ui';
 import { remarkGallery } from '@/lib/remark/gallery';
+
+// 懒加载 CodeBlock - 代码高亮仅在需要时加载 (~70 KB)
+const CodeBlock = lazy(() =>
+  import('@/components/common/ui/CodeBlock').then((m) => ({ default: m.CodeBlock }))
+);
+
+// 懒加载 ImageGallery - 图片画廊仅在需要时加载 (~64 KB)
+const ImageGallery = lazy(() =>
+  import('@/components/post/ImageGallery').then((m) => ({ default: m.ImageGallery }))
+);
+
+// 代码块加载占位符
+function CodeBlockFallback({ codeText }: { codeText: string }) {
+  return (
+    <pre className="bg-[var(--codeblock-bg)] p-4 rounded-xl overflow-x-auto text-sm font-mono">
+      <code>{codeText}</code>
+    </pre>
+  );
+}
 
 interface MarkdownRendererProps {
   content: string;
@@ -172,7 +192,7 @@ const Code = memo(function Code({ className, children, inline }: { className?: s
     );
   }
 
-  // 代码块
+  // 代码块 - 使用懒加载
   const langMatch = className?.match(/language-(\w+)/);
   const lang = langMatch?.[1] || '';
 
@@ -189,9 +209,11 @@ const Code = memo(function Code({ className, children, inline }: { className?: s
         .join('');
 
   return (
-    <CodeBlock className={className || ''} language={lang}>
-      {codeText}
-    </CodeBlock>
+    <Suspense fallback={<CodeBlockFallback codeText={codeText} />}>
+      <CodeBlock className={className || ''} language={lang}>
+        {codeText}
+      </CodeBlock>
+    </Suspense>
   );
 });
 
@@ -270,6 +292,15 @@ const TableCell = memo(function TableCell({ children }: { children?: ReactNode }
   return <td className="px-4 py-2 text-75">{children}</td>;
 });
 
+/** 图片画廊加载占位符 */
+function GalleryFallback() {
+  return (
+    <div className="my-4 flex items-center justify-center py-8 text-50 animate-pulse">
+      加载图片画廊...
+    </div>
+  );
+}
+
 /** Gallery 组件 - 渲染 gallery 节点 */
 const Gallery = memo(function Gallery({
   'data-photos': photosJson,
@@ -288,11 +319,13 @@ const Gallery = memo(function Gallery({
     const columns = columnsStr ? parseInt(columnsStr, 10) : undefined;
 
     return (
-      <ImageGallery
-        photos={photos}
-        targetRowHeight={rowHeight}
-        columns={columns}
-      />
+      <Suspense fallback={<GalleryFallback />}>
+        <ImageGallery
+          photos={photos}
+          targetRowHeight={rowHeight}
+          columns={columns}
+        />
+      </Suspense>
     );
   } catch {
     return null;

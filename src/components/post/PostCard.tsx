@@ -41,8 +41,8 @@ export function PostCard({ article, isHalfRow = false, className, style }: PostC
           </div>
         </div>
 {hasCover && (
-		<div className="flex-shrink-0 self-end rounded-[var(--radius-small)] overflow-hidden" style={{ width: '110px', height: '82px' }}>
-			<LazyImage src={article.cover_image!} alt={article.title} className="w-full h-full object-cover" wrapperClassName="w-full h-full" effect="blur" />
+		<div className="flex-shrink-0 self-end rounded-[var(--radius-small)] overflow-hidden w-[110px]">
+			<LazyImage src={article.cover_image!} alt={article.title} className="w-full h-full object-cover" wrapperClassName="w-full" aspectRatio="4/3" effect="blur" />
 		</div>
 	)}
       </Link>
