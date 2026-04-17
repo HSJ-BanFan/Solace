@@ -58,10 +58,8 @@ export function AdminArticlesPage() {
             <button
               key={status}
               onClick={() => setStatusFilter(status)}
-              className={`rounded-[var(--radius-medium)] py-2 px-3 text-sm font-medium transition-all scale-animation ripple ${
-                statusFilter === status
-                  ? 'bg-gradient-to-r from-[var(--klein-blue)] to-[var(--klein-blue-light)] text-white'
-                  : 'btn-regular'
+              className={`btn-regular btn-sm py-1 px-2.5 ${
+                statusFilter === status ? 'border-[var(--primary)] bg-[var(--btn-regular-bg-active)]' : ''
               }`}
             >
               {statusLabels[status]}
@@ -70,7 +68,7 @@ export function AdminArticlesPage() {
         </div>
         <Link
           to="/admin/articles/new"
-          className="rounded-[var(--radius-medium)] py-2 px-4 text-sm font-medium transition-all scale-animation ripple bg-gradient-to-r from-[var(--klein-blue)] to-[var(--klein-blue-light)] text-white hover:opacity-90"
+          className="btn-regular btn-sm py-1.5 px-3"
         >
           新建
         </Link>

@@ -309,16 +309,12 @@ export function PageEditorPage() {
 								key={opt.value}
 								type="button"
 								onClick={() => handleTemplateChange(opt.value)}
-								className={`rounded-[var(--radius-medium)] p-3 text-left transition-all ${
-									template === opt.value
-										? "bg-gradient-to-r from-[var(--klein-blue)] to-[var(--klein-blue-light)] text-white"
-										: "btn-regular hover:bg-[var(--btn-regular-bg-hover)]"
+								className={`btn-regular btn-sm p-2 text-left ${
+									template === opt.value ? "border-[var(--primary)] bg-[var(--btn-regular-bg-active)]" : ""
 								}`}
 							>
 								<div className="font-medium">{opt.label}</div>
-								<div className={`text-xs ${template === opt.value ? "text-white/80" : "text-50"}`}>
-									{opt.description}
-								</div>
+								<div className="text-xs text-50">{opt.description}</div>
 							</button>
 						))}
 					</div>
@@ -390,10 +386,8 @@ export function PageEditorPage() {
 						<button
 							type="button"
 							onClick={() => setStatus(request_CreatePageRequest.status.DRAFT)}
-							className={`rounded-[var(--radius-medium)] py-2 px-4 text-sm font-medium transition-all scale-animation ripple ${
-								status === request_CreatePageRequest.status.DRAFT
-									? "bg-gradient-to-r from-[var(--klein-blue)] to-[var(--klein-blue-light)] text-white"
-									: "btn-regular"
+							className={`btn-regular btn-sm py-1.5 px-3 ${
+								status === request_CreatePageRequest.status.DRAFT ? "border-[var(--primary)] bg-[var(--btn-regular-bg-active)]" : ""
 							}`}
 						>
 							草稿
@@ -401,10 +395,8 @@ export function PageEditorPage() {
 						<button
 							type="button"
 							onClick={() => setStatus(request_CreatePageRequest.status.PUBLISHED)}
-							className={`rounded-[var(--radius-medium)] py-2 px-4 text-sm font-medium transition-all scale-animation ripple ${
-								status === request_CreatePageRequest.status.PUBLISHED
-									? "bg-gradient-to-r from-[var(--klein-blue)] to-[var(--klein-blue-light)] text-white"
-									: "btn-regular"
+							className={`btn-regular btn-sm py-1.5 px-3 ${
+								status === request_CreatePageRequest.status.PUBLISHED ? "border-[var(--primary)] bg-[var(--btn-regular-bg-active)]" : ""
 							}`}
 						>
 							发布
@@ -416,14 +408,14 @@ export function PageEditorPage() {
 					<LoadingButton
 						type="submit"
 						loading={createMutation.isPending || updateMutation.isPending}
-						className="bg-gradient-to-r from-[var(--klein-blue)] to-[var(--klein-blue-light)] text-white"
+						className="btn-regular btn-sm py-1.5 px-4 hover:bg-[var(--btn-regular-bg-hover)]"
 					>
 						{isEdit ? "更新" : "创建"}
 					</LoadingButton>
 					<button
 						type="button"
 						onClick={() => navigate("/admin/pages")}
-						className="btn-plain rounded-[var(--radius-medium)] py-3 px-6 scale-animation ripple"
+						className="btn-plain btn-sm py-1.5 px-4"
 					>
 						取消
 					</button>

@@ -128,7 +128,7 @@ export function FootprintsEditor({ cities, onChange }: FootprintsEditorProps) {
 				<button
 					type="button"
 					onClick={handleAddCity}
-					className="btn-regular rounded-[var(--radius-medium)] py-2 px-3 text-sm flex items-center gap-1 scale-animation ripple"
+					className="btn-regular btn-sm py-1.5 px-3 flex items-center gap-1"
 				>
 					<SafeIcon icon="material-symbols:add-rounded" size={16} />
 					添加城市
@@ -137,7 +137,7 @@ export function FootprintsEditor({ cities, onChange }: FootprintsEditorProps) {
 
 			{/* 编辑/添加表单 */}
 			{(editingIndex !== null || showAddForm) && (
-				<div className="card-base p-4 space-y-3 border-2 border-[var(--klein-blue)]">
+				<div className="card-base p-4 space-y-3 border-2 border-[var(--primary)]">
 					<h4 className="text-75 font-medium text-sm">
 						{showAddForm ? "添加新城市" : "编辑城市"}
 					</h4>
@@ -249,14 +249,14 @@ export function FootprintsEditor({ cities, onChange }: FootprintsEditorProps) {
 						<button
 							type="button"
 							onClick={handleSaveEdit}
-							className="bg-[var(--klein-blue)] text-white rounded-[var(--radius-medium)] py-2 px-4 text-sm scale-animation ripple"
+							className="btn-primary btn-sm py-1.5 px-3"
 						>
 							保存
 						</button>
 						<button
 							type="button"
 							onClick={handleCancelEdit}
-							className="btn-plain rounded-[var(--radius-medium)] py-2 px-4 text-sm"
+							className="btn-plain btn-sm py-1.5 px-3"
 						>
 							取消
 						</button>

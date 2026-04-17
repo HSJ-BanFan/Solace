@@ -152,10 +152,8 @@ export function ArticleEditorPage() {
                 key={tag.id}
                 type="button"
                 onClick={() => toggleTag(tag.id)}
-                className={`rounded-full py-1.5 px-3 text-sm font-medium transition-all scale-animation ripple ${
-                  selectedTagIds.includes(tag.id)
-                    ? 'bg-gradient-to-r from-[var(--klein-blue)] to-[var(--klein-blue-light)] text-white'
-                    : 'btn-regular'
+                className={`btn-regular btn-sm py-1 px-2.5 ${
+                  selectedTagIds.includes(tag.id) ? 'border-[var(--primary)] bg-[var(--btn-regular-bg-active)]' : ''
                 }`}
               >
                 {tag.name}
@@ -178,10 +176,8 @@ export function ArticleEditorPage() {
                 key={s}
                 type="button"
                 onClick={() => setStatus(s)}
-                className={`rounded-[var(--radius-medium)] py-2 px-4 text-sm font-medium transition-all scale-animation ripple ${
-                  status === s
-                    ? 'bg-gradient-to-r from-[var(--klein-blue)] to-[var(--klein-blue-light)] text-white'
-                    : 'btn-regular'
+                className={`btn-regular btn-sm py-1.5 px-3 ${
+                  status === s ? 'border-[var(--primary)] bg-[var(--btn-regular-bg-active)]' : ''
                 }`}
               >
                 {s === 'published' ? '发布' : '草稿'}
@@ -195,14 +191,14 @@ export function ArticleEditorPage() {
           <LoadingButton
             type="submit"
             loading={createMutation.isPending || updateMutation.isPending}
-            className="bg-gradient-to-r from-[var(--klein-blue)] to-[var(--klein-blue-light)] text-white"
+            className="btn-regular btn-sm py-1.5 px-4"
           >
             {isEdit ? '更新' : '创建'}
           </LoadingButton>
           <button
             type="button"
             onClick={() => navigate('/admin')}
-            className="btn-plain rounded-[var(--radius-medium)] py-3 px-6 scale-animation ripple"
+            className="btn-plain btn-sm py-1.5 px-4"
           >
             取消
           </button>

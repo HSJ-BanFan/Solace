@@ -97,7 +97,7 @@ export function AdminCategoriesPage() {
       <div className="flex justify-end">
         <button
           onClick={() => setShowForm(true)}
-          className="rounded-[var(--radius-medium)] py-2 px-4 text-sm font-medium transition-all scale-animation ripple bg-gradient-to-r from-[var(--klein-blue)] to-[var(--klein-blue-light)] text-white hover:opacity-90"
+          className="btn-regular btn-sm py-1.5 px-3"
         >
           新建分类
         </button>
@@ -121,11 +121,11 @@ export function AdminCategoriesPage() {
             <LoadingButton
               type="submit"
               loading={createMutation.isPending || updateMutation.isPending}
-              className="bg-gradient-to-r from-[var(--klein-blue)] to-[var(--klein-blue-light)] text-white"
+              className="btn-regular btn-sm py-1.5 px-4"
             >
               {editingCategory ? '更新' : '创建'}
             </LoadingButton>
-            <button type="button" onClick={resetForm} className="btn-plain rounded-[var(--radius-medium)] py-3 px-6 scale-animation ripple">
+            <button type="button" onClick={resetForm} className="btn-plain btn-sm py-1.5 px-4">
               取消
             </button>
           </div>

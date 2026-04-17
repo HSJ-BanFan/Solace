@@ -123,7 +123,7 @@ export function ProjectsEditor({ projects, onChange }: ProjectsEditorProps) {
 				<button
 					type="button"
 					onClick={handleAddProject}
-					className="btn-regular rounded-[var(--radius-medium)] py-2 px-3 text-sm flex items-center gap-1 scale-animation ripple"
+					className="btn-regular btn-sm py-1.5 px-3 flex items-center gap-1"
 				>
 					<SafeIcon icon="material-symbols:add-rounded" size={16} />
 					添加项目
@@ -131,7 +131,7 @@ export function ProjectsEditor({ projects, onChange }: ProjectsEditorProps) {
 			</div>
 
 			{editingIndex !== null && (
-				<div className="card-base p-4 space-y-3 border-2 border-[var(--klein-blue)]">
+				<div className="card-base p-4 space-y-3 border-2 border-[var(--primary)]">
 					<h4 className="text-75 font-medium text-sm">
 						{editingIndex === projects.length ? "添加新项目" : "编辑项目"}
 					</h4>
@@ -212,7 +212,7 @@ export function ProjectsEditor({ projects, onChange }: ProjectsEditorProps) {
 								<button
 									type="button"
 									onClick={handleAddTech}
-									className="btn-regular rounded-[var(--radius-medium)] px-3 text-sm"
+									className="btn-regular btn-sm px-2.5"
 								>
 									添加
 								</button>
@@ -222,7 +222,7 @@ export function ProjectsEditor({ projects, onChange }: ProjectsEditorProps) {
 									{editForm.tech.map((tech) => (
 										<span
 											key={tech}
-											className="bg-[var(--klein-blue-light)] text-white rounded-[var(--radius-small)] px-2 py-0.5 text-xs flex items-center gap-1"
+											className="bg-[var(--primary)]/20 text-[var(--primary)] rounded-[var(--radius-small)] px-2 py-0.5 text-xs flex items-center gap-1"
 										>
 											{tech}
 											<button
@@ -248,7 +248,7 @@ export function ProjectsEditor({ projects, onChange }: ProjectsEditorProps) {
 										onClick={() => setEditForm({ ...editForm, status: opt.value as "active" | "archived" })}
 										className={`rounded-[var(--radius-medium)] py-1.5 px-3 text-sm flex items-center gap-1 transition-all ${
 											editForm.status === opt.value
-												? "bg-[var(--klein-blue)] text-white"
+												? "btn-primary btn-sm py-1 px-2.5"
 												: "btn-regular"
 										}`}
 									>
@@ -265,14 +265,14 @@ export function ProjectsEditor({ projects, onChange }: ProjectsEditorProps) {
 							type="button"
 							onClick={handleSaveEdit}
 							disabled={!editForm.name.trim()}
-							className="bg-[var(--klein-blue)] text-white rounded-[var(--radius-medium)] py-2 px-4 text-sm scale-animation ripple disabled:opacity-50 disabled:cursor-not-allowed"
+							className="btn-primary btn-sm py-1.5 px-3 disabled:opacity-50 disabled:cursor-not-allowed"
 						>
 							保存
 						</button>
 						<button
 							type="button"
 							onClick={handleCancelEdit}
-							className="btn-plain rounded-[var(--radius-medium)] py-2 px-4 text-sm"
+							className="btn-plain btn-sm py-1.5 px-3"
 						>
 							取消
 						</button>

@@ -196,7 +196,7 @@ export function ListEditor<T extends object>({
 				<button
 					type="button"
 					onClick={handleAddItem}
-					className="btn-regular rounded-[var(--radius-medium)] py-2 px-3 text-sm flex items-center gap-1 scale-animation ripple"
+					className="btn-regular btn-sm py-1.5 px-3 flex items-center gap-1"
 				>
 					<SafeIcon icon="material-symbols:add-rounded" size={16} />
 					添加
@@ -204,7 +204,7 @@ export function ListEditor<T extends object>({
 			</div>
 
 			{editingIndex !== null && (
-				<div className="card-base p-4 space-y-3 border-2 border-[var(--klein-blue)]">
+				<div className="card-base p-4 space-y-3 border-2 border-[var(--primary)]">
 					<h4 className="text-75 font-medium text-sm">
 						{editingIndex === items.length ? `添加新${config.itemLabel}` : `编辑${config.itemLabel}`}
 					</h4>
@@ -246,7 +246,7 @@ export function ListEditor<T extends object>({
 													onClick={() => handleFieldChange(field.name, opt.value)}
 													className={`rounded-[var(--radius-medium)] py-1.5 px-3 text-sm flex items-center gap-1 transition-all ${
 														editForm[field.name] === opt.value
-															? "bg-[var(--klein-blue)] text-white"
+															? "btn-primary btn-sm py-1 px-2.5"
 															: "btn-regular"
 													}`}
 												>
@@ -279,7 +279,7 @@ export function ListEditor<T extends object>({
 												<button
 													type="button"
 													onClick={() => handleAddTag(field.name)}
-													className="btn-regular rounded-[var(--radius-medium)] px-3 text-sm"
+													className="btn-regular btn-sm px-2.5"
 												>
 													添加
 												</button>
@@ -290,7 +290,7 @@ export function ListEditor<T extends object>({
 														{(editForm[field.name] as string[]).map((tag: string) => (
 															<span
 																key={tag}
-																className="bg-[var(--klein-blue-light)] text-white rounded-[var(--radius-small)] px-2 py-0.5 text-xs flex items-center gap-1"
+																className="bg-[var(--primary)]/20 text-[var(--primary)] rounded-[var(--radius-small)] px-2 py-0.5 text-xs flex items-center gap-1"
 															>
 																{tag}
 																<button
@@ -354,14 +354,14 @@ export function ListEditor<T extends object>({
 						<button
 							type="button"
 							onClick={handleSaveEdit}
-							className="bg-[var(--klein-blue)] text-white rounded-[var(--radius-medium)] py-2 px-4 text-sm scale-animation ripple"
+							className="btn-primary btn-sm py-1.5 px-3"
 						>
 							保存
 						</button>
 						<button
 							type="button"
 							onClick={handleCancelEdit}
-							className="btn-plain rounded-[var(--radius-medium)] py-2 px-4 text-sm"
+							className="btn-plain btn-sm py-1.5 px-3"
 						>
 							取消
 						</button>
