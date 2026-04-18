@@ -13,3 +13,6 @@ export * from './feedback';
 
 // 布局组件
 export * from './layout';
+
+// SEO 组件
+export * from './seo';

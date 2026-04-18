@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import { useLogin } from "@/hooks";
-import { LoadingButton, InputField, SafeIcon } from "@/components";
+import { LoadingButton, InputField, SafeIcon, PageSEO } from "@/components";
 
 export function LoginPage() {
 	const navigate = useNavigate();
@@ -33,6 +33,7 @@ export function LoginPage() {
 
 	return (
 		<div className="card-base card-hover-lift w-full max-w-md p-6 md:p-8 fade-in-up">
+			<PageSEO title="登录" path="/login" noIndex />
 			{/* 头部 */}
 			<div className="text-center mb-6">
 				<div className="w-16 h-16 rounded-full bg-gradient-to-br from-[var(--klein-blue)] to-[var(--sky-blue)] mx-auto mb-4 flex items-center justify-center breathing">

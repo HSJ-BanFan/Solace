@@ -11,11 +11,18 @@ import {
 	LicenseBlock,
 	RecommendedPosts,
 	ReadingProgress,
+	ArticleSEO,
+	BreadcrumbSEO,
 } from "@/components";
 import type { TocHeading } from "@/components/widget/TableOfContents";
 import { formatDate } from "@/utils";
 import { useEffect, useCallback, useRef } from "react";
 import { useTocStore } from "@/stores";
+import { ApiError } from "@/api/generated/core/ApiError";
+
+function isNotFoundError(error: unknown): boolean {
+	return error instanceof ApiError && error.status === 404;
+}
 
 export function ArticleDetailPage() {
 	const { slug } = useParams<{ slug: string }>();
@@ -43,7 +50,12 @@ export function ArticleDetailPage() {
 		[setHeadings],
 	);
 
-	if (error) return <ErrorDisplay message="加载文章失败" />;
+	if (error) {
+		if (isNotFoundError(error)) {
+			return <NotFoundDisplay message="未找到文章" />;
+		}
+		return <ErrorDisplay message="加载文章失败" />;
+	}
 	if (isLoading) return <ArticleDetailSkeleton />;
 	if (!article) return <NotFoundDisplay message="未找到文章" />;
 
@@ -51,8 +63,14 @@ export function ArticleDetailPage() {
 	const hasUpdate =
 		article.updated_at && article.updated_at !== article.created_at;
 
+	const breadcrumbItems = article.category
+		? [{ name: article.category.name, path: `/categories/${article.category.slug}` }]
+		: [];
+
 	return (
 		<>
+			<ArticleSEO article={article} path={`/articles/${slug}`} />
+			{breadcrumbItems.length > 0 && <BreadcrumbSEO items={breadcrumbItems} />}
 			<ReadingProgress show={true} articleRef={articleRef} />
 			<article ref={articleRef} className="flex-1 min-w-0 space-y-4">
 				<div className="card-base p-6 md:p-8 fade-in-up">

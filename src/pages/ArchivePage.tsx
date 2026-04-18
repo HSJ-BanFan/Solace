@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { useArchive } from "@/hooks";
-import { ErrorDisplay, InlineLoader, EmptyState } from "@/components";
+import { ErrorDisplay, InlineLoader, EmptyState, PageSEO } from "@/components";
 import { CategoryBar } from "@/components/widget";
 import { formatShortDate, formatTags } from "@/utils";
 
@@ -41,6 +41,7 @@ export function ArchivePage() {
 
 	return (
 		<div className="space-y-4">
+			<PageSEO title="归档" description="按时间归档浏览所有文章" path="/archive" />
 			{isFetching && !isLoading && <InlineLoader />}
 			<CategoryBar />
 			<div className="card-base px-8 py-6 onload-animation">

@@ -1,5 +1,5 @@
 import { useParams, useSearchParams } from "react-router-dom";
-import { useArticles } from "@/hooks";
+import { useArticles, useCategories, useTags } from "@/hooks";
 import {
 	PostCardList,
 	PostCardSkeletonList,
@@ -7,9 +7,11 @@ import {
 	EmptyState,
 	InlineLoader,
 	NotFoundDisplay,
+	PageSEO,
 } from "@/components";
 import { CategoryBar } from "@/components/widget";
 import { toPostCardArticle } from "@/utils/article";
+import { useMemo } from "react";
 
 export function CategoryPage() {
 	return <ArticleListPage type="category" />;
@@ -25,11 +27,24 @@ function ArticleListPage({ type }: { type: "category" | "tag" }) {
 	const page = parseInt(searchParams.get("page") || "1", 10);
 	const pageSize = 8;
 
+	const { data: categories } = useCategories();
+	const { data: tags } = useTags();
+
 	const { data, isLoading, isFetching } = useArticles({
 		page,
 		pageSize,
 		[type]: slug,
 	});
+
+	const entityName = useMemo(() => {
+		if (!slug) return "";
+		if (type === "category") {
+			return categories?.find((c) => c.slug === slug)?.name || slug;
+		}
+		return tags?.find((t) => t.slug === slug)?.name || slug;
+	}, [type, slug, categories, tags]);
+
+	const path = type === "category" ? `/categories/${slug}` : `/tags/${slug}`;
 
 	const handlePageChange = (newPage: number) => {
 		setSearchParams({ page: String(newPage) });
@@ -50,6 +65,11 @@ function ArticleListPage({ type }: { type: "category" | "tag" }) {
 
 	return (
 		<div className="flex flex-col gap-3 md:gap-4">
+			<PageSEO
+				title={entityName}
+				description={`${type === "category" ? "分类" : "标签"} "${entityName}" 下的所有文章`}
+				path={path}
+			/>
 			<CategoryBar />
 			{isLoading ? (
 				<PostCardSkeletonList count={pageSize} />

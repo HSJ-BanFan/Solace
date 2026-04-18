@@ -28,6 +28,9 @@ const TagPage = lazy(() =>
 const PageDetailPage = lazy(() =>
 	import("@/pages/PageDetailPage").then((m) => ({ default: m.PageDetailPage })),
 );
+const NotFoundPage = lazy(() =>
+	import("@/pages/NotFoundPage").then((m) => ({ default: m.NotFoundPage })),
+);
 
 // 认证页面
 const LoginPage = lazy(() =>
@@ -140,6 +143,9 @@ export const routes = {
 			fallback: skeletons.center,
 		},
 	],
+
+	// 404 页面
+	notFound: { Component: NotFoundPage, fallback: skeletons.center },
 } as const;
 
 // ============ 布局组件 ============

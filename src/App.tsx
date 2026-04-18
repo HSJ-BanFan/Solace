@@ -13,6 +13,7 @@
  */
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { HelmetProvider } from "react-helmet-async";
 import { useEffect } from "react";
 import { useAuthStore, useThemeStore } from "@/stores";
 import { useAutoHideScrollbar } from "@/hooks";
@@ -97,12 +98,13 @@ const queryClient = new QueryClient({
 
 function App() {
 	return (
-		<QueryClientProvider client={queryClient}>
-			<BrowserRouter>
-				<ThemeInitializer />
-				<ScrollbarController />
-				<SplashScreen />
-				<Routes>
+		<HelmetProvider>
+			<QueryClientProvider client={queryClient}>
+				<BrowserRouter>
+					<ThemeInitializer />
+					<ScrollbarController />
+					<SplashScreen />
+					<Routes>
 					{/* 公开路由 - 主布局 */}
 					<Route element={<layouts.main />}>
 						{routes.public.map((route) => (
@@ -112,6 +114,11 @@ function App() {
 								element={<LazyRoute Component={route.Component} fallback={route.fallback} />}
 							/>
 						))}
+						{/* 404 页面 - 也在主布局内 */}
+						<Route
+							path="*"
+							element={<LazyRoute Component={routes.notFound.Component} fallback={routes.notFound.fallback} />}
+						/>
 					</Route>
 
 					{/* 认证路由 - 登录布局 */}
@@ -141,12 +148,10 @@ function App() {
 							/>
 						))}
 					</Route>
-
-					{/* 回退路由 */}
-					<Route path="*" element={<Navigate to="/" replace />} />
 				</Routes>
 			</BrowserRouter>
 		</QueryClientProvider>
+		</HelmetProvider>
 	);
 }
 

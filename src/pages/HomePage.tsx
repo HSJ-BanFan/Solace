@@ -11,6 +11,7 @@ import {
 	Pagination,
 	EmptyState,
 	InlineLoader,
+	PageSEO,
 } from "@/components";
 import { CategoryBar } from "@/components/widget";
 import { toPostCardArticle } from "@/utils/article";
@@ -55,6 +56,7 @@ export function HomePage() {
 
 	return (
 		<>
+			<PageSEO title="" description="探索最新的技术文章和编程心得" path="/" />
 			{/* 后台刷新时显示顶部加载指示器 */}
 			{isFetching && !isLoading && <InlineLoader />}
 			{/* 分类导航栏 */}

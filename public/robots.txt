@@ -1,0 +1,17 @@
+User-agent: *
+Allow: /
+
+# 禁止访问管理页面和登录页
+Disallow: /admin/
+Disallow: /login
+
+# 允许访问公开页面
+Allow: /
+Allow: /articles/
+Allow: /archive
+Allow: /categories/
+Allow: /tags/
+Allow: /pages/
+
+# 站点地图位置
+Sitemap: https://blog.domye.top/sitemap.xml

@@ -7,6 +7,7 @@ import {
 	ErrorDisplay,
 	EmptyState,
 	ActionButton,
+	PageSEO,
 } from "@/components";
 import { useAuthStore } from "@/stores";
 import { formatDate } from "@/utils";
@@ -53,6 +54,7 @@ export function AdminArticlesPage() {
 
 	return (
 		<div className="space-y-4">
+			<PageSEO title="文章管理" path="/admin" noIndex />
 			{/* 状态筛选和新建按钮 */}
 			<div className="card-base p-4 fade-in-up flex items-center justify-between">
 				<div className="flex gap-2">
