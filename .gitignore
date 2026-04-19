@@ -5,6 +5,11 @@
 *.swp
 *.swo
 
+# AI Tools
+.claude/
+.opencode/
+.trellis/
+
 # OS
 .DS_Store
 Thumbs.db
