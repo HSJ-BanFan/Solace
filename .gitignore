@@ -1,8 +1,59 @@
-# Backend
+# IDE
+.idea
+*.iml
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Backend (Go)
 .env
 config.toml
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+backend/backend
+backend/server
+coverage.out
+coverage.txt
+*.test
+*.out
+vendor/
 
-# Frontend
-/dist/*
-/node_modules/*
-.env.local
+# Frontend (React + Vite)
+node_modules/
+dist/
+build/
+.turbo/
+.vite/
+stats.html
+*.tsbuildinfo
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Environment
+.env
+.env.*
+!.env.example
+!.env.example.*
+
+# Docker
+*.log
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.temp
+
+# 参考
+参考/
+.idea/blog-backend.iml
