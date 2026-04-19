@@ -28,18 +28,21 @@ English | [**简体中文**](./README_CN.md)
 ## ✨ 功能特性
 
 ### 内容管理
+
 - 📝 **Markdown 编辑器** - 完整的 Markdown 支持，代码语法高亮
 - 🏷️ **分类与标签** - 灵活的内容组织系统
 - 🖼️ **相册展示** - 图片懒加载与灯箱查看器
 - 🔍 **全文搜索** - 快速文章搜索功能
 
 ### 用户体验
+
 - 📊 **访客足迹** - 基于 ECharts 的世界地图可视化
 - 🌙 **深色模式** - 自动跟随系统偏好
 - 📱 **响应式设计** - 移动优先，适配所有设备
 - ⚡ **性能优化** - 代码分割、懒加载、CDN 就绪
 
 ### 技术亮点
+
 - 🔐 **JWT 认证** - 安全的用户身份验证
 - 📖 **自动 API 文档** - Swagger/OpenAPI 文档自动生成
 - 🐳 **Docker 就绪** - 容器化部署
@@ -49,31 +52,31 @@ English | [**简体中文**](./README_CN.md)
 
 ### 后端
 
-| 类别 | 技术 |
-|------|------|
-| 语言 | Go 1.25+ |
-| 框架 | Gin |
-| ORM | GORM |
-| 数据库 | PostgreSQL |
-| 认证 | JWT (golang-jwt) |
-| 日志 | zerolog |
+| 类别     | 技术             |
+| -------- | ---------------- |
+| 语言     | Go 1.25+         |
+| 框架     | Gin              |
+| ORM      | GORM             |
+| 数据库   | PostgreSQL       |
+| 认证     | JWT (golang-jwt) |
+| 日志     | zerolog          |
 | API 文档 | Swagger (swaggo) |
-| 配置 | TOML |
+| 配置     | TOML             |
 
 ### 前端
 
-| 类别 | 技术 |
-|------|------|
-| 框架 | React 18 |
-| 语言 | TypeScript 5.6 |
-| 构建工具 | Vite 6 |
-| 样式 | Tailwind CSS 3 |
-| 服务端状态 | TanStack Query |
-| 客户端状态 | Zustand |
-| 路由 | React Router 7 |
-| 表单 | React Hook Form + Zod |
-| 图表 | ECharts |
-| 图标 | Iconify |
+| 类别       | 技术                  |
+| ---------- | --------------------- |
+| 框架       | React 18              |
+| 语言       | TypeScript 5.6        |
+| 构建工具   | Vite 6                |
+| 样式       | Tailwind CSS 3        |
+| 服务端状态 | TanStack Query        |
+| 客户端状态 | Zustand               |
+| 路由       | React Router 7        |
+| 表单       | React Hook Form + Zod |
+| 图表       | ECharts               |
+| 图标       | Iconify               |
 
 ## 📦 项目结构
 
@@ -181,6 +184,7 @@ docker-compose up -d
 ```
 
 服务地址：
+
 - 前端：`http://localhost:8088`
 - 后端 API：`http://localhost:8080`
 - API 文档：`http://localhost:8080/swagger/index.html`
@@ -236,18 +240,18 @@ http://localhost:8080/swagger/index.html
 
 ### API 端点概览
 
-| 方法 | 端点 | 描述 |
-|------|------|------|
-| `GET` | `/api/v1/articles` | 获取文章列表 |
-| `GET` | `/api/v1/articles/:slug` | 根据 slug 获取文章 |
-| `POST` | `/api/v1/articles` | 创建文章（需认证） |
-| `PUT` | `/api/v1/articles/:id` | 更新文章（需认证） |
-| `DELETE` | `/api/v1/articles/:id` | 删除文章（需认证） |
-| `GET` | `/api/v1/categories` | 获取分类列表 |
-| `GET` | `/api/v1/tags` | 获取标签列表 |
-| `GET` | `/api/v1/albums` | 获取相册列表 |
-| `POST` | `/api/v1/auth/login` | 用户登录 |
-| `POST` | `/api/v1/auth/register` | 用户注册 |
+| 方法     | 端点                     | 描述               |
+| -------- | ------------------------ | ------------------ |
+| `GET`    | `/api/v1/articles`       | 获取文章列表       |
+| `GET`    | `/api/v1/articles/:slug` | 根据 slug 获取文章 |
+| `POST`   | `/api/v1/articles`       | 创建文章（需认证） |
+| `PUT`    | `/api/v1/articles/:id`   | 更新文章（需认证） |
+| `DELETE` | `/api/v1/articles/:id`   | 删除文章（需认证） |
+| `GET`    | `/api/v1/categories`     | 获取分类列表       |
+| `GET`    | `/api/v1/tags`           | 获取标签列表       |
+| `GET`    | `/api/v1/albums`         | 获取相册列表       |
+| `POST`   | `/api/v1/auth/login`     | 用户登录           |
+| `POST`   | `/api/v1/auth/register`  | 用户注册           |
 
 ## 📝 可用脚本
 
@@ -312,12 +316,12 @@ expire = 24  # hours
 
 ### 前端环境变量
 
-| 变量 | 描述 | 默认值 |
-|------|------|--------|
-| `VITE_API_BASE` | 后端 API 地址 | `/api/v1` |
-| `SITE_BASE_URL` | 站点基础 URL | - |
-| `SITE_NAME` | 站点名称 | `Solace` |
-| `SITE_DESCRIPTION` | 站点描述 | - |
+| 变量               | 描述          | 默认值    |
+| ------------------ | ------------- | --------- |
+| `VITE_API_BASE`    | 后端 API 地址 | `/api/v1` |
+| `SITE_BASE_URL`    | 站点基础 URL  | -         |
+| `SITE_NAME`        | 站点名称      | `Solace`  |
+| `SITE_DESCRIPTION` | 站点描述      | -         |
 
 ## 🤝 参与贡献
 
