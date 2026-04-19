@@ -1,0 +1,68 @@
+/* ========================================
+   工具类样式
+   ======================================== */
+
+@tailwind utilities;
+
+/* === 归档时间线 (Fuwari/Mizuki) === */
+.dash-line {
+  position: relative;
+}
+
+.dash-line::before {
+  content: "";
+  position: absolute;
+  width: 10%;
+  height: 100%;
+  left: calc(50% - 1px);
+  border-left: 2px dashed oklch(0.7 0.05 var(--hue) / 0.4);
+  pointer-events: none;
+  transition: all 0.3s ease-out;
+  transform: translateY(-50%);
+}
+
+/* hover 时虚线变实线，更精致 */
+.group:hover .dash-line::before {
+  border-left-style: solid;
+  border-left-color: var(--primary);
+  border-left-width: 2px;
+}
+
+/* === 色调滑块 === */
+.hue-slider {
+  -webkit-appearance: none;
+  height: 1.5rem;
+  background: linear-gradient(to right,
+    oklch(0.75 0.15 0),
+    oklch(0.75 0.15 60),
+    oklch(0.75 0.15 120),
+    oklch(0.75 0.15 180),
+    oklch(0.75 0.15 240),
+    oklch(0.75 0.15 300),
+    oklch(0.75 0.15 360)
+  );
+  border-radius: var(--radius-small);
+}
+
+.hue-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  height: 1rem;
+  width: 0.5rem;
+  border-radius: 0.125rem;
+  background: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+}
+
+.hue-slider::-webkit-slider-thumb:hover {
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.hue-slider::-moz-range-thumb {
+  height: 1rem;
+  width: 0.5rem;
+  border-radius: 0.125rem;
+  border: none;
+  background: rgba(255, 255, 255, 0.8);
+  cursor: pointer;
+}

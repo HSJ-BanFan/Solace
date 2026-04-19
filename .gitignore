@@ -1,2 +1,8 @@
+# Backend
 .env
 config.toml
+
+# Frontend
+/dist/*
+/node_modules/*
+.env.local
