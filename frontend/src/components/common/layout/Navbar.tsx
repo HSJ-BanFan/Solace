@@ -18,8 +18,6 @@ const staticNavLinks = [
 	},
 ];
 
-
-
 /** 图标按钮 - 用于工具栏 */
 function IconButton({
 	icon,
@@ -56,7 +54,7 @@ function BrandLogo() {
 					size="1.75rem"
 					className="mb-1 mr-2"
 				/>
-				<span>Blog</span>
+				<span>Solace</span>
 			</div>
 		</Link>
 	);
