@@ -172,7 +172,7 @@ export function MainLayout() {
 			<Navbar />
 
 			{/* 主内容区域 - 三栏布局 */}
-			<div className="flex-1 max-w-[var(--page-width)] mx-auto w-full px-4 py-4">
+			<div className="flex-1 max-w-[var(--page-width)] mx-auto w-full px-4 pt-4 pb-0">
 				<div className="flex gap-4">
 					{/* 左侧边栏 - Profile + TOC（lg 以上显示） */}
 					{isLgOrLarger && (
