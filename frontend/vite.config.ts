@@ -56,7 +56,6 @@ export default defineConfig(({ mode }) => {
             'vendor-markdown': ['react-markdown', 'remark-gfm', 'remark-directive', 'remark-breaks', 'unist-util-visit'],
             'vendor-highlight': ['react-syntax-highlighter'],
             'vendor-image': ['react-lazy-load-image-component', 'react-photo-album', 'yet-another-react-lightbox'],
-            'vendor-echarts': ['echarts'],
           },
         },
       },

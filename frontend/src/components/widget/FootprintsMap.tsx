@@ -1,30 +1,53 @@
 /**
- * 足迹地图组件 - ECharts 中国地图（性能优化版）
+ * 足迹地图组件 - ECharts 中国地图（CDN 加载版）
  *
  * 优化策略：
- * 1. R-Tree 空间索引 - 点查询 O(log n)
- * 2. 并行加载省级 GeoJSON - Promise.all
- * 3. localStorage 缓存 - 避免重复网络请求
- * 4. 预计算映射 - tooltip 零查找
+ * 1. CDN 加载 ECharts - 避免打包大体积库
+ * 2. R-Tree 空间索引 - 点查询 O(log n)
+ * 3. 并行加载省级 GeoJSON - Promise.all
+ * 4. localStorage 缓存 - 避免重复网络请求
+ * 5. 预计算映射 - tooltip 零查找
  */
 
 import { useEffect, useRef, useState, useMemo, useCallback } from "react";
-import * as echarts from "echarts/core";
-import { MapChart, ScatterChart, EffectScatterChart } from "echarts/charts";
-import { GeoComponent, TooltipComponent } from "echarts/components";
-import { SVGRenderer } from "echarts/renderers";
 import type { FootprintCity } from "@/types";
 import { useThemeStore } from "@/stores/theme";
 
-// 注册 ECharts 模块
-echarts.use([
-	MapChart,
-	ScatterChart,
-	EffectScatterChart,
-	GeoComponent,
-	TooltipComponent,
-	SVGRenderer,
-]);
+// ============================================================
+// ECharts CDN 加载
+// ============================================================
+
+/** 简化 ECharts 类型定义 */
+interface EChartsType {
+	init: (dom: HTMLElement) => EChartsInstance;
+	registerMap: (name: string, geoJson: unknown) => void;
+}
+
+interface EChartsInstance {
+	setOption: (option: unknown, opts?: { notMerge?: boolean }) => void;
+	resize: () => void;
+	dispose: () => void;
+}
+
+/** 从 CDN 加载 ECharts */
+function loadECharts(): Promise<EChartsType> {
+	return new Promise((resolve, reject) => {
+		// 已经加载过
+		if (window.echarts) {
+			resolve(window.echarts as EChartsType);
+			return;
+		}
+
+		const script = document.createElement("script");
+		script.src =
+			"https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js";
+		script.crossOrigin = "anonymous";
+		script.async = true;
+		script.onload = () => resolve(window.echarts as EChartsType);
+		script.onerror = () => reject(new Error("加载 ECharts 失败"));
+		document.head.appendChild(script);
+	});
+}
 
 // ============================================================
 // 常量配置
@@ -336,7 +359,8 @@ interface FootprintsMapProps {
 
 export function FootprintsMap({ cities }: FootprintsMapProps) {
 	const chartRef = useRef<HTMLDivElement>(null);
-	const chartInstance = useRef<echarts.ECharts | null>(null);
+	const chartInstance = useRef<EChartsInstance | null>(null);
+	const echartsRef = useRef<EChartsType | null>(null);
 	const cacheRef = useRef<CacheData | null>(null);
 	const [isReady, setIsReady] = useState(false);
 	const { theme, hue } = useThemeStore();
@@ -347,113 +371,112 @@ export function FootprintsMap({ cities }: FootprintsMapProps) {
 		[cities],
 	);
 
-	// 加载 GeoJSON
+	// 加载 ECharts 和 GeoJSON
 	useEffect(() => {
 		if (!chartRef.current) return;
 
-		const loadGeoJson = async () => {
-			// 读取缓存
+		const loadData = async () => {
 			try {
+				// 1. 加载 ECharts
+				const echarts = await loadECharts();
+				echartsRef.current = echarts;
+
+				// 2. 加载 GeoJSON
 				const cached = localStorage.getItem(CACHE_KEY);
 				if (cached) {
 					const data = JSON.parse(cached) as CacheData;
 					if (Date.now() - data.timestamp < CACHE_EXPIRE_MS) {
 						cacheRef.current = data;
-						// eslint-disable-next-line @typescript-eslint/no-explicit-any
 						echarts.registerMap("china_merged", {
 							type: "FeatureCollection",
 							features: data.mergedFeatures,
-						} as any);
+						});
+						if (!chartRef.current) return;
 						chartInstance.current = echarts.init(chartRef.current);
 						setIsReady(true);
 						return;
 					}
 				}
-			} catch {
-				/* 缓存损坏 */
-			}
 
-			// 加载中国地图
-			let chinaGeoJson: GeoJSON;
-			try {
+				// 加载中国地图
+				let chinaGeoJson: GeoJSON;
 				const res = await fetch(CHINA_GEOJSON_URL);
 				if (!res.ok) throw new Error("加载中国地图失败");
 				chinaGeoJson = await res.json();
-			} catch (e) {
-				console.error("加载中国地图失败", e);
-				return;
-			}
 
-			const chinaTree = buildRTree(parseFeatures(chinaGeoJson));
-			const provinceMap = new Map<string, CityWithData[]>();
+				const chinaTree = buildRTree(parseFeatures(chinaGeoJson));
+				const provinceMap = new Map<string, CityWithData[]>();
 
-			for (const city of citiesWithCoords) {
-				const province = findProvince(
-					chinaTree,
-					city.coords.lat,
-					city.coords.lng,
-				);
-				if (province) {
-					const list = provinceMap.get(province) ?? [];
-					list.push(city);
-					provinceMap.set(province, list);
-				}
-			}
-
-			// 并行加载省级 GeoJSON
-			const provinceNames = [...provinceMap.keys()].filter(
-				(n) => !MUNICIPALITY_NAMES.has(n),
-			);
-			const provinceResults = await Promise.all(
-				provinceNames.map(async (name) => {
-					const url = getProvinceGeoJsonUrl(name);
-					if (!url) return { name, features: [], rawFeatures: [] };
-					try {
-						const geoJson = await fetch(url).then((r) => r.json());
-						return {
-							name,
-							features: parseFeatures(geoJson),
-							rawFeatures: geoJson.features,
-						};
-					} catch {
-						return { name, features: [], rawFeatures: [] };
+				for (const city of citiesWithCoords) {
+					const province = findProvince(
+						chinaTree,
+						city.coords.lat,
+						city.coords.lng,
+					);
+					if (province) {
+						const list = provinceMap.get(province) ?? [];
+						list.push(city);
+						provinceMap.set(province, list);
 					}
-				}),
-			);
-
-			const provinceFeatures = Object.fromEntries(
-				provinceResults.map((r) => [r.name, r.features]),
-			);
-			const mergedFeatures = [
-				...chinaGeoJson.features,
-				...provinceResults.flatMap((r) => r.rawFeatures),
-			];
-
-			// eslint-disable-next-line @typescript-eslint/no-explicit-any
-			echarts.registerMap("china_merged", {
-				type: "FeatureCollection",
-				features: mergedFeatures,
-			} as any);
-
-			cacheRef.current = {
-				china: chinaGeoJson,
-				provinceFeatures,
-				mergedFeatures,
-				timestamp: Date.now(),
-			};
-			setTimeout(() => {
-				try {
-					localStorage.setItem(CACHE_KEY, JSON.stringify(cacheRef.current));
-				} catch {
-					/* 满了 */
 				}
-			}, 0);
 
-			chartInstance.current = echarts.init(chartRef.current);
-			setIsReady(true);
+				// 并行加载省级 GeoJSON
+				const provinceNames = [...provinceMap.keys()].filter(
+					(n) => !MUNICIPALITY_NAMES.has(n),
+				);
+				const provinceResults = await Promise.all(
+					provinceNames.map(async (name) => {
+						const url = getProvinceGeoJsonUrl(name);
+						if (!url) return { name, features: [], rawFeatures: [] };
+						try {
+							const geoJson = await fetch(url).then((r) => r.json());
+							return {
+								name,
+								features: parseFeatures(geoJson),
+								rawFeatures: geoJson.features,
+							};
+						} catch {
+							return { name, features: [], rawFeatures: [] };
+						}
+					}),
+				);
+
+				const provinceFeatures = Object.fromEntries(
+					provinceResults.map((r) => [r.name, r.features]),
+				);
+				const mergedFeatures = [
+					...chinaGeoJson.features,
+					...provinceResults.flatMap((r) => r.rawFeatures),
+				];
+
+				echarts.registerMap("china_merged", {
+					type: "FeatureCollection",
+					features: mergedFeatures,
+				});
+
+				cacheRef.current = {
+					china: chinaGeoJson,
+					provinceFeatures,
+					mergedFeatures,
+					timestamp: Date.now(),
+				};
+				setTimeout(() => {
+					try {
+						localStorage.setItem(CACHE_KEY, JSON.stringify(cacheRef.current));
+					} catch {
+						/* 满了 */
+					}
+				}, 0);
+
+				if (!chartRef.current) return;
+				chartInstance.current = echarts.init(chartRef.current);
+				setIsReady(true);
+			} catch (e) {
+				console.error("初始化地图失败", e);
+			}
 		};
 
-		loadGeoJson();
+		loadData();
 
 		const handleResize = () => chartInstance.current?.resize();
 		window.addEventListener("resize", handleResize);
@@ -556,6 +579,7 @@ export function FootprintsMap({ cities }: FootprintsMapProps) {
 		if (!isReady || !chartInstance.current) return;
 
 		const baseLabel = { fontFamily: FONT_FAMILY, fontSize: 12, show: true };
+		const labelColor = isDark ? "#e2e8f0" : "#334155";
 
 		chartInstance.current.setOption(
 			{
@@ -563,13 +587,25 @@ export function FootprintsMap({ cities }: FootprintsMapProps) {
 				tooltip: {
 					trigger: "item",
 					formatter: tooltipFormatter,
-					extraCssText: `font-family: ${FONT_FAMILY} !important`,
+					backgroundColor: isDark ? "rgba(30, 41, 59, 0.95)" : "rgba(255, 255, 255, 0.95)",
+					borderColor: isDark ? "#475569" : "#e2e8f0",
+					textStyle: {
+						color: isDark ? "#e2e8f0" : "#334155",
+						fontFamily: FONT_FAMILY,
+					},
+					extraCssText: `font-family: ${FONT_FAMILY} !important;`,
 				},
 				geo: {
 					tooltip: {
 						show: true,
 						formatter: tooltipFormatter,
-						extraCssText: `font-family: ${FONT_FAMILY} !important`,
+						backgroundColor: isDark ? "rgba(30, 41, 59, 0.95)" : "rgba(255, 255, 255, 0.95)",
+						borderColor: isDark ? "#475569" : "#e2e8f0",
+						textStyle: {
+							color: isDark ? "#e2e8f0" : "#334155",
+							fontFamily: FONT_FAMILY,
+						},
+						extraCssText: `font-family: ${FONT_FAMILY} !important;`,
 					},
 					map: "china_merged",
 					roam: true,
@@ -583,7 +619,10 @@ export function FootprintsMap({ cities }: FootprintsMapProps) {
 					},
 					emphasis: {
 						itemStyle: { areaColor: isDark ? "#334155" : "#e2e8f0" },
-						label: baseLabel,
+						label: {
+							...baseLabel,
+							color: labelColor,
+						},
 					},
 					label: {
 						...baseLabel,
@@ -646,4 +685,14 @@ export function FootprintsMap({ cities }: FootprintsMapProps) {
 			className="h-[400px] md:h-[500px] w-full rounded-xl overflow-hidden"
 		/>
 	);
+}
+
+// ============================================================
+// 全局类型声明
+// ============================================================
+
+declare global {
+	interface Window {
+		echarts?: EChartsType;
+	}
 }
