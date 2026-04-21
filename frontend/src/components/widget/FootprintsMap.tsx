@@ -13,6 +13,12 @@ import { useEffect, useRef, useState, useMemo, useCallback } from "react";
 import type { FootprintCity } from "@/types";
 import { useThemeStore } from "@/stores/theme";
 
+/** 默认主题颜色 */
+const DEFAULT_PRIMARY_COLOR = {
+	dark: "#60a5fa",
+	light: "#3b82f6",
+};
+
 // ============================================================
 // ECharts CDN 加载
 // ============================================================
@@ -156,36 +162,9 @@ const getProvinceGeoJsonUrl = (name: string): string | null => {
 	return fileName ? `${CDN_BASE}/${fileName}_geo.json` : null;
 };
 
-/** 色调映射表（预计算，二分查找） */
-const HUE_TABLE: [number, string, string][] = [
-	[0, "#f87171", "#ef4444"],
-	[30, "#fb923c", "#f97316"],
-	[60, "#facc15", "#eab308"],
-	[120, "#4ade80", "#22c55e"],
-	[180, "#22d3ee", "#06b6d4"],
-	[210, "#38bdf8", "#0ea5e9"],
-	[240, "#818cf8", "#6366f1"],
-	[250, "#60a5fa", "#3b82f6"],
-	[270, "#a78bfa", "#8b5cf6"],
-	[300, "#f472b6", "#ec4899"],
-	[330, "#fb7185", "#f43f5e"],
-];
-
-/** 根据 hue 值获取颜色（二分查找） */
-function hueToHex(hue: number, isDark: boolean): string {
-	let left = 0,
-		right = HUE_TABLE.length - 1;
-	while (left < right) {
-		const mid = (left + right) >>> 1;
-		if (HUE_TABLE[mid]![0] < hue) left = mid + 1;
-		else right = mid;
-	}
-	const curr = HUE_TABLE[left]!;
-	const prev = left > 0 ? HUE_TABLE[left - 1] : null;
-	if (prev && Math.abs(prev[0] - hue) < Math.abs(curr[0] - hue)) {
-		return isDark ? prev[1] : prev[2];
-	}
-	return isDark ? curr[1] : curr[2];
+/** 获取主题主色 */
+function getPrimaryColor(isDark: boolean): string {
+	return isDark ? DEFAULT_PRIMARY_COLOR.dark : DEFAULT_PRIMARY_COLOR.light;
 }
 
 /** 射线法判断点是否在多边形内 */
@@ -363,7 +342,7 @@ export function FootprintsMap({ cities }: FootprintsMapProps) {
 	const echartsRef = useRef<EChartsType | null>(null);
 	const cacheRef = useRef<CacheData | null>(null);
 	const [isReady, setIsReady] = useState(false);
-	const { theme, hue } = useThemeStore();
+	const { theme } = useThemeStore();
 
 	// 带坐标的城市
 	const citiesWithCoords = useMemo(
@@ -533,7 +512,7 @@ export function FootprintsMap({ cities }: FootprintsMapProps) {
 
 	// 主题
 	const isDark = theme === "dark";
-	const primaryColor = hueToHex(hue, isDark);
+	const primaryColor = getPrimaryColor(isDark);
 
 	// 区域高亮
 	const regions = useMemo(
@@ -670,7 +649,6 @@ export function FootprintsMap({ cities }: FootprintsMapProps) {
 	}, [
 		isReady,
 		theme,
-		hue,
 		center,
 		regions,
 		scatterData,

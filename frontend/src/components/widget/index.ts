@@ -8,7 +8,6 @@
  * - 使用路径导入: import { FootprintsMap } from "@/components/widget/FootprintsMap"
  */
 
-export { HuePicker } from "./HuePicker";
 export { Profile } from "./Profile";
 export { Categories } from "./Categories";
 export { CategoryBar } from "./CategoryBar";

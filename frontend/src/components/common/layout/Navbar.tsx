@@ -5,7 +5,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAuthStore } from "@/stores";
 import { useClickOutside, useNavPages } from "@/hooks";
 import { ThemeToggle, SafeIcon } from "@/components/common/ui";
-import { SearchModal, HuePicker } from "@/components/widget";
+import { SearchModal } from "@/components/widget";
 import { useState, useRef, useMemo, useCallback } from "react";
 
 // ============ 常量定义 ============
@@ -75,21 +75,15 @@ function DesktopNavLink({ path, name }: { path: string; name: string }) {
 /** 工具栏 */
 function Toolbar({
 	onSearch,
-	onToggleHuePicker,
 	onToggleMobileMenu,
 	onLogout,
-	huePickerRef,
 	mobileMenuButtonRef,
-	showHuePicker,
 	isAuthenticated,
 }: {
 	onSearch: () => void;
-	onToggleHuePicker: () => void;
 	onToggleMobileMenu: () => void;
 	onLogout: () => void;
-	huePickerRef: React.RefObject<HTMLDivElement>;
 	mobileMenuButtonRef: React.RefObject<HTMLButtonElement>;
-	showHuePicker: boolean;
 	isAuthenticated: boolean;
 }) {
 	return (
@@ -99,15 +93,6 @@ function Toolbar({
 				onClick={onSearch}
 				label="搜索"
 			/>
-
-			<div ref={huePickerRef} className="relative">
-				<IconButton
-					icon="material-symbols:palette-outline"
-					onClick={onToggleHuePicker}
-					label="显示设置"
-				/>
-				<HuePicker isOpen={showHuePicker} />
-			</div>
 
 			<ThemeToggle />
 
@@ -322,16 +307,13 @@ export function Navbar() {
 	const { isAuthenticated } = useAuthStore();
 	const navigate = useNavigate();
 	const [showSearch, setShowSearch] = useState(false);
-	const [showHuePicker, setShowHuePicker] = useState(false);
 	const [showMobileMenu, setShowMobileMenu] = useState(false);
 
 	const { data: navPages } = useNavPages();
 
-	const huePickerRef = useRef<HTMLDivElement>(null);
 	const mobileMenuRef = useRef<HTMLDivElement>(null);
 	const mobileMenuButtonRef = useRef<HTMLButtonElement>(null);
 
-	useClickOutside(huePickerRef, () => setShowHuePicker(false), showHuePicker);
 	useClickOutside(
 		mobileMenuRef,
 		() => setShowMobileMenu(false),
@@ -347,10 +329,6 @@ export function Navbar() {
 
 	const openSearch = useCallback(() => setShowSearch(true), []);
 	const closeSearch = useCallback(() => setShowSearch(false), []);
-	const toggleHuePicker = useCallback(
-		() => setShowHuePicker((prev) => !prev),
-		[],
-	);
 	const toggleMobileMenu = useCallback(
 		() => setShowMobileMenu((prev) => !prev),
 		[],
@@ -408,16 +386,13 @@ export function Navbar() {
 						))}
 					</nav>
 
-					<Toolbar
-						onSearch={openSearch}
-						onToggleHuePicker={toggleHuePicker}
-						onToggleMobileMenu={toggleMobileMenu}
-						onLogout={handleLogout}
-						huePickerRef={huePickerRef}
-						mobileMenuButtonRef={mobileMenuButtonRef}
-						showHuePicker={showHuePicker}
-						isAuthenticated={isAuthenticated}
-					/>
+				<Toolbar
+					onSearch={openSearch}
+					onToggleMobileMenu={toggleMobileMenu}
+					onLogout={handleLogout}
+					mobileMenuButtonRef={mobileMenuButtonRef}
+					isAuthenticated={isAuthenticated}
+				/>
 				</div>
 
 				<MobileMenuPanel
