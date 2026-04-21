@@ -12,13 +12,13 @@ set FRONTEND_IMAGE=domye/blog-frontend:latest
 
 :: ====================== 并行构建 ======================
 echo [1/2] 开始 同时构建 前后端镜像...
-echo 后端：docker build -t %BACKEND_IMAGE% ./blog-backend
-echo 前端：docker build -t %FRONTEND_IMAGE% ./blog-frontend
+echo 后端：docker build -t %BACKEND_IMAGE% ./backend
+echo 前端：docker build -t %FRONTEND_IMAGE% ./frontend
 echo.
 
 :: 启动两个独立窗口同时构建（后台运行）
-start /B docker build -t %BACKEND_IMAGE% ./blog-backend
-start /B docker build -t %FRONTEND_IMAGE% ./blog-frontend
+start /B docker build -t %BACKEND_IMAGE% ./backend
+start /B docker build -t %FRONTEND_IMAGE% ./frontend
 
 :: 等待两个构建全部完成
 echo 等待构建完成...
