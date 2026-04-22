@@ -7,3 +7,5 @@ export { ProjectsEditor } from "./ProjectsEditor";
 export { FootprintsEditor } from "./FootprintsEditor";
 export { ListEditor } from "./ListEditor";
 export type { ListEditorConfig, ListEditorField } from "./ListEditor";
+export { MarkdownEditor } from "./MarkdownEditor";
+export { LazyMarkdownEditor } from "./LazyMarkdownEditor";

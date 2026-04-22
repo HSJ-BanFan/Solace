@@ -54,6 +54,7 @@ export default defineConfig(({ mode }) => {
             'vendor-react': ['react', 'react-dom', 'react-router-dom'],
             'vendor-query': ['@tanstack/react-query', 'zustand'],
             'vendor-markdown': ['react-markdown', 'remark-gfm', 'remark-directive', 'remark-breaks', 'unist-util-visit'],
+			'vendor-md-editor': ['react-markdown-editor-lite', 'markdown-it'],
             'vendor-highlight': ['react-syntax-highlighter'],
             'vendor-image': ['react-lazy-load-image-component', 'react-photo-album', 'yet-another-react-lightbox'],
           },

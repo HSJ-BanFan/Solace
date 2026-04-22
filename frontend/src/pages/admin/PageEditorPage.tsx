@@ -1,16 +1,11 @@
-/**
- * 页面编辑器
- */
-
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { usePage, useCreatePage, useUpdatePage } from "@/hooks";
 import {
-	PageHeader,
 	LoadingButton,
 	InputField,
-	TextAreaField,
 } from "@/components";
+import { LazyMarkdownEditor } from "@/components/admin";
 import {
 	ProjectsEditor,
 	FootprintsEditor,
@@ -98,7 +93,6 @@ cities:
 记录我去过的城市。`,
 };
 
-// 判断模板是否需要可视化编辑器
 function isVisualTemplate(template: PageTemplate): boolean {
 	return (
 		template === request_CreatePageRequest.template.PROJECTS ||
@@ -121,8 +115,6 @@ export function PageEditorPage() {
 		request_CreatePageRequest.template.DEFAULT,
 	);
 	const [content, setContent] = useState("");
-	const [summary, setSummary] = useState("");
-	const [coverImage, setCoverImage] = useState("");
 	const [status, setStatus] = useState<PageStatus>(
 		request_CreatePageRequest.status.DRAFT,
 	);
@@ -130,25 +122,20 @@ export function PageEditorPage() {
 	const [showInNav, setShowInNav] = useState(true);
 	const [error, setError] = useState("");
 
-	// 各模板专用 state
 	const [projects, setProjects] = useState<Project[]>([]);
 	const [cities, setCities] = useState<FootprintCity[]>([]);
 	const [markdownContent, setMarkdownContent] = useState("");
 
-	// 加载现有页面数据
 	useEffect(() => {
 		if (existingPage) {
 			setTitle(existingPage.title);
 			setSlug(existingPage.slug || "");
 			setTemplate(existingPage.template as PageTemplate);
 			setContent(existingPage.content);
-			setSummary(existingPage.summary || "");
-			setCoverImage(existingPage.cover_image || "");
 			setStatus(existingPage.status as PageStatus);
 			setOrder(existingPage.order);
 			setShowInNav(existingPage.show_in_nav);
 
-			// 解析对应模板的内容
 			if (existingPage.template === "projects") {
 				const parsed = parseFrontmatter<ProjectsFrontmatter>(
 					existingPage.content,
@@ -167,7 +154,6 @@ export function PageEditorPage() {
 		}
 	}, [existingPage]);
 
-	// 同步 frontmatter 数据到 content
 	const syncFrontmatter = (
 		frontmatterData: Record<string, unknown>,
 		markdown: string,
@@ -176,19 +162,16 @@ export function PageEditorPage() {
 		setContent(yamlStr + markdown);
 	};
 
-	// Projects 数据变更
 	const handleProjectsChange = (newProjects: Project[]) => {
 		setProjects(newProjects);
 		syncFrontmatter({ projects: newProjects }, markdownContent);
 	};
 
-	// Cities 数据变更
 	const handleCitiesChange = (newCities: FootprintCity[]) => {
 		setCities(newCities);
 		syncFrontmatter({ cities: newCities }, markdownContent);
 	};
 
-	// Markdown 内容变更
 	const handleMarkdownChange = (newMarkdown: string) => {
 		setMarkdownContent(newMarkdown);
 		let frontmatterData: Record<string, unknown> = {};
@@ -200,12 +183,10 @@ export function PageEditorPage() {
 		syncFrontmatter(frontmatterData, newMarkdown);
 	};
 
-	// 模板切换
 	const handleTemplateChange = (newTemplate: PageTemplate) => {
 		setTemplate(newTemplate);
 
 		if (!isEdit && !content) {
-			// 新建页面：插入示例内容
 			setContent(templateExamples[newTemplate]);
 
 			if (newTemplate === request_CreatePageRequest.template.PROJECTS) {
@@ -226,7 +207,6 @@ export function PageEditorPage() {
 				setMarkdownContent(parsed.markdown);
 			}
 		} else if (isVisualTemplate(newTemplate)) {
-			// 切换到可视化模板：解析现有内容
 			if (newTemplate === request_CreatePageRequest.template.PROJECTS) {
 				const parsed = parseFrontmatter<ProjectsFrontmatter>(content);
 				setProjects(parsed.frontmatter.projects || []);
@@ -258,8 +238,6 @@ export function PageEditorPage() {
 				slug: slug.trim() || undefined,
 				template,
 				content,
-				summary,
-				cover_image: coverImage || undefined,
 				status,
 				order,
 				show_in_nav: showInNav,
@@ -283,7 +261,6 @@ export function PageEditorPage() {
 		}
 	};
 
-	// 渲染可视化编辑器
 	const renderVisualEditor = () => {
 		if (template === request_CreatePageRequest.template.PROJECTS) {
 			return (
@@ -297,27 +274,14 @@ export function PageEditorPage() {
 	};
 
 	return (
-		<div className="space-y-4">
-			<PageHeader
-				title={isEdit ? "编辑页面" : "新建页面"}
-				icon={
-					isEdit
-						? "material-symbols:edit-outline-rounded"
-						: "material-symbols:add-rounded"
-				}
-			/>
+		<form onSubmit={handleSubmit} className="space-y-4">
+			{error && (
+				<div className="bg-red-500/10 text-red-500 rounded-[var(--radius-medium)] p-3 mb-4 text-sm">
+					{error}
+				</div>
+			)}
 
-			<form
-				onSubmit={handleSubmit}
-				className="card-base p-6 fade-in-up"
-				style={{ animationDelay: "0.1s" }}
-			>
-				{error && (
-					<div className="bg-red-500/10 text-red-500 rounded-[var(--radius-medium)] p-3 mb-4 text-sm">
-						{error}
-					</div>
-				)}
-
+			<div className="card-base p-6 h-[calc(100vh-12rem)] flex flex-col">
 				<InputField
 					label="标题"
 					value={title}
@@ -325,30 +289,26 @@ export function PageEditorPage() {
 					placeholder="页面标题"
 					required
 				/>
-
-				<div className="mb-4">
-					<label htmlFor="page-slug" className="block text-75 text-sm font-medium mb-2">
-						Slug{" "}
-						<span className="text-50 text-xs ml-1">(留空自动从标题生成)</span>
-					</label>
-					<input
-						id="page-slug"
-						type="text"
-						value={slug}
-						onChange={(e) => setSlug(e.target.value)}
-						placeholder="例如: about"
-						className="input-base"
+				<div className="flex-1 min-h-0 mt-4">
+					<LazyMarkdownEditor
+						value={isVisualTemplate(template) ? markdownContent : content}
+						onChange={(val) => {
+							if (isVisualTemplate(template)) {
+								handleMarkdownChange(val);
+							} else {
+								setContent(val);
+							}
+						}}
+						placeholder="在这里撰写 Markdown 内容..."
+						height="100%"
 					/>
-					<p className="text-50 text-xs mt-1">
-						用于页面 URL，访问地址为 /pages/{slug || "..."}
-					</p>
 				</div>
+			</div>
 
-				<div className="mb-4">
-					<label className="block text-75 text-sm font-medium mb-2">
-						页面模板
-					</label>
-					<div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+			<div className="card-base p-6 space-y-4">
+				<div>
+					<label className="block text-75 text-sm font-medium mb-2">页面模板</label>
+					<div className="grid grid-cols-2 md:grid-cols-4 gap-2">
 						{templateOptions.map((opt) => (
 							<button
 								key={opt.value}
@@ -366,69 +326,26 @@ export function PageEditorPage() {
 						))}
 					</div>
 				</div>
+				{isVisualTemplate(template) && renderVisualEditor()}
+			</div>
 
-				<InputField
-					label="封面图片"
-					value={coverImage}
-					onChange={setCoverImage}
-					placeholder="https://example.com/cover.jpg"
-					type="url"
-				/>
-
-				<TextAreaField
-					label="摘要"
-					value={summary}
-					onChange={setSummary}
-					placeholder="页面简要摘要"
-					rows={2}
-				/>
-
-				<div className="mb-4">
-					<label htmlFor="page-content" className="block text-75 text-sm font-medium mb-2">
-						内容{" "}
-						<span className="text-50 text-xs ml-1">
-							(Markdown + YAML frontmatter)
-						</span>
-					</label>
-
-					{isVisualTemplate(template) && (
-						<div className="mb-4">{renderVisualEditor()}</div>
-					)}
-
-					<textarea
-						id="page-content"
-						value={isVisualTemplate(template) ? markdownContent : content}
-						onChange={(e) => {
-							if (isVisualTemplate(template)) {
-								handleMarkdownChange(e.target.value);
-							} else {
-								setContent(e.target.value);
-							}
-						}}
-						placeholder={
-							isVisualTemplate(template)
-								? "在这里撰写页面正文（Markdown）..."
-								: "在这里撰写页面内容..."
-						}
-						rows={isVisualTemplate(template) ? 8 : 20}
-						className="input-base font-mono text-sm"
-						required={!isVisualTemplate(template)}
-					/>
-					<p className="text-50 text-xs mt-1">
-						{isVisualTemplate(template)
-							? "结构化数据已在上方的可视化编辑器中填写，此处仅编辑正文内容。"
-							: template !== "default"
-								? "根据模板类型，在 YAML frontmatter 中填写结构化数据（--- 包围的部分）。"
-								: ""}
-						正文使用 Markdown 格式。
-					</p>
-				</div>
-
-				<div className="mb-4 flex gap-4 flex-wrap">
-					<div className="flex-1 min-w-[120px]">
-						<label htmlFor="page-order" className="block text-75 text-sm font-medium mb-2">
-							排序
+			<div className="card-base p-6 space-y-4">
+				<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+					<div>
+						<label htmlFor="page-slug" className="block text-75 text-sm font-medium mb-2">
+							Slug <span className="text-50 text-xs ml-1">(留空自动生成)</span>
 						</label>
+						<input
+							id="page-slug"
+							type="text"
+							value={slug}
+							onChange={(e) => setSlug(e.target.value)}
+							placeholder="例如: about"
+							className="input-base"
+						/>
+					</div>
+					<div>
+						<label htmlFor="page-order" className="block text-75 text-sm font-medium mb-2">排序</label>
 						<input
 							id="page-order"
 							type="number"
@@ -437,9 +354,7 @@ export function PageEditorPage() {
 							min={0}
 							className="input-base w-full"
 						/>
-						<p className="text-50 text-xs mt-1">数字越小越靠前</p>
 					</div>
-
 					<div className="flex items-center gap-2 pt-6">
 						<input
 							type="checkbox"
@@ -448,15 +363,13 @@ export function PageEditorPage() {
 							onChange={(e) => setShowInNav(e.target.checked)}
 							className="w-4 h-4 rounded border-[var(--border-light)]"
 						/>
-						<label htmlFor="showInNav" className="text-75 text-sm">
-							显示在导航中
-						</label>
+						<label htmlFor="showInNav" className="text-75 text-sm">显示在导航中</label>
 					</div>
 				</div>
 
-				<div className="mb-6">
-					<label className="block text-75 text-sm font-medium mb-2">状态</label>
-					<div className="flex gap-2">
+				<div className="flex items-center justify-between pt-4 border-t border-[var(--border-light)]">
+					<div className="flex items-center gap-2">
+						<label className="text-75 text-sm font-medium">状态</label>
 						<button
 							type="button"
 							onClick={() => setStatus(request_CreatePageRequest.status.DRAFT)}
@@ -470,9 +383,7 @@ export function PageEditorPage() {
 						</button>
 						<button
 							type="button"
-							onClick={() =>
-								setStatus(request_CreatePageRequest.status.PUBLISHED)
-							}
+							onClick={() => setStatus(request_CreatePageRequest.status.PUBLISHED)}
 							className={`btn-regular btn-sm py-1.5 px-3 ${
 								status === request_CreatePageRequest.status.PUBLISHED
 									? "border-[var(--primary)] bg-[var(--btn-regular-bg-active)]"
@@ -482,25 +393,24 @@ export function PageEditorPage() {
 							发布
 						</button>
 					</div>
+					<div className="flex gap-2">
+						<button
+							type="button"
+							onClick={() => navigate("/admin/pages")}
+							className="btn-plain btn-sm py-1.5 px-4"
+						>
+							取消
+						</button>
+						<LoadingButton
+							type="submit"
+							loading={createMutation.isPending || updateMutation.isPending}
+							className="btn-regular btn-sm py-1.5 px-4"
+						>
+							{isEdit ? "更新" : "创建"}
+						</LoadingButton>
+					</div>
 				</div>
-
-				<div className="flex gap-2">
-					<LoadingButton
-						type="submit"
-						loading={createMutation.isPending || updateMutation.isPending}
-						className="btn-regular btn-sm py-1.5 px-4 hover:bg-[var(--btn-regular-bg-hover)]"
-					>
-						{isEdit ? "更新" : "创建"}
-					</LoadingButton>
-					<button
-						type="button"
-						onClick={() => navigate("/admin/pages")}
-						className="btn-plain btn-sm py-1.5 px-4"
-					>
-						取消
-					</button>
-				</div>
-			</form>
-		</div>
+			</div>
+		</form>
 	);
 }
