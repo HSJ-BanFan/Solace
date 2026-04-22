@@ -3,23 +3,20 @@
  */
 
 import { Link } from "react-router-dom";
-import { useAuthStore } from "@/stores";
 import { useOwner } from "@/hooks";
 import { LazyImage, SafeIcon } from "@/components/common/ui";
 
 export function Profile() {
-	const { isAuthenticated } = useAuthStore();
 	const { data: owner } = useOwner();
 
 	const displayName = owner?.nickname || "博主";
 	const displayBio = owner?.bio || "欢迎来到我的博客！";
 	const displayAvatar = owner?.avatar_url;
-	const githubUrl = owner?.github_url;
 
 	return (
 		<div className="card-base p-2.5 onload-animation">
 			<Link
-				to="/about"
+				to="/pages/about"
 				className="group block relative mx-auto mt-0.5 lg:mx-0 lg:mt-0 mb-2 max-w-[10rem] lg:max-w-none aspect-square overflow-hidden rounded-lg active:scale-95"
 				aria-label="关于我"
 			>
@@ -56,31 +53,57 @@ export function Profile() {
 				<div className="h-0.5 w-4 bg-[var(--primary)] mx-auto rounded-full mb-1.5" />
 				<div className="text-center text-50 text-sm mb-2">{displayBio}</div>
 
-				<div className="flex flex-wrap gap-1.5 justify-center mb-0.5">
-					{isAuthenticated ? (
-						<Link
-							to="/admin"
-							className="btn-regular rounded-md h-8 gap-1.5 px-2.5 font-medium text-sm active:scale-95 flex items-center"
+				<div className="flex gap-2 justify-center">
+					{owner?.github_url && (
+						<a
+							href={owner.github_url}
+							target="_blank"
+							rel="noopener noreferrer"
+							className="w-8 h-8 rounded-full flex items-center justify-center text-50 hover:bg-[var(--primary)] hover:text-white transition-all"
+							aria-label="GitHub"
+						>
+							<SafeIcon icon="fa6-brands:github" size="1.125rem" />
+						</a>
+					)}
+					{owner?.email && (
+						<a
+							href={`mailto:${owner.email}`}
+							className="w-8 h-8 rounded-full flex items-center justify-center text-50 hover:bg-[var(--primary)] hover:text-white transition-all"
+							aria-label="邮箱"
 						>
 							<SafeIcon
-								icon="material-symbols:dashboard-outline-rounded"
-								size="1rem"
+								icon="material-symbols:mail-outline-rounded"
+								size="1.125rem"
 							/>
-							管理后台
-						</Link>
-					) : (
-						githubUrl && (
-							<a
-								href={githubUrl}
-								target="_blank"
-								rel="noopener noreferrer"
-								className="btn-regular rounded-md h-8 gap-1.5 px-2.5 font-medium text-sm active:scale-95 flex items-center"
-								aria-label="GitHub"
-							>
-								<SafeIcon icon="fa6-brands:github" size="1.125rem" />
-								GitHub
-							</a>
-						)
+						</a>
+					)}
+					{owner?.rss_url && (
+						<a
+							href={owner.rss_url}
+							target="_blank"
+							rel="noopener noreferrer"
+							className="w-8 h-8 rounded-full flex items-center justify-center text-50 hover:bg-[var(--primary)] hover:text-white transition-all"
+							aria-label="RSS"
+						>
+							<SafeIcon
+								icon="material-symbols:rss-feed-rounded"
+								size="1.125rem"
+							/>
+						</a>
+					)}
+					{owner?.sitemap_url && (
+						<a
+							href={owner.sitemap_url}
+							target="_blank"
+							rel="noopener noreferrer"
+							className="w-8 h-8 rounded-full flex items-center justify-center text-50 hover:bg-[var(--primary)] hover:text-white transition-all"
+							aria-label="Sitemap"
+						>
+							<SafeIcon
+								icon="material-symbols:map-outline-rounded"
+								size="1.125rem"
+							/>
+						</a>
 					)}
 				</div>
 			</div>
