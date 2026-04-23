@@ -5,7 +5,7 @@
  * - 左侧：Markdown 编辑区
  * - 右侧：实时预览区
  */
-import { useMemo } from "react";
+import { useMemo, useState, useEffect } from "react";
 import MdEditor from "react-markdown-editor-lite";
 import MarkdownIt from "markdown-it";
 import "react-markdown-editor-lite/lib/index.css";
@@ -31,6 +31,17 @@ export function MarkdownEditor({
 	height = 500,
 }: MarkdownEditorProps) {
 	const editorStyle = useMemo(() => ({ height }), [height]);
+	// 使用 key 强制重新挂载编辑器，确保初始值正确设置到 undo 历史中
+	const [editorKey, setEditorKey] = useState(0);
+	const [isInitialized, setIsInitialized] = useState(false);
+
+	// 当 value 从空变为有值时，重新挂载编辑器
+	useEffect(() => {
+		if (value && !isInitialized) {
+			setIsInitialized(true);
+			setEditorKey((k) => k + 1);
+		}
+	}, [value, isInitialized]);
 
 	const handleEditorChange = ({ text }: { html: string; text: string }) => {
 		onChange(text);
@@ -39,6 +50,7 @@ export function MarkdownEditor({
 	return (
 		<div className="markdown-editor-wrapper h-full">
 			<MdEditor
+				key={editorKey}
 				value={value}
 				style={editorStyle}
 				renderHTML={(text) => mdParser.render(text)}
