@@ -5,9 +5,7 @@
 @tailwind base;
 
 @layer base {
-	/* 强制保留滚动条空间，防止页面切换时左右偏移 */
-	/* 禁止水平滚动，防止元素溢出导致的右滑问题 */
-	html {
+	body {
 		overflow-y: scroll;
 		overflow-x: hidden;
 		/* 整体缩放 - 移动端 14px，桌面端 15px */
@@ -17,7 +15,7 @@
 	}
 
 	@media (min-width: 768px) {
-		html {
+		body {
 			font-size: 15px;
 		}
 	}
@@ -89,7 +87,6 @@
 		@apply antialiased transition;
 		line-height: 1.5;
 		font-display: swap;
-		overflow-x: hidden;
 	}
 
 	::selection {
