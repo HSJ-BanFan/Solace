@@ -27,6 +27,16 @@ Perfect for developers looking for a **modern blog platform**, **personal websit
 
 The system supports **article management** with **Markdown**, **category/tag organization**, **photo albums** with **lazy loading**, **visitor footprint visualization**, **SEO optimization**, and **dark mode** support.
 
+## 🤖 Multica Test Notes
+
+This repository is connected to Multica workspace tasks.
+
+Basic verification flow:
+- Receive issue and read acceptance criteria first
+- Keep changes scoped to requested files only
+- Run minimal verification commands relevant to the change
+- Report changed files, commit hash, and PR link in issue comments
+
 ## ✨ Features
 
 ### Content Management
