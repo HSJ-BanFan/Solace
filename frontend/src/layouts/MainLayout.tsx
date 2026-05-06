@@ -31,6 +31,7 @@ import {
 	Profile,
 	Categories,
 	Tags,
+	RecentMoments,
 } from "@/components/widget";
 import { BackToTop, MobileToc } from "@/components/common/ui";
 import { useTocStore } from "@/stores";
@@ -62,6 +63,7 @@ function LeftSidebar({ isArticlePage, headings, showCategories }: LeftSidebarPro
 				{/* Profile 不固定 */}
 				<div className="flex flex-col w-full gap-4 mb-4">
 					<Profile />
+					<RecentMoments />
 				</div>
 
 				{/* 吸顶组件区域 */}
@@ -87,6 +89,7 @@ function LeftSidebar({ isArticlePage, headings, showCategories }: LeftSidebarPro
 		<aside className="w-64 flex-shrink-0">
 			<div className="sticky top-4 flex flex-col w-full gap-4">
 				<Profile />
+				<RecentMoments />
 				<Tags
 					className="onload-animation"
 					style={{ animationDelay: "150ms" }}

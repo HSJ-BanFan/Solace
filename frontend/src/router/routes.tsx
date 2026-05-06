@@ -28,6 +28,9 @@ const TagPage = lazy(() =>
 const PageDetailPage = lazy(() =>
 	import("@/pages/PageDetailPage").then((m) => ({ default: m.PageDetailPage })),
 );
+const MomentsPage = lazy(() =>
+	import("@/pages/MomentsPage").then((m) => ({ default: m.MomentsPage })),
+);
 const NotFoundPage = lazy(() =>
 	import("@/pages/NotFoundPage").then((m) => ({ default: m.NotFoundPage })),
 );
@@ -103,6 +106,7 @@ export const routes = {
 			Component: PageDetailPage,
 			fallback: skeletons.single,
 		},
+		{ path: "/moments", Component: MomentsPage, fallback: skeletons.list },
 	],
 
 	// 认证路由
