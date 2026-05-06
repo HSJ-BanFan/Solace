@@ -97,16 +97,16 @@ export function AdminLayout() {
 									<Link
 										key={item.path}
 										to={item.path}
-										className={`rounded-lg py-2 px-3 text-sm transition flex items-center ${
+										className={`rounded-lg py-2 px-3 text-sm transition flex items-center gap-2 ${
 											isActive(item.path)
 												? "bg-[var(--btn-regular-bg)] text-[var(--primary)] font-medium"
-												: "btn-plain"
+												: "text-75 hover:bg-[var(--btn-plain-bg-hover)]"
 										}`}
 									>
 										<SafeIcon
 											icon={item.icon}
 											size="1.125rem"
-											className="mr-2 flex-shrink-0"
+											className="flex-shrink-0"
 										/>
 										<span className="whitespace-nowrap">{item.name}</span>
 									</Link>
