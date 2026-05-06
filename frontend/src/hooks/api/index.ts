@@ -58,3 +58,13 @@ export {
   useUpdatePage,
   useDeletePage,
 } from './pages';
+
+// 瞬间(说说)相关
+export {
+  useMoments,
+  useMoment,
+  useRecentMoments,
+  useCreateMoment,
+  useDeleteMoment,
+} from './moments';
+export type { Moment } from './moments';

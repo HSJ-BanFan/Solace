@@ -45,4 +45,10 @@ export const queryKeys = {
 	auth: {
 		me: () => ["auth", "me"] as const,
 	},
+	moments: {
+		list: (params?: { page?: number; pageSize?: number }) =>
+			["moments", params] as const,
+		detail: (id: number) => ["moment", id] as const,
+		recent: (limit?: number) => ["moments", "recent", limit] as const,
+	},
 } as const;
