@@ -106,9 +106,9 @@ export function AdminLayout() {
 										<SafeIcon
 											icon={item.icon}
 											size="1.125rem"
-											className="mr-2"
+											className="mr-2 flex-shrink-0"
 										/>
-										{item.name}
+										<span className="whitespace-nowrap">{item.name}</span>
 									</Link>
 								))}
 							</nav>
