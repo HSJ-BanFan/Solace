@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { useMoments, useDeleteMoment } from "@/hooks";
 import {
 	Pagination,
@@ -43,7 +44,12 @@ export function AdminMomentsPage() {
 			
 			<div className="card-base p-4 fade-in-up flex items-center justify-between">
 				<h2 className="text-90 font-bold">说说列表</h2>
-				<span className="text-50 text-sm">共 {total} 条</span>
+				<Link
+					to="/admin/moments/new"
+					className="btn-regular btn-sm py-1.5 px-3"
+				>
+					发布说说
+				</Link>
 			</div>
 
 			{isLoading ? (

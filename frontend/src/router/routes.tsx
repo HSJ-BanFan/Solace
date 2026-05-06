@@ -76,6 +76,11 @@ const AdminMomentsPage = lazy(() =>
 		default: m.AdminMomentsPage,
 	})),
 );
+const MomentEditorPage = lazy(() =>
+	import("@/pages/admin/MomentEditorPage").then((m) => ({
+		default: m.MomentEditorPage,
+	})),
+);
 
 // ============ Fallback 组件 ============
 const skeletons = {
@@ -152,6 +157,7 @@ export const routes = {
 			fallback: skeletons.center,
 		},
 		{ path: "/admin/moments", Component: AdminMomentsPage, fallback: skeletons.list },
+		{ path: "/admin/moments/new", Component: MomentEditorPage, fallback: skeletons.center },
 	],
 
 	// 404 页面
