@@ -62,3 +62,11 @@ type PageRepository interface {
 	Delete(ctx context.Context, id uint) error
 	ExistsBySlug(ctx context.Context, slug string) bool
 }
+
+// MomentRepository 说说数据访问接口
+type MomentRepository interface {
+	FindByID(ctx context.Context, id uint) (*model.Moment, error)
+	FindAll(ctx context.Context, limit, offset int) ([]*model.Moment, int64, error)
+	Create(ctx context.Context, moment *model.Moment) error
+	Delete(ctx context.Context, id uint) error
+}

@@ -25,6 +25,7 @@ type Router struct {
 	sitemapHandler  *handler.SitemapHandler
 	rssHandler      *handler.RSSHandler
 	pageHandler     *handler.PageHandler
+	momentHandler   *handler.MomentHandler
 	authService     service.AuthService
 }
 
@@ -40,6 +41,7 @@ func NewRouter(
 	sitemapHandler *handler.SitemapHandler,
 	rssHandler *handler.RSSHandler,
 	pageHandler *handler.PageHandler,
+	momentHandler *handler.MomentHandler,
 ) *Router {
 	return &Router{
 		authHandler:     authHandler,
@@ -52,6 +54,7 @@ func NewRouter(
 		sitemapHandler:  sitemapHandler,
 		rssHandler:      rssHandler,
 		pageHandler:     pageHandler,
+		momentHandler:   momentHandler,
 	}
 }
 
@@ -106,6 +109,13 @@ func (r *Router) Setup(cfg *config.Config) (*gin.Engine, []*middleware.RateLimit
 
 		// 公开页面路由（按 slug 访问）
 		v1.GET("/pages/slug/:slug", r.pageHandler.GetBySlug)
+
+		// 公开说说路由
+		moments := v1.Group("/moments")
+		{
+			moments.GET("", r.momentHandler.GetList)
+		}
+
 		auth := v1.Group("/auth")
 		{
 			if cfg.RateLimit() > 0 {
@@ -175,6 +185,14 @@ func (r *Router) Setup(cfg *config.Config) (*gin.Engine, []*middleware.RateLimit
 				protectedPages.POST("", r.pageHandler.Create)
 				protectedPages.PUT("/:id", r.pageHandler.Update)
 				protectedPages.DELETE("/:id", r.pageHandler.Delete)
+			}
+
+			// 受保护的说说路由
+			protectedMoments := protected.Group("/moments")
+			{
+				protectedMoments.GET("/:id", r.momentHandler.GetByID)
+				protectedMoments.POST("", r.momentHandler.Create)
+				protectedMoments.DELETE("/:id", r.momentHandler.Delete)
 			}
 		}
 	}
