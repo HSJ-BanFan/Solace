@@ -60,9 +60,9 @@ export const RecentMoments = memo(function RecentMoments({
 						<Link
 							to="/moments"
 							onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-							className="block group py-2 px-2 -mx-2 rounded-md hover:bg-[var(--btn-plain-bg-hover)] transition-all"
+							className="block group py-1.5 px-2 -mx-2 rounded-md hover:bg-[var(--btn-plain-bg-hover)] transition-all"
 						>
-							<p className="text-xs lg:text-sm text-75 line-clamp-2 leading-relaxed group-hover:text-[var(--primary)] transition mb-1">
+							<p className="text-xs lg:text-sm text-75 line-clamp-2 leading-relaxed group-hover:text-[var(--primary)] transition mb-0.5">
 								{moment.content}
 							</p>
 							<p className="text-[10px] lg:text-xs text-30 text-right">
@@ -70,7 +70,7 @@ export const RecentMoments = memo(function RecentMoments({
 							</p>
 						</Link>
 						{index < moments.length - 1 && (
-							<div className="border-b border-dashed border-[var(--showa-border-color)] opacity-50 my-2" />
+							<div className="border-b border-dashed border-[var(--showa-border-color)] opacity-50 my-1.5" />
 						)}
 					</div>
 				))}
