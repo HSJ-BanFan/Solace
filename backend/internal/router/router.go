@@ -187,11 +187,17 @@ func (r *Router) Setup(cfg *config.Config) (*gin.Engine, []*middleware.RateLimit
 				protectedPages.DELETE("/:id", r.pageHandler.Delete)
 			}
 
+			// Moment 创建路由（支持 JWT 或 moment-secret 认证）
+			momentCreate := v1.Group("/moments")
+			momentCreate.Use(middleware.MomentAuth(r.authService, cfg.MomentSecret()))
+			{
+				momentCreate.POST("", r.momentHandler.Create)
+			}
+
 			// 受保护的说说路由
 			protectedMoments := protected.Group("/moments")
 			{
 				protectedMoments.GET("/:id", r.momentHandler.GetByID)
-				protectedMoments.POST("", r.momentHandler.Create)
 				protectedMoments.DELETE("/:id", r.momentHandler.Delete)
 			}
 		}
