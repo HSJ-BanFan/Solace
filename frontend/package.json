@@ -9,7 +9,7 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
-    "generate-api": "openapi --input ../blog-backend/internal/docs/swagger.json --output ./src/api/generated --client fetch --name ApiClient --indent 2"
+    "generate-api": "openapi --input ../backend/internal/docs/swagger.json --output ./src/api/generated --client fetch --name ApiClient --indent 2"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
