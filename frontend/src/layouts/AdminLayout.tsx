@@ -25,7 +25,7 @@ const navItems = [
 	{
 		name: "页面管理",
 		path: "/admin/pages",
-		icon: "material-symbols:web-outline-rounded",
+		icon: "material-symbols:dashboard-outline-rounded",
 	},
 	{
 		name: "瞬间管理",
