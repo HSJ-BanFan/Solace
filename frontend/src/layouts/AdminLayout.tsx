@@ -28,6 +28,11 @@ const navItems = [
 		icon: "material-symbols:web-outline-rounded",
 	},
 	{
+		name: "瞬间管理",
+		path: "/admin/moments",
+		icon: "material-symbols:chat-bubble-outline-rounded",
+	},
+	{
 		name: "分类管理",
 		path: "/admin/categories",
 		icon: "material-symbols:category-outline-rounded",
@@ -53,6 +58,9 @@ export function AdminLayout() {
 		}
 		if (path === "/admin/pages") {
 			return location.pathname.startsWith("/admin/pages");
+		}
+		if (path === "/admin/moments") {
+			return location.pathname.startsWith("/admin/moments");
 		}
 		if (path === "/admin/categories") {
 			return location.pathname.startsWith("/admin/categories");
