@@ -171,7 +171,7 @@ export function useRecentArticles(limit = 5) {
 }
 
 /** 获取文章贡献日历 */
-export function useArticleContributions() {
+export function useArticleContributions(enabled = true) {
 	return useQuery({
 		queryKey: queryKeys.articles.contributions(),
 		queryFn: async () => {
@@ -188,6 +188,7 @@ export function useArticleContributions() {
 				}>;
 			};
 		},
+		enabled,
 		staleTime: 10 * 60 * 1000,
 	});
 }

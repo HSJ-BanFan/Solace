@@ -88,14 +88,16 @@ type articleService struct {
 	articleRepo  articleRepository
 	categoryRepo categoryRepository
 	tagRepo      tagRepository
+	momentRepo   momentRepository
 }
 
 // NewArticleService 创建文章服务
-func NewArticleService(articleRepo articleRepository, categoryRepo categoryRepository, tagRepo tagRepository) ArticleService {
+func NewArticleService(articleRepo articleRepository, categoryRepo categoryRepository, tagRepo tagRepository, momentRepo momentRepository) ArticleService {
 	return &articleService{
 		articleRepo:  articleRepo,
 		categoryRepo: categoryRepo,
 		tagRepo:      tagRepo,
+		momentRepo:   momentRepo,
 	}
 }
 
@@ -280,14 +282,22 @@ func (s *articleService) GetArchive(ctx context.Context) (*response.ArchiveRespo
 
 func (s *articleService) GetContributions(ctx context.Context) (*response.ArticleContributionsResponse, error) {
 	log := logger.WithContext(ctx)
-	log.Debug().Msg("获取文章贡献日历数据")
+	log.Debug().Msg("获取文章和瞬间贡献日历数据")
 
 	to := time.Now()
 	from := to.AddDate(-1, 0, 0)
 
+	// 获取文章贡献数据
 	articles, err := s.articleRepo.GetContributions(ctx, from, to)
 	if err != nil {
 		log.Error().Err(err).Msg("获取文章贡献数据失败")
+		return nil, err
+	}
+
+	// 获取瞬间贡献数据
+	moments, err := s.momentRepo.GetContributions(ctx, from, to)
+	if err != nil {
+		log.Error().Err(err).Msg("获取瞬间贡献数据失败")
 		return nil, err
 	}
 
@@ -295,6 +305,7 @@ func (s *articleService) GetContributions(ctx context.Context) (*response.Articl
 	yearGroups := make(map[int]*response.ArticleContributionsGroup, 2)
 	total := 0
 
+	// 统计文章贡献
 	for _, article := range articles {
 		if article.PublishedAt == nil {
 			continue
@@ -302,6 +313,22 @@ func (s *articleService) GetContributions(ctx context.Context) (*response.Articl
 
 		year := article.PublishedAt.Year()
 		dateKey := article.PublishedAt.Format("01-02")
+
+		if _, ok := yearGroups[year]; !ok {
+			yearGroups[year] = &response.ArticleContributionsGroup{
+				Year:          year,
+				Contributions: make(map[string]int, 64),
+			}
+		}
+
+		yearGroups[year].Contributions[dateKey]++
+		total++
+	}
+
+	// 统计瞬间贡献
+	for _, moment := range moments {
+		year := moment.CreatedAt.Year()
+		dateKey := moment.CreatedAt.Format("01-02")
 
 		if _, ok := yearGroups[year]; !ok {
 			yearGroups[year] = &response.ArticleContributionsGroup{
@@ -322,7 +349,7 @@ func (s *articleService) GetContributions(ctx context.Context) (*response.Articl
 		return groups[i].Year > groups[j].Year
 	})
 
-	log.Debug().Int("total", total).Int("groups", len(groups)).Msg("获取文章贡献数据成功")
+	log.Debug().Int("total", total).Int("groups", len(groups)).Msg("获取文章和瞬间贡献数据成功")
 	return &response.ArticleContributionsResponse{Total: total, Groups: groups}, nil
 }
 

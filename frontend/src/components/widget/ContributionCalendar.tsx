@@ -140,7 +140,7 @@ const CalendarCellButton = memo(function CalendarCellButton({
 			type="button"
 			className={`aspect-square flex items-center justify-center rounded cursor-pointer relative transition-all duration-200 ${cell.isToday ? "ring-1 ring-[var(--primary)]/50" : "hover:bg-[var(--btn-plain-bg-hover)]"}`}
 			style={{ backgroundColor: bgColor }}
-			title={mode === "github" ? `${cell.date}: ${cell.count} 次贡献` : `${cell.date}: ${cell.count} 篇文章`}
+			title={mode === "github" ? `${cell.date}: ${cell.count} 次贡献` : `${cell.date}: ${cell.count} 次贡献`}
 		>
 			<span
 				className={`text-[8px] lg:text-[10px] ${
@@ -170,17 +170,17 @@ const ModeSwitcher = memo(function ModeSwitcher({ mode, onModeChange }: ModeSwit
 		<div className="flex items-center gap-1 bg-neutral-100/80 dark:bg-neutral-800/60 p-0.5 rounded-md">
 			<button
 				type="button"
+				onClick={() => onModeChange("articles")}
+				className={`px-2 py-0.5 text-[8px] lg:text-[9px] rounded transition-all duration-200 ${mode === "articles" ? "bg-white dark:bg-neutral-700 text-slate-600 dark:text-slate-300 shadow-sm" : "text-neutral-500 dark:text-neutral-400 hover:text-[var(--primary)]"}`}
+			>
+				贡献
+			</button>
+			<button
+				type="button"
 				onClick={() => onModeChange("github")}
 				className={`px-2 py-0.5 text-[8px] lg:text-[9px] rounded transition-all duration-200 ${mode === "github" ? "bg-white dark:bg-neutral-700 text-slate-600 dark:text-slate-300 shadow-sm" : "text-neutral-500 dark:text-neutral-400 hover:text-[var(--primary)]"}`}
 			>
 				GitHub
-			</button>
-			<button
-				type="button"
-				onClick={() => onModeChange("articles")}
-				className={`px-2 py-0.5 text-[8px] lg:text-[9px] rounded transition-all duration-200 ${mode === "articles" ? "bg-white dark:bg-neutral-700 text-slate-600 dark:text-slate-300 shadow-sm" : "text-neutral-500 dark:text-neutral-400 hover:text-[var(--primary)]"}`}
-			>
-				文章
 			</button>
 		</div>
 	);
@@ -200,10 +200,10 @@ export function ContributionCalendar({
 		[owner?.github_url],
 	);
 
-	const [mode, setMode] = useState<CalendarMode>("github");
+	const [mode, setMode] = useState<CalendarMode>("articles");
 
-	const { data: githubData, isLoading: githubLoading, error: githubError } = useGitHubContributions();
-	const { data: articleData, isLoading: articleLoading, error: articleError } = useArticleContributions();
+	const { data: githubData, isLoading: githubLoading, error: githubError } = useGitHubContributions(mode === "github");
+	const { data: articleData, isLoading: articleLoading, error: articleError } = useArticleContributions(mode === "articles");
 
 	const sparseData = mode === "github" ? githubData : articleData;
 	const isLoading = mode === "github" ? githubLoading : articleLoading;
