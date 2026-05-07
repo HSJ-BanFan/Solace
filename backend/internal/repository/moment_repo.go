@@ -75,3 +75,22 @@ func (r *momentRepo) Delete(ctx context.Context, id uint) error {
 	logger.Debug().Uint("moment_id", id).Dur("duration", time.Since(start)).Msg("Delete 说说成功")
 	return nil
 }
+
+func (r *momentRepo) GetContributions(ctx context.Context, from, to time.Time) ([]*model.Moment, error) {
+	start := time.Now()
+	var moments []*model.Moment
+
+	err := r.db.WithContext(ctx).
+		Select("id, content, created_at").
+		Where("created_at >= ? AND created_at <= ?", from, to).
+		Order("created_at DESC").
+		Find(&moments).Error
+
+	if err != nil {
+		logger.Error().Err(err).Dur("duration", time.Since(start)).Msg("GetContributions 说说失败")
+		return nil, err
+	}
+
+	logger.Debug().Int("count", len(moments)).Dur("duration", time.Since(start)).Msg("GetContributions 说说成功")
+	return moments, nil
+}

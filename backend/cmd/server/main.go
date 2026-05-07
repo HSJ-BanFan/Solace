@@ -86,7 +86,7 @@ func main() {
 	)
 	ownerService := service.NewOwnerService(cfg)
 	githubService := service.NewGitHubService(cfg)
-	articleService := service.NewArticleService(articleRepo, categoryRepo, tagRepo)
+	articleService := service.NewArticleService(articleRepo, categoryRepo, tagRepo, momentRepo)
 	categoryService := service.NewCategoryService(categoryRepo)
 	tagService := service.NewTagService(tagRepo)
 	pageService := service.NewPageService(pageRepo)
