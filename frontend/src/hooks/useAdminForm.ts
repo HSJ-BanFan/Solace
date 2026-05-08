@@ -21,10 +21,11 @@ interface UseAdminFormStateReturn<T extends EntityWithId> {
 	error: string;
 	setShowForm: (show: boolean) => void;
 	setEditEntity: (entity: T | null) => void;
+	setFormValues: (values: Record<string, string>) => void;
 	setFormValue: (key: string, value: string) => void;
 	setError: (error: string) => void;
 	resetForm: () => void;
-	handleEdit: (entity: T) => void;
+	handleEdit: (entity: T, getFormValues: (entity: T) => Record<string, string>) => void;
 }
 
 /** 管理页面表单状态 Hook */
@@ -50,8 +51,9 @@ export function useAdminFormState<T extends EntityWithId>(
 	}, [initialValues]);
 
 	const handleEdit = useCallback(
-		(entity: T) => {
+		(entity: T, getFormValues: (entity: T) => Record<string, string>) => {
 			setEditEntity(entity);
+			setFormValues(getFormValues(entity));
 			setShowForm(true);
 		},
 		[],
@@ -64,6 +66,7 @@ export function useAdminFormState<T extends EntityWithId>(
 		error,
 		setShowForm,
 		setEditEntity,
+		setFormValues,
 		setFormValue,
 		setError,
 		resetForm,
@@ -86,36 +89,12 @@ export function useDeleteHandler(
 	};
 }
 
-/** 通用表单提交处理 */
-export function useFormSubmit<T extends EntityWithId, D>(
-	editEntity: T | null,
-	formValues: Record<string, string>,
-	createMutation: { mutateAsync: (data: D) => Promise<void>; isPending: boolean },
-	updateMutation: {
-		mutateAsync: (data: { id: number; data: D }) => Promise<void>;
-		isPending: boolean;
-	},
-	buildCreateData: (values: Record<string, string>) => D,
-	buildUpdateData: (values: Record<string, string>) => D,
-	resetForm: () => void,
-	setError: (error: string) => void,
-) {
-	return async (e: React.FormEvent) => {
-		e.preventDefault();
-		setError("");
-
-		try {
-			if (editEntity) {
-				await updateMutation.mutateAsync({
-					id: editEntity.id,
-					data: buildUpdateData(formValues),
-				});
-			} else {
-				await createMutation.mutateAsync(buildCreateData(formValues));
-			}
-			resetForm();
-		} catch (err) {
-			setError(err instanceof Error ? err.message : "保存失败");
+/** 验证必填字段 */
+export function validateRequired(values: Record<string, string>, requiredFields: string[]): string | null {
+	for (const field of requiredFields) {
+		if (!values[field]?.trim()) {
+			return `${field}不能为空`;
 		}
-	};
+	}
+	return null;
 }

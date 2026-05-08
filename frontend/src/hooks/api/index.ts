@@ -4,16 +4,6 @@
  * 按功能模块导出所有 API 相关的 React Query hooks
  */
 
-// 工厂函数
-export {
-	createListQuery,
-	createPagedListQuery,
-	createDetailQuery,
-	createCreateMutation,
-	createUpdateMutation,
-	createDeleteMutation,
-} from "./factory";
-
 // 文章相关
 export {
 	useArticles,

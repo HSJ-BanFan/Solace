@@ -1,9 +1,8 @@
 /**
  * 标签管理页面
- * 使用通用管理页面组件
+ * 使用通用管理页面组件和 hooks
  */
 
-import { useState } from "react";
 import { useTags, useCreateTag, useUpdateTag, useDeleteTag } from "@/hooks";
 import {
 	AdminPageLayout,
@@ -13,7 +12,11 @@ import {
 	AdminListItem,
 } from "@/components/admin";
 import { InputField } from "@/components";
-import { useDeleteHandler } from "@/hooks/useAdminForm";
+import {
+	useAdminFormState,
+	useDeleteHandler,
+	validateRequired,
+} from "@/hooks/useAdminForm";
 import type { Tag } from "@/types";
 
 const INITIAL_VALUES = {
@@ -21,62 +24,45 @@ const INITIAL_VALUES = {
 	slug: "",
 };
 
+const REQUIRED_FIELDS = ["name"];
+
+/** 从标签实体获取表单值 */
+const getTagFormValues = (tag: Tag): Record<string, string> => ({
+	name: tag.name,
+	slug: tag.slug,
+});
+
 export function AdminTagsPage() {
 	const { data: tags, isLoading, error } = useTags();
 	const createMutation = useCreateTag();
 	const updateMutation = useUpdateTag();
 	const deleteMutation = useDeleteTag();
 
-	const [showForm, setShowForm] = useState(false);
-	const [editingTag, setEditingTag] = useState<Tag | null>(null);
-	const [formValues, setFormValues] = useState(INITIAL_VALUES);
-	const [errorForm, setErrorForm] = useState("");
-
+	const formState = useAdminFormState<Tag>({ initialValues: INITIAL_VALUES });
 	const handleDelete = useDeleteHandler(deleteMutation, "标签");
-
-	const handleEdit = (tag: Tag) => {
-		setEditingTag(tag);
-		setFormValues({
-			name: tag.name,
-			slug: tag.slug,
-		});
-		setShowForm(true);
-	};
-
-	const resetForm = () => {
-		setFormValues(INITIAL_VALUES);
-		setErrorForm("");
-		setEditingTag(null);
-		setShowForm(false);
-	};
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
-		setErrorForm("");
-
-		if (!formValues.name.trim()) {
-			setErrorForm("名称不能为空");
+		const validationError = validateRequired(formState.formValues, REQUIRED_FIELDS);
+		if (validationError) {
+			formState.setError(validationError);
 			return;
 		}
 
+		const data = {
+			name: formState.formValues.name ?? "",
+			slug: formState.formValues.slug || undefined,
+		};
+
 		try {
-			if (editingTag) {
-				await updateMutation.mutateAsync({
-					id: editingTag.id,
-					data: {
-						name: formValues.name,
-						slug: formValues.slug || undefined,
-					},
-				});
+			if (formState.editEntity) {
+				await updateMutation.mutateAsync({ id: formState.editEntity.id, data });
 			} else {
-				await createMutation.mutateAsync({
-					name: formValues.name,
-					slug: formValues.slug || undefined,
-				});
+				await createMutation.mutateAsync(data);
 			}
-			resetForm();
+			formState.resetForm();
 		} catch (err) {
-			setErrorForm(err instanceof Error ? err.message : "保存失败");
+			formState.setError(err instanceof Error ? err.message : "保存失败");
 		}
 	};
 
@@ -91,50 +77,56 @@ export function AdminTagsPage() {
 
 	if (stateComponent) {
 		return (
-			<AdminPageLayout title="标签管理" newButtonLabel="新建标签" onNewClick={() => setShowForm(true)}>
+			<AdminPageLayout
+				title="标签管理"
+				newButtonLabel="新建标签"
+				onNewClick={() => formState.setShowForm(true)}
+			>
 				{stateComponent}
 			</AdminPageLayout>
 		);
 	}
 
 	return (
-		<AdminPageLayout title="标签管理" newButtonLabel="新建标签" onNewClick={() => setShowForm(true)}>
-			{/* 表单 */}
-			{showForm && (
+		<AdminPageLayout
+			title="标签管理"
+			newButtonLabel="新建标签"
+			onNewClick={() => formState.setShowForm(true)}
+		>
+			{formState.showForm && (
 				<AdminForm
 					onSubmit={handleSubmit}
-					error={errorForm}
-					onCancel={resetForm}
-					submitLabel={editingTag ? "更新" : "创建"}
+					error={formState.error}
+					onCancel={formState.resetForm}
+					submitLabel={formState.editEntity ? "更新" : "创建"}
 					isSubmitting={createMutation.isPending || updateMutation.isPending}
 				>
 					<InputField
 						label="名称"
-						value={formValues.name}
-						onChange={(v) => setFormValues((prev) => ({ ...prev, name: v }))}
+						value={formState.formValues.name ?? ""}
+						onChange={(v) => formState.setFormValue("name", v)}
 						placeholder="标签名称"
 						required
 					/>
 					<InputField
 						label="Slug"
-						value={formValues.slug}
-						onChange={(v) => setFormValues((prev) => ({ ...prev, slug: v }))}
+						value={formState.formValues.slug ?? ""}
+						onChange={(v) => formState.setFormValue("slug", v)}
 						placeholder="留空自动生成（基于名称）"
 					/>
 				</AdminForm>
 			)}
 
-			{/* 标签列表 */}
 			<AdminListContainer>
 				{tags!.map((tag) => (
 					<AdminListItem
 						key={tag.id}
 						title={tag.name}
 						badges={[
-							{ label: `Slug: ${tag.slug}`, variant: "default" },
-							{ label: `${tag.article_count || 0} 篇文章`, variant: "default" },
+							{ label: `Slug: ${tag.slug}` },
+							{ label: `${tag.article_count ?? 0} 篇文章` },
 						]}
-						editOnClick={() => handleEdit(tag)}
+						editOnClick={() => formState.handleEdit(tag, getTagFormValues)}
 						onDelete={() => handleDelete(tag.id)}
 						deleteDisabled={deleteMutation.isPending}
 					/>
