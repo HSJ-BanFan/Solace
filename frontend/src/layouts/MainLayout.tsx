@@ -173,14 +173,18 @@ export function MainLayout() {
 		return /^\/articles\//.test(location.pathname);
 	}, [location.pathname]);
 
+	// 计算 min-height 以补偿 zoom: 0.95
+	const isZoomed = useMediaQuery("(min-width: 1024px) and (max-width: 2560px)");
+	const minHeight = isZoomed ? "105.26vh" : "100vh";
+
 	return (
-		<div className="flex flex-col" style={{ minHeight: "calc(100dvh / 0.95)" }}>
+		<div className="flex flex-col" style={{ minHeight }}>
 			{/* 顶部导航栏 */}
 			<Navbar />
 
 			{/* 主内容区域 - 三栏布局 */}
-			<div className="flex-1 max-w-[var(--page-width)] mx-auto w-full px-4 pt-4 pb-0">
-				<div className="flex gap-4">
+			<div className="flex-1 flex flex-col max-w-[var(--page-width)] mx-auto w-full px-4 pt-4">
+				<div className="flex gap-4 flex-1">
 					{/* 左侧边栏 - Profile + TOC（lg 以上显示） */}
 					{isLgOrLarger && (
 						<LeftSidebar

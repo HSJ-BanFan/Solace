@@ -14,6 +14,7 @@ import { Outlet, useLocation, Link } from "react-router-dom";
 import { Navbar, Footer } from "@/components/common";
 import { SafeIcon } from "@/components/common/ui";
 import { useAuthStore } from "@/stores";
+import { useMediaQuery } from "@/hooks";
 
 /** 侧边栏导航项 */
 const navItems = [
@@ -48,6 +49,10 @@ export function AdminLayout() {
 	const { user } = useAuthStore();
 	const location = useLocation();
 
+	// 计算 min-height 以补偿 zoom: 0.95
+	const isZoomed = useMediaQuery("(min-width: 1024px) and (max-width: 2560px)");
+	const minHeight = isZoomed ? "105.26vh" : "100vh";
+
 	/** 判断导航项是否激活 */
 	const isActive = (path: string) => {
 		if (path === "/admin") {
@@ -72,7 +77,7 @@ export function AdminLayout() {
 	};
 
 	return (
-		<div className="min-h-screen flex flex-col">
+		<div className="flex flex-col" style={{ minHeight }}>
 			{/* 顶部导航栏 */}
 			<Navbar />
 
