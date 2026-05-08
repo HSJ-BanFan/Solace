@@ -1,5 +1,3 @@
-import { SafeIcon } from "@/components/common/ui";
-
 interface LoadingStateProps {
 	message?: string;
 	className?: string;
@@ -33,20 +31,3 @@ export const InlineLoader = (
 	props: Omit<LoadingStateProps, "message" | "inline">,
 ) => <LoadingState {...props} inline />;
 
-/** 空状态展示 */
-export function EmptyState({
-	icon = "material-symbols:article-outline-rounded",
-	message = "暂无内容",
-	className = "",
-}: {
-	icon?: string;
-	message?: string;
-	className?: string;
-}) {
-	return (
-		<div className={`card-base p-8 text-center onload-animation ${className}`}>
-			<SafeIcon icon={icon} size="2.5rem" className="text-50 mb-4" />
-			<p className="text-75">{message}</p>
-		</div>
-	);
-}
