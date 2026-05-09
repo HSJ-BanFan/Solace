@@ -53,6 +53,13 @@ func ensureMediaSchema(ctx context.Context, mediaRepo repository.MediaAssetRepos
 	return nil
 }
 
+func ensureArticleCoreSchema(ctx context.Context, articleRepo repository.ArticleRepository) error {
+	if err := articleRepo.EnsureCoreTables(ctx); err != nil {
+		return fmt.Errorf("ensure article core schema: %w", err)
+	}
+	return nil
+}
+
 func ensureArticleSchema(ctx context.Context, articleRepo repository.ArticleRepository) error {
 	if err := articleRepo.EnsureSearchSchema(ctx); err != nil {
 		return fmt.Errorf("ensure article schema: %w", err)
@@ -106,6 +113,13 @@ func main() {
 		logger.Fatal().Err(err).Msg("media asset table init failed")
 	}
 	cancelMediaSchema()
+
+	articleCoreSchemaCtx, cancelArticleCoreSchema := context.WithTimeout(context.Background(), 10*time.Second)
+	if err := ensureArticleCoreSchema(articleCoreSchemaCtx, articleRepo); err != nil {
+		cancelArticleCoreSchema()
+		logger.Fatal().Err(err).Msg("article core schema init failed")
+	}
+	cancelArticleCoreSchema()
 
 	articleSchemaCtx, cancelArticleSchema := context.WithTimeout(context.Background(), 10*time.Second)
 	if err := ensureArticleSchema(articleSchemaCtx, articleRepo); err != nil {

@@ -54,7 +54,9 @@ BEGIN
         FOR EACH ROW EXECUTE FUNCTION update_article_search_vec();
     END IF;
 END $$;
+`
 
+const backfillArticleSearchSchemaSQL = `
 UPDATE articles SET search_vec =
     setweight(to_tsvector('simple', COALESCE(title, '')), 'A') ||
     setweight(to_tsvector('simple', COALESCE(summary, '')), 'B') ||
@@ -76,9 +78,19 @@ func NewArticleRepository(db *gorm.DB, maxSearchQueryLen int) ArticleRepository 
 	return &articleRepo{db: db, maxSearchQueryLen: maxSearchQueryLen}
 }
 
+func (r *articleRepo) EnsureCoreTables(ctx context.Context) error {
+	if err := r.db.WithContext(ctx).AutoMigrate(&model.Category{}, &model.Tag{}, &model.Article{}, &model.ArticleTag{}); err != nil {
+		return fmt.Errorf("ensure article core tables: %w", err)
+	}
+	return nil
+}
+
 func (r *articleRepo) EnsureSearchSchema(ctx context.Context) error {
 	if err := r.db.WithContext(ctx).Exec(ensureArticleSearchSchemaSQL).Error; err != nil {
 		return fmt.Errorf("ensure article search schema: %w", err)
+	}
+	if err := r.db.WithContext(ctx).Exec(backfillArticleSearchSchemaSQL).Error; err != nil {
+		return fmt.Errorf("backfill article search schema: %w", err)
 	}
 	return nil
 }

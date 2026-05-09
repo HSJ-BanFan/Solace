@@ -13,12 +13,20 @@ import (
 )
 
 type fakeArticleRepository struct {
-	createdArticle             *model.Article
-	updatedArticle             *model.Article
-	storedArticle              *model.Article
-	createErr                  error
-	conflictOnCreateSlug       string
-	allowCreateAfterSlugRetry  bool
+	createdArticle            *model.Article
+	updatedArticle            *model.Article
+	storedArticle             *model.Article
+	createErr                 error
+	conflictOnCreateSlug      string
+	allowCreateAfterSlugRetry bool
+}
+
+func (r *fakeArticleRepository) EnsureCoreTables(ctx context.Context) error {
+	return nil
+}
+
+func (r *fakeArticleRepository) EnsureSearchSchema(ctx context.Context) error {
+	return nil
 }
 
 func (r *fakeArticleRepository) FindByID(ctx context.Context, id uint) (*model.Article, error) {

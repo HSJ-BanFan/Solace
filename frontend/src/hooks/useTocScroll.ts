@@ -1,10 +1,4 @@
-/**
- * 目录滚动逻辑 Hook
- *
- * 处理目录滚动同步和位置检测
- */
-
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { TocHeading } from "@/components/widget/TableOfContents";
 
 interface UseTocScrollOptions {
@@ -12,111 +6,193 @@ interface UseTocScrollOptions {
 	offset?: number;
 }
 
+type HeadingAnchor = Pick<HTMLElement, "getBoundingClientRect">;
+
+const ACTIVE_OFFSET_PADDING = 20;
+const SCROLL_DEBOUNCE_MS = 50;
+const HASH_SCROLL_BEHAVIOR: ScrollBehavior = "auto";
+
+export function getCurrentHeadingId(
+	headings: TocHeading[],
+	scrollPosition: number,
+	getElementTop: (id: string) => number | null,
+): string {
+	let currentId = headings[0]?.id ?? "";
+
+	for (const heading of headings) {
+		const top = getElementTop(heading.id);
+		if (top !== null && scrollPosition >= top) {
+			currentId = heading.id;
+		}
+	}
+
+	return currentId;
+}
+
+export function getHashHeadingId(hash: string, headings: TocHeading[]): string {
+	const rawHash = hash.replace(/^#/, "");
+	if (!rawHash) {
+		return "";
+	}
+
+	let normalizedHash = rawHash;
+	try {
+		normalizedHash = decodeURIComponent(rawHash);
+	} catch {
+		normalizedHash = rawHash;
+	}
+
+	return headings.some((heading) => heading.id === normalizedHash)
+		? normalizedHash
+		: "";
+}
+
+export function getScrollTargetTop(elementTop: number, offset: number): number {
+	return elementTop - offset;
+}
+
+export function reconcileHashHeading(
+	hash: string,
+	headings: TocHeading[],
+	offset: number,
+	getElementTop: (id: string) => number | null,
+	scrollTo: (options: ScrollToOptions) => void,
+): string {
+	const hashId = getHashHeadingId(hash, headings);
+	if (!hashId) {
+		return "";
+	}
+
+	const elementTop = getElementTop(hashId);
+	if (elementTop === null) {
+		return "";
+	}
+
+	scrollTo({
+		top: getScrollTargetTop(elementTop, offset),
+		behavior: HASH_SCROLL_BEHAVIOR,
+	});
+
+	return hashId;
+}
+
+function getHeadingElement(id: string): HeadingAnchor | null {
+	return document.getElementById(id);
+}
+
+function getHeadingTop(id: string): number | null {
+	const element = getHeadingElement(id);
+	return element ? element.getBoundingClientRect().top + window.scrollY : null;
+}
+
 export function useTocScroll({ headings, offset = 80 }: UseTocScrollOptions) {
 	const [activeId, setActiveId] = useState<string>("");
 	const activeIdRef = useRef(activeId);
-	const visibleHeadingsRef = useRef<Set<string>>(new Set());
 	const observerRef = useRef<IntersectionObserver | null>(null);
 
 	useEffect(() => {
 		activeIdRef.current = activeId;
 	}, [activeId]);
 
+	const syncActiveHeading = useCallback(() => {
+		if (headings.length === 0) {
+			return;
+		}
+
+		const nextId = getCurrentHeadingId(
+			headings,
+			window.scrollY + offset + ACTIVE_OFFSET_PADDING,
+			getHeadingTop,
+		);
+
+		if (nextId && nextId !== activeIdRef.current) {
+			setActiveId(nextId);
+		}
+	}, [headings, offset]);
+
 	useEffect(() => {
-		if (headings.length === 0) return;
+		if (headings.length === 0) {
+			return;
+		}
 
-		if (observerRef.current) observerRef.current.disconnect();
-		visibleHeadingsRef.current = new Set();
-
+		observerRef.current?.disconnect();
 		observerRef.current = new IntersectionObserver(
-			(entries) => {
-				const visible = new Set<string>(visibleHeadingsRef.current);
-				entries.forEach((entry) => {
-					if (entry.isIntersecting) {
-						visible.add(entry.target.id);
-					} else {
-						visible.delete(entry.target.id);
-					}
-				});
-
-				visibleHeadingsRef.current = visible;
-				if (visible.size > 0) {
-					const firstVisible = headings.find((h) => visible.has(h.id))?.id;
-					if (firstVisible) setActiveId(firstVisible);
-				}
+			() => {
+				syncActiveHeading();
 			},
 			{ rootMargin: "-15% 0px -60% 0px", threshold: [0, 1] },
 		);
 
-		headings.forEach((h) => {
-			const el = document.getElementById(h.id);
-			if (el) observerRef.current?.observe(el);
+		headings.forEach((heading) => {
+			const element = document.getElementById(heading.id);
+			if (element) {
+				observerRef.current?.observe(element);
+			}
 		});
 
-		return () => observerRef.current?.disconnect();
-	}, [headings]);
+		const frameId = window.requestAnimationFrame(() => {
+			const hashId = reconcileHashHeading(
+				window.location.hash,
+				headings,
+				offset,
+				getHeadingTop,
+				(options) => window.scrollTo(options),
+			);
+
+			if (hashId) {
+				setActiveId(hashId);
+				return;
+			}
+
+			syncActiveHeading();
+		});
+
+		return () => {
+			observerRef.current?.disconnect();
+			window.cancelAnimationFrame(frameId);
+		};
+	}, [headings, offset, syncActiveHeading]);
 
 	useEffect(() => {
-		let scrollTimeout: ReturnType<typeof setTimeout>;
+		let scrollTimeout: ReturnType<typeof setTimeout> | undefined;
 
 		const handleScroll = () => {
-			if (scrollTimeout) clearTimeout(scrollTimeout);
+			if (scrollTimeout) {
+				clearTimeout(scrollTimeout);
+			}
 
 			scrollTimeout = setTimeout(() => {
-				if (headings.length === 0) return;
-
-				const scrollPosition = window.scrollY + offset + 20;
-
-				let currentId = headings[0]?.id;
-				let minDistance = Infinity;
-
-				headings.forEach((h) => {
-					const el = document.getElementById(h.id);
-					if (el) {
-						const distance = scrollPosition - el.offsetTop;
-						if (distance >= 0 && distance < minDistance) {
-							minDistance = distance;
-							currentId = h.id;
-						}
-					}
-				});
-
-				if (
-					visibleHeadingsRef.current.size === 0 &&
-					currentId &&
-					currentId !== activeIdRef.current
-				) {
-					setActiveId(currentId);
-				}
-			}, 50);
+				syncActiveHeading();
+			}, SCROLL_DEBOUNCE_MS);
 		};
 
 		window.addEventListener("scroll", handleScroll, { passive: true });
 		return () => {
 			window.removeEventListener("scroll", handleScroll);
-			if (scrollTimeout) clearTimeout(scrollTimeout);
+			if (scrollTimeout) {
+				clearTimeout(scrollTimeout);
+			}
 		};
-	}, [headings, offset]);
+	}, [syncActiveHeading]);
 
-	const handleClick = (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
-		e.preventDefault();
-		const element = document.getElementById(id);
-		if (element) {
-			const bodyRect = document.body.getBoundingClientRect().top;
-			const elementRect = element.getBoundingClientRect().top;
-			const elementPosition = elementRect - bodyRect;
-			const offsetPosition = elementPosition - offset;
+	const handleClick = useCallback(
+		(e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
+			e.preventDefault();
+			const elementTop = getHeadingTop(id);
+			if (elementTop === null) {
+				return;
+			}
 
-			visibleHeadingsRef.current = new Set();
 			window.scrollTo({
-				top: offsetPosition,
+				top: getScrollTargetTop(elementTop, offset),
 				behavior: "smooth",
 			});
 
 			setActiveId(id);
-			window.history.pushState(null, "", `#${id}`);
-		}
-	};
+			window.history.pushState(null, "", `#${encodeURIComponent(id)}`);
+		},
+		[offset],
+	);
 
 	return { activeId, handleClick };
 }
