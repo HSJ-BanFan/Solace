@@ -9,6 +9,7 @@ import (
 
 // ArticleRepository 文章数据访问接口
 type ArticleRepository interface {
+	EnsureSearchSchema(ctx context.Context) error
 	FindByID(ctx context.Context, id uint) (*model.Article, error)
 	FindBySlug(ctx context.Context, slug string) (*model.Article, error)
 	FindAll(ctx context.Context, limit, offset int, filters map[string]interface{}) ([]*model.Article, int64, error)

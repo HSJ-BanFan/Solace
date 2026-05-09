@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"gin-quickstart/internal/model"
@@ -10,6 +11,56 @@ import (
 )
 
 const defaultMaxSearchQueryLen = 100
+
+const ensureArticleSearchSchemaSQL = `
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM information_schema.columns
+        WHERE table_name = 'articles' AND column_name = 'search_vec'
+    ) THEN
+        ALTER TABLE articles ADD COLUMN search_vec tsvector;
+    END IF;
+END $$;
+
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_indexes
+        WHERE indexname = 'index_article_search'
+    ) THEN
+        CREATE INDEX index_article_search ON articles USING gin(search_vec);
+    END IF;
+END $$;
+
+CREATE OR REPLACE FUNCTION update_article_search_vec()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.search_vec :=
+        setweight(to_tsvector('simple', COALESCE(NEW.title, '')), 'A') ||
+        setweight(to_tsvector('simple', COALESCE(NEW.summary, '')), 'B') ||
+        setweight(to_tsvector('simple', COALESCE(NEW.content, '')), 'C');
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_trigger WHERE tgname = 'article_search_vec_update'
+    ) THEN
+        CREATE TRIGGER article_search_vec_update
+        BEFORE INSERT OR UPDATE ON articles
+        FOR EACH ROW EXECUTE FUNCTION update_article_search_vec();
+    END IF;
+END $$;
+
+UPDATE articles SET search_vec =
+    setweight(to_tsvector('simple', COALESCE(title, '')), 'A') ||
+    setweight(to_tsvector('simple', COALESCE(summary, '')), 'B') ||
+    setweight(to_tsvector('simple', COALESCE(content, '')), 'C')
+WHERE search_vec IS NULL;
+`
 
 // articleRepo 文章仓储实现
 type articleRepo struct {
@@ -23,6 +74,13 @@ func NewArticleRepository(db *gorm.DB, maxSearchQueryLen int) ArticleRepository 
 		maxSearchQueryLen = defaultMaxSearchQueryLen
 	}
 	return &articleRepo{db: db, maxSearchQueryLen: maxSearchQueryLen}
+}
+
+func (r *articleRepo) EnsureSearchSchema(ctx context.Context) error {
+	if err := r.db.WithContext(ctx).Exec(ensureArticleSearchSchemaSQL).Error; err != nil {
+		return fmt.Errorf("ensure article search schema: %w", err)
+	}
+	return nil
 }
 
 func (r *articleRepo) FindByID(ctx context.Context, id uint) (*model.Article, error) {
@@ -202,8 +260,6 @@ func (r *articleRepo) FindBySlugWithNav(ctx context.Context, slug string) (*mode
 
 	return article, prev, next, nil
 }
-
-const maxSearchQueryLength = 100
 
 func (r *articleRepo) GetArchive(ctx context.Context) ([]*model.Article, error) {
 	start := time.Now()
