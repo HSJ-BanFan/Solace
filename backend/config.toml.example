@@ -4,6 +4,11 @@
 [server]
 port = "8080"
 mode = "debug"  # debug, release, test
+allowed_origins = []
+rate_limit = 0
+search_rate_limit = 0
+enable_swagger = true
+max_search_query_len = 100
 
 [database]
 host = "localhost"
@@ -21,6 +26,11 @@ refresh_duration = 10080  # 分钟 (7天)
 [logging]
 level = "info"      # trace, debug, info, warn, error, fatal, panic
 env = "development" # development, production
+output_file = ""
+max_size = 0
+max_backups = 0
+max_age = 0
+compress = false
 
 [migration]
 path = "migrations"
@@ -33,6 +43,8 @@ nickname = "博主"
 avatar_url = ""
 bio = "欢迎来到我的博客"
 github = ""
+bilibili = ""
+x = ""
 
 [github]
 token = ""         # GitHub Personal Access Token
