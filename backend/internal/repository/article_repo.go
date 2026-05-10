@@ -79,8 +79,24 @@ func NewArticleRepository(db *gorm.DB, maxSearchQueryLen int) ArticleRepository 
 }
 
 func (r *articleRepo) EnsureCoreTables(ctx context.Context) error {
-	if err := r.db.WithContext(ctx).AutoMigrate(&model.Category{}, &model.Tag{}, &model.Article{}, &model.ArticleTag{}); err != nil {
-		return fmt.Errorf("ensure article core tables: %w", err)
+	db := r.db.WithContext(ctx)
+	models := []struct {
+		table string
+		value interface{}
+	}{
+		{table: "categories", value: &model.Category{}},
+		{table: "tags", value: &model.Tag{}},
+		{table: "articles", value: &model.Article{}},
+		{table: "article_tags", value: &model.ArticleTag{}},
+	}
+	for _, modelValue := range models {
+		if db.Migrator().HasTable(modelValue.value) {
+			continue
+		}
+		// Existing tables may use legacy constraints that AutoMigrate tries to rewrite.
+		if err := db.Migrator().CreateTable(modelValue.value); err != nil {
+			return fmt.Errorf("ensure article core table %s: %w", modelValue.table, err)
+		}
 	}
 	return nil
 }

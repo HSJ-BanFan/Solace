@@ -112,6 +112,42 @@ func TestArticleRepositoryEnsureCoreTablesIsIdempotent(t *testing.T) {
 	}
 }
 
+func TestArticleRepositoryEnsureCoreTablesSkipsExistingTables(t *testing.T) {
+	db := openArticleRepositoryTestDB(t)
+	cleanupArticleTables(t, db)
+
+	if err := db.Exec(`
+		CREATE TABLE categories (
+			id bigserial PRIMARY KEY,
+			name varchar(100) NOT NULL,
+			slug varchar(100) NOT NULL
+		)
+	`).Error; err != nil {
+		t.Fatalf("seed categories table error = %v", err)
+	}
+
+	repo := NewArticleRepository(db, 100)
+	ctx := context.Background()
+
+	if err := repo.EnsureCoreTables(ctx); err != nil {
+		t.Fatalf("EnsureCoreTables() error = %v", err)
+	}
+
+	for _, table := range []string{"categories", "tags", "articles", "article_tags"} {
+		if !db.Migrator().HasTable(table) {
+			t.Fatalf("table %s was not created", table)
+		}
+	}
+
+	var count int64
+	if err := db.Raw(`SELECT count(*) FROM information_schema.columns WHERE table_name = 'categories'`).Scan(&count).Error; err != nil {
+		t.Fatalf("count category columns error = %v", err)
+	}
+	if count != 3 {
+		t.Fatalf("categories columns = %d, want 3", count)
+	}
+}
+
 func TestArticleRepositoryFindByIDWorksAfterEnsureCoreTables(t *testing.T) {
 	db := openArticleRepositoryTestDB(t)
 	cleanupArticleTables(t, db)
