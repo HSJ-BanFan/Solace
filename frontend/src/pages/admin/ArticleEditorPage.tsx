@@ -18,9 +18,9 @@ import { request_CreateArticleRequest } from "@/api";
 type ArticleStatus = request_CreateArticleRequest.status;
 
 const articleSchema = z.object({
-	title: z.string().min(1, "标题不能为空"),
+	title: z.string().min(1, { error: "标题不能为空" }),
 	slug: z.string().optional(),
-	content: z.string().min(1, "内容不能为空"),
+	content: z.string().min(1, { error: "内容不能为空" }),
 	summary: z.string().optional(),
 	cover_image: z.string().url("请输入有效的URL").optional().or(z.literal("")),
 	category_id: z.number().optional(),

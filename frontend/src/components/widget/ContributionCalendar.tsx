@@ -14,9 +14,9 @@ import { useArticleContributions } from "@/hooks/api/articles";
 import type { ContributionsGroup } from "@/hooks/api/github";
 import { useOwner } from "@/hooks";
 
-// ============================================================
+// ------------------------------------------------------------
 // 类型定义
-// ============================================================
+// ------------------------------------------------------------
 
 interface ContributionCalendarProps {
 	className?: string;
@@ -33,17 +33,17 @@ interface CalendarCell {
 
 type CalendarMode = "github" | "articles";
 
-// ============================================================
+// ------------------------------------------------------------
 // 常量
-// ============================================================
+// ------------------------------------------------------------
 
 const MONTH_NAMES = ["一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月"];
 const WEEK_DAYS = ["日", "一", "二", "三", "四", "五", "六"];
 const SKELETON_CELLS = 35;
 
-// ============================================================
+// ------------------------------------------------------------
 // 工具函数（提取到组件外部，避免重复创建）
-// ============================================================
+// ------------------------------------------------------------
 
 /** 根据 count 计算 level (0-4)，四分位算法 */
 function calculateLevel(count: number, maxCount: number): number {
@@ -114,9 +114,9 @@ function getEmptyBgColor(isDark: boolean, hue: string): string {
 	return isDark ? `oklch(0.25 0.008 ${hue})` : `oklch(0.96 0.008 ${hue})`;
 }
 
-// ============================================================
+// ------------------------------------------------------------
 // 子组件（memo 优化）
-// ============================================================
+// ------------------------------------------------------------
 
 interface CalendarCellButtonProps {
 	cell: CalendarCell;
@@ -129,7 +129,6 @@ const CalendarCellButton = memo(function CalendarCellButton({
 	cell,
 	isDark,
 	hue,
-	mode,
 }: CalendarCellButtonProps) {
 	const bgColor = cell.isToday
 		? getEmptyBgColor(isDark, hue)
@@ -140,7 +139,7 @@ const CalendarCellButton = memo(function CalendarCellButton({
 			type="button"
 			className={`aspect-square flex items-center justify-center rounded cursor-pointer relative transition-all duration-200 ${cell.isToday ? "ring-1 ring-[var(--primary)]/50" : "hover:bg-[var(--btn-plain-bg-hover)]"}`}
 			style={{ backgroundColor: bgColor }}
-			title={mode === "github" ? `${cell.date}: ${cell.count} 次贡献` : `${cell.date}: ${cell.count} 篇文章`}
+			title={`${cell.date}: ${cell.count} 次贡献`}
 		>
 			<span
 				className={`text-[8px] lg:text-[10px] ${
@@ -163,18 +162,18 @@ const CalendarCellButton = memo(function CalendarCellButton({
 interface ModeSwitcherProps {
 	mode: CalendarMode;
 	onModeChange: (mode: CalendarMode) => void;
+	canUseGithub: boolean;
+	githubHint: string;
 }
 
-const ModeSwitcher = memo(function ModeSwitcher({ mode, onModeChange }: ModeSwitcherProps) {
+const ModeSwitcher = memo(function ModeSwitcher({
+	mode,
+	onModeChange,
+	canUseGithub,
+	githubHint,
+}: ModeSwitcherProps) {
 	return (
 		<div className="flex items-center gap-1 bg-neutral-100/80 dark:bg-neutral-800/60 p-0.5 rounded-md">
-			<button
-				type="button"
-				onClick={() => onModeChange("github")}
-				className={`px-2 py-0.5 text-[8px] lg:text-[9px] rounded transition-all duration-200 ${mode === "github" ? "bg-white dark:bg-neutral-700 text-slate-600 dark:text-slate-300 shadow-sm" : "text-neutral-500 dark:text-neutral-400 hover:text-[var(--primary)]"}`}
-			>
-				GitHub
-			</button>
 			<button
 				type="button"
 				onClick={() => onModeChange("articles")}
@@ -182,13 +181,22 @@ const ModeSwitcher = memo(function ModeSwitcher({ mode, onModeChange }: ModeSwit
 			>
 				文章
 			</button>
+			<button
+				type="button"
+				onClick={() => onModeChange("github")}
+				disabled={!canUseGithub}
+				title={!canUseGithub ? githubHint : undefined}
+				className={`px-2 py-0.5 text-[8px] lg:text-[9px] rounded transition-all duration-200 ${mode === "github" ? "bg-white dark:bg-neutral-700 text-slate-600 dark:text-slate-300 shadow-sm" : "text-neutral-500 dark:text-neutral-400 hover:text-[var(--primary)]"} ${!canUseGithub ? "cursor-not-allowed opacity-50 hover:text-neutral-500 dark:hover:text-neutral-400" : ""}`}
+			>
+				GitHub
+			</button>
 		</div>
 	);
 });
 
-// ============================================================
+// ------------------------------------------------------------
 // 主组件
-// ============================================================
+// ------------------------------------------------------------
 
 export function ContributionCalendar({
 	className,
@@ -200,10 +208,12 @@ export function ContributionCalendar({
 		[owner?.github_url],
 	);
 
-	const [mode, setMode] = useState<CalendarMode>("github");
+	const [mode, setMode] = useState<CalendarMode>("articles");
+	const hasGithubProfile = Boolean(githubUsername);
+	const githubHint = "未配置 GitHub 主页链接";
 
-	const { data: githubData, isLoading: githubLoading, error: githubError } = useGitHubContributions();
-	const { data: articleData, isLoading: articleLoading, error: articleError } = useArticleContributions();
+	const { data: githubData, isLoading: githubLoading, error: githubError } = useGitHubContributions(mode === "github");
+	const { data: articleData, isLoading: articleLoading, error: articleError } = useArticleContributions(mode === "articles");
 
 	const sparseData = mode === "github" ? githubData : articleData;
 	const isLoading = mode === "github" ? githubLoading : articleLoading;
@@ -234,6 +244,12 @@ export function ContributionCalendar({
 
 		return () => observer.disconnect();
 	}, []);
+
+	useEffect(() => {
+		if (mode === "github" && !hasGithubProfile) {
+			setMode("articles");
+		}
+	}, [hasGithubProfile, mode]);
 
 	const maxCount = useMemo(
 		() => computeMaxCount(sparseData?.groups),
@@ -283,9 +299,15 @@ export function ContributionCalendar({
 		setCurrentMonth(today.getMonth());
 	}, []);
 
-	const handleModeChange = useCallback((newMode: CalendarMode) => {
-		setMode(newMode);
-	}, []);
+	const handleModeChange = useCallback(
+		(newMode: CalendarMode) => {
+			if (newMode === "github" && !hasGithubProfile) {
+				return;
+			}
+			setMode(newMode);
+		},
+		[hasGithubProfile],
+	);
 
 	if (ownerLoading) {
 		return (
@@ -293,10 +315,6 @@ export function ContributionCalendar({
 				<SkeletonCalendar />
 			</div>
 		);
-	}
-
-	if (mode === "github" && !githubUsername) {
-		return null;
 	}
 
 	if (isLoading) {
@@ -374,17 +392,22 @@ export function ContributionCalendar({
 			{/* 底部统计 */}
 			<div className="px-2.5 lg:px-3 mt-1 lg:mt-1.5 flex items-center justify-between text-[8px] lg:text-[9px] text-neutral-400 dark:text-neutral-500">
 				<span>
-					当月 <span className="font-medium text-[var(--primary)]">{monthTotal}</span> {mode === "github" ? "次" : "篇"}
+					当月 <span className="font-medium text-[var(--primary)]">{monthTotal}</span> 次
 				</span>
-				<ModeSwitcher mode={mode} onModeChange={handleModeChange} />
+				<ModeSwitcher
+					mode={mode}
+					onModeChange={handleModeChange}
+					canUseGithub={hasGithubProfile}
+					githubHint={githubHint}
+				/>
 			</div>
 		</div>
 	);
 }
 
-// ============================================================
+// ------------------------------------------------------------
 // 骨架屏组件
-// ============================================================
+// ------------------------------------------------------------
 
 function SkeletonCalendar() {
 	return (

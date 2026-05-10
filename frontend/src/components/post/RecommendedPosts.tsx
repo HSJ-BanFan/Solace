@@ -9,7 +9,7 @@ import { useRandomArticles, useRecentArticles } from "@/hooks";
 import { getArticleDate } from "@/utils";
 import type { ArticleSummary } from "@/types";
 
-// ============ 类型定义 ============
+// ------------ 类型定义 ------------
 
 type RecommendedMode = "random" | "recent";
 
@@ -20,7 +20,7 @@ interface RecommendedPostsProps {
 	className?: string;
 }
 
-// ============ 配置常量 ============
+// ------------ 配置常量 ------------
 
 const MODE_CONFIG = {
 	random: {
@@ -35,7 +35,7 @@ const MODE_CONFIG = {
 	},
 } as const;
 
-// ============ 子组件 ============
+// ------------ 子组件 ------------
 
 /** 文章列表项 */
 function PostItem({
@@ -124,7 +124,7 @@ function RecommendedPostsSkeleton() {
 	);
 }
 
-// ============ 主组件 ============
+// ------------ 主组件 ------------
 
 export function RecommendedPosts({
 	mode,

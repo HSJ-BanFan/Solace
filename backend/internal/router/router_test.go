@@ -53,6 +53,7 @@ func TestArticleIDRouteRequiresAuth(t *testing.T) {
 		&handler.UploadHandler{},
 		nil,
 		nil,
+		nil,
 	).Setup(&config.Config{})
 
 	req := httptest.NewRequest(http.MethodGet, "/api/v1/articles/1", nil)

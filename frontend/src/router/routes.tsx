@@ -6,7 +6,7 @@ import { lazy } from "react";
 import { PostCardSkeletonList } from "@/components";
 import { MainLayout, AuthLayout, AdminLayout } from "@/layouts";
 
-// ============ 懒加载页面 ============
+// ------------ 懒加载页面 ------------
 // 使用 .then() 提取命名导出
 const HomePage = lazy(() =>
 	import("@/pages/HomePage").then((m) => ({ default: m.HomePage })),
@@ -27,6 +27,9 @@ const TagPage = lazy(() =>
 );
 const PageDetailPage = lazy(() =>
 	import("@/pages/PageDetailPage").then((m) => ({ default: m.PageDetailPage })),
+);
+const MomentsPage = lazy(() =>
+	import("@/pages/MomentsPage").then((m) => ({ default: m.MomentsPage })),
 );
 const NotFoundPage = lazy(() =>
 	import("@/pages/NotFoundPage").then((m) => ({ default: m.NotFoundPage })),
@@ -73,8 +76,18 @@ const ImageSettingsPage = lazy(() =>
 		default: m.ImageSettingsPage,
 	})),
 );
+const AdminMomentsPage = lazy(() =>
+	import("@/pages/admin/AdminMomentsPage").then((m) => ({
+		default: m.AdminMomentsPage,
+	})),
+);
+const MomentEditorPage = lazy(() =>
+	import("@/pages/admin/MomentEditorPage").then((m) => ({
+		default: m.MomentEditorPage,
+	})),
+);
 
-// ============ Fallback 组件 ============
+// ------------ Fallback 组件 ------------
 const skeletons = {
 	list: <PostCardSkeletonList count={10} />,
 	single: <PostCardSkeletonList count={1} />,
@@ -86,7 +99,7 @@ const skeletons = {
 	),
 };
 
-// ============ 路由配置 ============
+// ------------ 路由配置 ------------
 export const routes = {
 	// 公开路由
 	public: [
@@ -108,6 +121,7 @@ export const routes = {
 			Component: PageDetailPage,
 			fallback: skeletons.single,
 		},
+		{ path: "/moments", Component: MomentsPage, fallback: skeletons.list },
 	],
 
 	// 认证路由
@@ -152,13 +166,15 @@ export const routes = {
 			Component: ImageSettingsPage,
 			fallback: skeletons.center,
 		},
+		{ path: "/admin/moments", Component: AdminMomentsPage, fallback: skeletons.list },
+		{ path: "/admin/moments/new", Component: MomentEditorPage, fallback: skeletons.center },
 	],
 
 	// 404 页面
 	notFound: { Component: NotFoundPage, fallback: skeletons.center },
 } as const;
 
-// ============ 布局组件 ============
+// ------------ 布局组件 ------------
 export const layouts = {
 	main: MainLayout,
 	auth: AuthLayout,

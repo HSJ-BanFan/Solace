@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 	"time"
 
@@ -67,6 +68,13 @@ func ensureArticleSchema(ctx context.Context, articleRepo repository.ArticleRepo
 	return nil
 }
 
+func ensureMomentSchema(ctx context.Context, momentRepo repository.MomentRepository) error {
+	if err := momentRepo.EnsureTable(ctx); err != nil {
+		return fmt.Errorf("ensure moments schema: %w", err)
+	}
+	return nil
+}
+
 func main() {
 	// 加载配置
 	cfg := config.Load()
@@ -81,6 +89,31 @@ func main() {
 		MaxAge:     cfg.LogMaxAge(),
 		Compress:   cfg.LogCompress(),
 	})
+
+	if warning := cfg.MomentSecretWarning(); warning != "" {
+		logger.Warn().Msg(warning)
+	}
+
+	jwtSecret := cfg.JWTSecret()
+	if jwtSecret == "" {
+		logger.Fatal().Msg("jwt.secret must not be empty")
+	}
+	if len(jwtSecret) < 32 {
+		logger.Fatal().Msg("jwt.secret must be at least 32 characters")
+	}
+
+	adminEmail := strings.TrimSpace(cfg.AdminEmail())
+	if adminEmail == "" {
+		logger.Fatal().Msg("admin.email must not be empty")
+	}
+
+	adminPassword := cfg.AdminPassword()
+	if adminPassword == "" {
+		logger.Fatal().Msg("admin.password must not be empty")
+	}
+	if len(adminPassword) < 12 {
+		logger.Fatal().Msg("admin.password must be at least 12 characters")
+	}
 
 	logger.Info().
 		Str("port", cfg.ServerPort()).
@@ -100,6 +133,8 @@ func main() {
 	pageRepo := repository.NewPageRepository(db)
 	settingsRepo := repository.NewSettingsRepository(db)
 	mediaRepo := repository.NewMediaAssetRepository(db)
+	momentRepo := repository.NewMomentRepository(db)
+
 	settingsSchemaCtx, cancelSettingsSchema := context.WithTimeout(context.Background(), 10*time.Second)
 	if err := ensureSettingsSchema(settingsSchemaCtx, settingsRepo); err != nil {
 		cancelSettingsSchema()
@@ -128,8 +163,14 @@ func main() {
 	}
 	cancelArticleSchema()
 
-	// 初始化 JWT 管理器
+	momentSchemaCtx, cancelMomentSchema := context.WithTimeout(context.Background(), 10*time.Second)
+	if err := ensureMomentSchema(momentSchemaCtx, momentRepo); err != nil {
+		cancelMomentSchema()
+		logger.Fatal().Err(err).Msg("moments schema init failed")
+	}
+	cancelMomentSchema()
 
+	// 初始化 JWT 管理器
 	jwtManager := jwt.NewJWTManager(
 		cfg.JWTSecret(),
 		cfg.JWTAccessDuration(),
@@ -145,11 +186,12 @@ func main() {
 	ownerService := service.NewOwnerService(cfg)
 	githubService := service.NewGitHubService(cfg)
 	mediaService := service.NewMediaService(mediaRepo, cfg)
-	articleService := service.NewArticleService(articleRepo, categoryRepo, tagRepo)
+	articleService := service.NewArticleService(articleRepo, categoryRepo, tagRepo, momentRepo)
 	categoryService := service.NewCategoryService(categoryRepo)
 	tagService := service.NewTagService(tagRepo)
 	pageService := service.NewPageService(pageRepo)
 	settingsService := service.NewSettingsService(settingsRepo)
+	momentService := service.NewMomentService(momentRepo)
 
 	// 初始化处理器
 	authHandler := handler.NewAuthHandler(authService)
@@ -163,6 +205,7 @@ func main() {
 	pageHandler := handler.NewPageHandler(pageService, mediaService)
 	settingsHandler := handler.NewSettingsHandler(settingsService)
 	mediaHandler := handler.NewMediaHandler(mediaService)
+	momentHandler := handler.NewMomentHandler(momentService)
 	uploadHandler, err := handler.NewUploadHandler(cfg)
 	if err != nil {
 		logger.Fatal().Err(err).Msg("上传处理器初始化失败")
@@ -183,6 +226,7 @@ func main() {
 		uploadHandler,
 		settingsHandler,
 		mediaHandler,
+		momentHandler,
 	)
 	r, limiters := appRouter.Setup(cfg)
 

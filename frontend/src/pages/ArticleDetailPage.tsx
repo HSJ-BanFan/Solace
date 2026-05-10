@@ -15,7 +15,7 @@ import {
 	BreadcrumbSEO,
 } from "@/components";
 import type { TocHeading } from "@/components/widget/TableOfContents";
-import { formatDate } from "@/utils";
+import { formatDate, getArticleUpdateTime } from "@/utils";
 import { useEffect, useCallback, useRef } from "react";
 import { useTocStore } from "@/stores";
 import { ApiError } from "@/api/generated/core/ApiError";
@@ -58,10 +58,6 @@ export function ArticleDetailPage() {
 	}
 	if (isLoading) return <ArticleDetailSkeleton />;
 	if (!article) return <NotFoundDisplay message="未找到文章" />;
-
-	// 判断是否有更新（更新时间与创建时间不同）
-	const hasUpdate =
-		article.updated_at && article.updated_at !== article.created_at;
 
 	const breadcrumbItems = article.category
 		? [{ name: article.category.name, path: `/categories/${article.category.slug}` }]
@@ -117,9 +113,7 @@ export function ArticleDetailPage() {
 									icon="material-symbols:edit-calendar-outline-rounded"
 									size="1rem"
 								/>
-								{hasUpdate
-									? formatDate(article.updated_at)
-									: formatDate(article.published_at || article.created_at)}
+								{formatDate(getArticleUpdateTime(article))}
 							</span>
 							{/* 右下角：标签 */}
 							{article.tags && article.tags.length > 0 && (

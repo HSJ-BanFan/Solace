@@ -17,7 +17,7 @@ import {
 } from "./EditorComponents";
 import type { FootprintCity } from "@/types";
 
-// ============ 类型定义 ============
+// ------------ 类型定义 ------------
 
 interface ProvinceGroup {
 	province: string;
@@ -35,11 +35,11 @@ interface EditState {
 	form: FootprintCity;
 }
 
-// ============ 常量 ============
+// ------------ 常量 ------------
 
 const EMPTY_CITY: FootprintCity = { name: "", country: "" };
 
-// ============ 子组件 ============
+// ------------ 子组件 ------------
 
 /** 城市列表项 */
 function CityItem({
@@ -99,7 +99,7 @@ function GroupHeader({
 	);
 }
 
-// ============ 主组件 ============
+// ------------ 主组件 ------------
 
 export function FootprintsEditor({ cities, onChange }: FootprintsEditorProps) {
 	const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set());

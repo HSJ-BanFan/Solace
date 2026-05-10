@@ -5,7 +5,7 @@
  */
 import { SafeIcon } from "@/components/common/ui";
 
-// ============ 类型定义 ============
+// ------------ 类型定义 ------------
 
 interface InputFieldProps {
 	label: string;
@@ -78,7 +78,7 @@ interface EditFormActionsProps {
 	saveDisabled?: boolean;
 }
 
-// ============ 子组件 ============
+// ------------ 子组件 ------------
 
 /** 输入字段 */
 export function InputField({

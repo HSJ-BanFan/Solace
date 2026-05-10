@@ -71,6 +71,15 @@ definitions:
     required:
     - name
     type: object
+  request.CreateMomentRequest:
+    properties:
+      content:
+        maxLength: 200
+        minLength: 1
+        type: string
+    required:
+    - content
+    type: object
   request.CreatePageRequest:
     properties:
       content:
@@ -743,6 +752,107 @@ paths:
       summary: 获取 GitHub 贡献日历
       tags:
       - github
+  /moments:
+    get:
+      parameters:
+      - default: 1
+        description: 页码
+        in: query
+        minimum: 1
+        name: page
+        type: integer
+      - default: 5
+        description: 每页数量
+        in: query
+        maximum: 50
+        minimum: 1
+        name: pageSize
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.Response'
+      summary: 获取说说列表
+      tags:
+      - moment
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: 说说数据
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.CreateMomentRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/handler.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handler.Response'
+      summary: 创建说说
+      tags:
+      - moment
+  /moments/{id}:
+    delete:
+      parameters:
+      - description: 说说ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "204":
+          description: 无内容
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handler.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.Response'
+      summary: 删除说说
+      tags:
+      - moment
+    get:
+      parameters:
+      - description: 说说ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.Response'
+      summary: 根据 ID 获取说说
+      tags:
+      - moment
   /owner:
     get:
       produces:

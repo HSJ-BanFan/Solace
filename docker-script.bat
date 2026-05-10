@@ -1,16 +1,16 @@
 @echo off
 chcp 65001 >nul
-echo ==============================================
+echo ----------------------------------------------
 echo        Windows 并行构建 Docker 镜像
 echo          前后端同时构建 + 同时推送
-echo ==============================================
+echo ----------------------------------------------
 echo.
 
 :: 定义镜像名称（你可以直接改这里）
 set BACKEND_IMAGE=domye/blog-backend:latest
 set FRONTEND_IMAGE=domye/blog-frontend:latest
 
-:: ====================== 并行构建 ======================
+:: ---------------------- 并行构建 ----------------------
 echo [1/2] 开始 同时构建 前后端镜像...
 echo 后端：docker build -t %BACKEND_IMAGE% ./backend
 echo 前端：docker build -t %FRONTEND_IMAGE% ./frontend
@@ -30,7 +30,7 @@ echo.
 echo ? 前后端镜像 同时构建完成！
 echo.
 
-:: ====================== 并行推送 ======================
+:: ---------------------- 并行推送 ----------------------
 echo [2/2] 开始 同时推送 前后端到 Docker Hub...
 echo 推送后端：docker push docker.io/%BACKEND_IMAGE%
 echo 推送前端：docker push docker.io/%FRONTEND_IMAGE%
@@ -47,9 +47,9 @@ tasklist | find /i "docker.exe" >nul
 if not errorlevel 1 goto wait_push
 
 echo.
-echo ==============================================
+echo ----------------------------------------------
 echo ? 所有任务完成！
 echo 后端：docker.io/%BACKEND_IMAGE%
 echo 前端：docker.io/%FRONTEND_IMAGE%
-echo ==============================================
+echo ----------------------------------------------
 pause

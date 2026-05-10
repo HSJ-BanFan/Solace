@@ -11,12 +11,12 @@ import { PostMeta } from "./PostMeta";
 import { TagList } from "./TagList";
 import type { PostCardArticle } from "@/types";
 
-// ============ 常量 ============
+// ------------ 常量 ------------
 
 const COVER_WIDTH = "25%";
 const ARROW_WIDTH = "52px";
 
-// ============ 类型定义 ============
+// ------------ 类型定义 ------------
 
 interface PostCardProps {
 	article: PostCardArticle;
@@ -26,7 +26,7 @@ interface PostCardProps {
 	style?: React.CSSProperties;
 }
 
-// ============ 子组件 ============
+// ------------ 子组件 ------------
 
 /** 箭头图标 */
 function ArrowIcon({
@@ -144,7 +144,7 @@ function CardTags({
 	);
 }
 
-// ============ 主组件 ============
+// ------------ 主组件 ------------
 
 export function PostCard({
 	article,
