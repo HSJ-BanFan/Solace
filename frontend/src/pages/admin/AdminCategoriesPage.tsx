@@ -1,4 +1,8 @@
-import { useState } from "react";
+/**
+ * 分类管理页面
+ * 使用通用管理页面组件和 hooks
+ */
+
 import {
 	useCategories,
 	useCreateCategory,
@@ -6,15 +10,36 @@ import {
 	useDeleteCategory,
 } from "@/hooks";
 import {
-	AdminListSkeleton,
-	ErrorDisplay,
-	EmptyState,
-	EditDeleteButtons,
-	LoadingButton,
-	InputField,
-	TextAreaField,
-} from "@/components";
+	AdminPageLayout,
+	AdminPageState,
+	AdminForm,
+	AdminListContainer,
+	AdminListItem,
+} from "@/components/admin";
+import { InputField, TextAreaField } from "@/components";
+import {
+	useAdminFormState,
+	useDeleteHandler,
+	validateRequired,
+} from "@/hooks/useAdminForm";
 import type { Category } from "@/types";
+
+const INITIAL_VALUES = {
+	name: "",
+	slug: "",
+	description: "",
+	sortOrder: "0",
+};
+
+const REQUIRED_FIELDS = ["name"];
+
+/** 从分类实体获取表单值 */
+const getCategoryFormValues = (category: Category): Record<string, string> => ({
+	name: category.name,
+	slug: category.slug,
+	description: category.description || "",
+	sortOrder: String(category.sort_order),
+});
 
 export function AdminCategoriesPage() {
 	const { data: categories, isLoading, error } = useCategories();
@@ -22,198 +47,118 @@ export function AdminCategoriesPage() {
 	const updateMutation = useUpdateCategory();
 	const deleteMutation = useDeleteCategory();
 
-	const [showForm, setShowForm] = useState(false);
-	const [editingCategory, setEditingCategory] = useState<Category | null>(null);
-	const [name, setName] = useState("");
-	const [slug, setSlug] = useState("");
-	const [description, setDescription] = useState("");
-	const [sortOrder, setSortOrder] = useState("0");
-	const [errorForm, setErrorForm] = useState("");
-
-	const resetForm = () => {
-		setName("");
-		setSlug("");
-		setDescription("");
-		setSortOrder("0");
-		setErrorForm("");
-		setEditingCategory(null);
-		setShowForm(false);
-	};
-
-	const handleEdit = (category: Category) => {
-		setEditingCategory(category);
-		setName(category.name);
-		setSlug(category.slug);
-		setDescription(category.description || "");
-		setSortOrder(String(category.sort_order));
-		setShowForm(true);
-	};
-
-	const handleDelete = async (id: number) => {
-		if (!confirm("确定要删除这个分类吗？")) return;
-		try {
-			await deleteMutation.mutateAsync(id);
-		} catch (err) {
-			alert(err instanceof Error ? err.message : "删除失败");
-		}
-	};
+	const formState = useAdminFormState<Category>({ initialValues: INITIAL_VALUES });
+	const handleDelete = useDeleteHandler(deleteMutation, "分类");
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
-		setErrorForm("");
-
-		if (!name.trim()) {
-			setErrorForm("名称不能为空");
+		const validationError = validateRequired(formState.formValues, REQUIRED_FIELDS);
+		if (validationError) {
+			formState.setError(validationError);
 			return;
 		}
 
+		const data = {
+			name: formState.formValues.name ?? "",
+			slug: formState.formValues.slug || undefined,
+			description: formState.formValues.description ?? "",
+			sort_order: parseInt(formState.formValues.sortOrder ?? "0") || 0,
+		};
+
 		try {
-			if (editingCategory) {
-				await updateMutation.mutateAsync({
-					id: editingCategory.id,
-					data: {
-						name,
-						slug: slug || undefined,
-						description,
-						sort_order: parseInt(sortOrder) || 0,
-					},
-				});
+			if (formState.editEntity) {
+				await updateMutation.mutateAsync({ id: formState.editEntity.id, data });
 			} else {
-				await createMutation.mutateAsync({
-					name,
-					slug: slug || undefined,
-					description,
-					sort_order: parseInt(sortOrder) || 0,
-				});
+				await createMutation.mutateAsync(data);
 			}
-			resetForm();
+			formState.resetForm();
 		} catch (err) {
-			setErrorForm(err instanceof Error ? err.message : "保存失败");
+			formState.setError(err instanceof Error ? err.message : "保存失败");
 		}
 	};
 
-	if (error) {
-		return <ErrorDisplay message="加载分类列表失败" />;
+	const stateComponent = AdminPageState({
+		isLoading,
+		error,
+		isEmpty: !categories || categories.length === 0,
+		emptyIcon: "material-symbols:category-outline-rounded",
+		emptyMessage: "暂无分类",
+		errorMessage: "加载分类列表失败",
+	});
+
+	if (stateComponent) {
+		return (
+			<AdminPageLayout
+				title="分类管理"
+				newButtonLabel="新建分类"
+				onNewClick={() => formState.setShowForm(true)}
+			>
+				{stateComponent}
+			</AdminPageLayout>
+		);
 	}
 
 	return (
-		<div className="space-y-4">
-			{/* 新建按钮 */}
-			<div className="flex justify-end">
-				<button
-					onClick={() => setShowForm(true)}
-					className="btn-regular btn-sm py-1.5 px-3"
-				>
-					新建分类
-				</button>
-			</div>
-
-			{/* 表单 */}
-			{showForm && (
-				<form
+		<AdminPageLayout
+			title="分类管理"
+			newButtonLabel="新建分类"
+			onNewClick={() => formState.setShowForm(true)}
+		>
+			{formState.showForm && (
+				<AdminForm
 					onSubmit={handleSubmit}
-					className="card-base p-6 fade-in-up"
-					style={{ animationDelay: "0.1s" }}
+					error={formState.error}
+					onCancel={formState.resetForm}
+					submitLabel={formState.editEntity ? "更新" : "创建"}
+					isSubmitting={createMutation.isPending || updateMutation.isPending}
 				>
-					{errorForm && (
-						<div className="bg-red-500/10 text-red-500 rounded-[var(--radius-medium)] p-3 mb-4 text-sm">
-							{errorForm}
-						</div>
-					)}
-
 					<InputField
 						label="名称"
-						value={name}
-						onChange={setName}
+						value={formState.formValues.name ?? ""}
+						onChange={(v) => formState.setFormValue("name", v)}
 						placeholder="分类名称"
 						required
 					/>
 					<InputField
 						label="Slug"
-						value={slug}
-						onChange={setSlug}
+						value={formState.formValues.slug ?? ""}
+						onChange={(v) => formState.setFormValue("slug", v)}
 						placeholder="留空自动生成（基于名称）"
 					/>
 					<TextAreaField
 						label="描述"
-						value={description}
-						onChange={setDescription}
+						value={formState.formValues.description ?? ""}
+						onChange={(v) => formState.setFormValue("description", v)}
 						placeholder="分类简要描述"
 						rows={2}
 					/>
 					<InputField
 						label="排序"
 						type="number"
-						value={sortOrder}
-						onChange={setSortOrder}
+						value={formState.formValues.sortOrder ?? "0"}
+						onChange={(v) => formState.setFormValue("sortOrder", v)}
 						placeholder="排序顺序（数字越小越靠前）"
 					/>
-
-					<div className="flex gap-2 mt-4">
-						<LoadingButton
-							type="submit"
-							loading={createMutation.isPending || updateMutation.isPending}
-							className="btn-regular btn-sm py-1.5 px-4"
-						>
-							{editingCategory ? "更新" : "创建"}
-						</LoadingButton>
-						<button
-							type="button"
-							onClick={resetForm}
-							className="btn-plain btn-sm py-1.5 px-4"
-						>
-							取消
-						</button>
-					</div>
-				</form>
+				</AdminForm>
 			)}
 
-			{/* 分类列表 */}
-			{isLoading ? (
-				<AdminListSkeleton count={3} />
-			) : !categories || categories.length === 0 ? (
-				<EmptyState
-					icon="material-symbols:category-outline-rounded"
-					message="暂无分类"
-				/>
-			) : (
-				<div
-					className="card-base fade-in-up"
-					style={{ animationDelay: "0.15s" }}
-				>
-					<div className="divide-y divide-[var(--border-light)]">
-						{categories.map((category) => (
-							<div
-								key={category.id}
-								className="p-4 flex items-center gap-4 hover:bg-[var(--btn-plain-bg-hover)] transition-colors"
-							>
-								<div className="flex-1 min-w-0">
-									<div className="text-90 font-bold mb-1">{category.name}</div>
-									<div className="flex items-center gap-2 text-50 text-xs">
-										<span>Slug: {category.slug}</span>
-										<span>•</span>
-										<span className="px-2 py-0.5 rounded-full bg-[var(--btn-regular-bg)]">
-											{category.article_count || 0} 篇文章
-										</span>
-										<span>•</span>
-										<span>排序: {category.sort_order}</span>
-									</div>
-									{category.description && (
-										<div className="text-50 text-sm mt-1">
-											{category.description}
-										</div>
-									)}
-								</div>
-								<EditDeleteButtons
-									editOnClick={() => handleEdit(category)}
-									onDelete={() => handleDelete(category.id)}
-									deleteDisabled={deleteMutation.isPending}
-								/>
-							</div>
-						))}
-					</div>
-				</div>
-			)}
-		</div>
+			<AdminListContainer>
+				{categories!.map((category) => (
+					<AdminListItem
+						key={category.id}
+						title={category.name}
+						subtitle={category.description ?? undefined}
+						badges={[
+							{ label: `Slug: ${category.slug}` },
+							{ label: `${category.article_count ?? 0} 篇文章` },
+							{ label: `排序: ${category.sort_order}` },
+						]}
+						editOnClick={() => formState.handleEdit(category, getCategoryFormValues)}
+						onDelete={() => handleDelete(category.id)}
+						deleteDisabled={deleteMutation.isPending}
+					/>
+				))}
+			</AdminListContainer>
+		</AdminPageLayout>
 	);
 }

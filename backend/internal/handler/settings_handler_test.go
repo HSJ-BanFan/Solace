@@ -8,6 +8,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"gin-quickstart/internal/dto/response"
 	"gin-quickstart/internal/service"
 	"github.com/gin-gonic/gin"
 )
@@ -112,5 +113,51 @@ func TestSettingsHandlerRejectsUnknownFields(t *testing.T) {
 
 	if response.Code != http.StatusBadRequest {
 		t.Fatalf("response status = %d, want %d", response.Code, http.StatusBadRequest)
+	}
+}
+
+type fakeMomentService struct {
+	page     int
+	pageSize int
+}
+
+func (s *fakeMomentService) Create(ctx context.Context, content string) (*response.MomentResponse, error) {
+	panic("unexpected call")
+}
+
+func (s *fakeMomentService) GetByID(ctx context.Context, id uint) (*response.MomentResponse, error) {
+	panic("unexpected call")
+}
+
+func (s *fakeMomentService) GetList(ctx context.Context, page, pageSize int) (*response.MomentListResponse, error) {
+	s.page = page
+	s.pageSize = pageSize
+	return &response.MomentListResponse{Items: []*response.MomentResponse{}, Page: page, PageSize: pageSize, Total: 0}, nil
+}
+
+func (s *fakeMomentService) Delete(ctx context.Context, id uint) error {
+	panic("unexpected call")
+}
+
+func TestMomentHandlerClampsListQuery(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+	momentService := &fakeMomentService{}
+	handler := NewMomentHandler(momentService)
+	router := gin.New()
+	router.GET("/moments", handler.GetList)
+
+	response := httptest.NewRecorder()
+	request := httptest.NewRequest(http.MethodGet, "/moments?page=-1&pageSize=999", nil)
+
+	router.ServeHTTP(response, request)
+
+	if response.Code != http.StatusOK {
+		t.Fatalf("response status = %d, want %d; body = %q", response.Code, http.StatusOK, response.Body.String())
+	}
+	if momentService.page != 1 {
+		t.Fatalf("page = %d, want 1", momentService.page)
+	}
+	if momentService.pageSize != 50 {
+		t.Fatalf("pageSize = %d, want 50", momentService.pageSize)
 	}
 }

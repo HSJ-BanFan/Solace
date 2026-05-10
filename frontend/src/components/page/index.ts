@@ -3,3 +3,4 @@
  */
 
 export * from "./templates";
+export { ArticleListPage, HomePage, CategoryPage, TagPage } from "./ArticleListPage";

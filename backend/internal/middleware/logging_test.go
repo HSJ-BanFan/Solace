@@ -2,12 +2,16 @@ package middleware
 
 import (
 	"bytes"
+	"context"
 	"io"
 	"mime/multipart"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
+	"gin-quickstart/internal/dto/request"
+	"gin-quickstart/internal/dto/response"
+	"gin-quickstart/internal/pkg/jwt"
 	"github.com/gin-gonic/gin"
 )
 
@@ -83,5 +87,92 @@ func TestLoggingDoesNotConsumeMultipartRequestBody(t *testing.T) {
 
 	if response.Code != http.StatusNoContent {
 		t.Fatalf("response status = %d, want %d; body = %q", response.Code, http.StatusNoContent, response.Body.String())
+	}
+}
+
+type fakeMomentAuthService struct{}
+
+func (fakeMomentAuthService) Login(context.Context, *request.LoginRequest) (*response.AuthResponse, error) {
+	panic("unexpected call")
+}
+
+func (fakeMomentAuthService) Logout(context.Context, string) error {
+	panic("unexpected call")
+}
+
+func (fakeMomentAuthService) Refresh(context.Context, *request.RefreshTokenRequest) (*response.RefreshResponse, error) {
+	panic("unexpected call")
+}
+
+func (fakeMomentAuthService) ValidateAccessToken(string) (*jwt.Claims, error) {
+	return &jwt.Claims{UserID: 1, Username: "admin", Role: "admin"}, nil
+}
+
+func TestMomentAuthAcceptsMomentSecret(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+
+	router := gin.New()
+	router.Use(MomentAuth(fakeMomentAuthService{}, "secret"))
+	router.GET("/moments", func(c *gin.Context) {
+		if got := c.GetUint("user_id"); got != 0 {
+			t.Fatalf("user_id = %d, want 0", got)
+		}
+		if got := c.GetString("role"); got != "moment-secret" {
+			t.Fatalf("role = %q, want %q", got, "moment-secret")
+		}
+		c.Status(http.StatusOK)
+	})
+
+	req := httptest.NewRequest(http.MethodGet, "/moments", nil)
+	req.Header.Set("X-Moment-Secret", "secret")
+	rec := httptest.NewRecorder()
+
+	router.ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusOK {
+		t.Fatalf("status = %d, want %d; body = %q", rec.Code, http.StatusOK, rec.Body.String())
+	}
+}
+
+func TestMomentAuthFallsBackToJWT(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+
+	router := gin.New()
+	router.Use(MomentAuth(fakeMomentAuthService{}, "secret"))
+	router.GET("/moments", func(c *gin.Context) {
+		if got := c.GetUint("user_id"); got != 1 {
+			t.Fatalf("user_id = %d, want 1", got)
+		}
+		c.Status(http.StatusOK)
+	})
+
+	req := httptest.NewRequest(http.MethodGet, "/moments", nil)
+	req.Header.Set("Authorization", "Bearer token")
+	rec := httptest.NewRecorder()
+
+	router.ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusOK {
+		t.Fatalf("status = %d, want %d; body = %q", rec.Code, http.StatusOK, rec.Body.String())
+	}
+}
+
+func TestMomentAuthRejectsInvalidMomentSecret(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+
+	router := gin.New()
+	router.Use(MomentAuth(fakeMomentAuthService{}, "secret"))
+	router.GET("/moments", func(c *gin.Context) {
+		c.Status(http.StatusOK)
+	})
+
+	req := httptest.NewRequest(http.MethodGet, "/moments", nil)
+	req.Header.Set("X-Moment-Secret", "wrong-secret")
+	rec := httptest.NewRecorder()
+
+	router.ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusUnauthorized {
+		t.Fatalf("status = %d, want %d; body = %q", rec.Code, http.StatusUnauthorized, rec.Body.String())
 	}
 }

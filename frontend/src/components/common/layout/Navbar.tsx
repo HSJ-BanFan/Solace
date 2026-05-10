@@ -13,6 +13,11 @@ import { useState, useRef, useMemo, useCallback } from "react";
 const staticNavLinks = [
 	{ name: "首页", path: "/", icon: "material-symbols:home-outline-rounded" },
 	{
+		name: "瞬间",
+		path: "/moments",
+		icon: "material-symbols:chat-bubble-outline-rounded",
+	},
+	{
 		name: "归档",
 		path: "/archive",
 		icon: "material-symbols:archive-outline-rounded",

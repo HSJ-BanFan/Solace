@@ -37,6 +37,7 @@ type ServerConfig struct {
 	SearchRateLimit   int      `toml:"search_rate_limit"`    // 搜索接口每分钟限制
 	EnableSwagger     bool     `toml:"enable_swagger"`       // 是否启用 Swagger 文档
 	MaxSearchQueryLen int      `toml:"max_search_query_len"` // 搜索查询最大长度，默认 100
+	MomentSecret      string   `toml:"moment_secret"`        // moment接口密钥，用于简化认证
 }
 
 // DatabaseConfig 数据库配置
@@ -178,6 +179,7 @@ func (c *Config) MaxSearchQueryLen() int {
 	}
 	return c.Server.MaxSearchQueryLen
 }
+func (c *Config) MomentSecret() string { return c.Server.MomentSecret }
 
 // Logging 配置访问器
 func (c *Config) LogLevel() string      { return c.Logging.Level }

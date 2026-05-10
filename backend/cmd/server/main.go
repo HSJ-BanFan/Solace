@@ -100,6 +100,8 @@ func main() {
 	pageRepo := repository.NewPageRepository(db)
 	settingsRepo := repository.NewSettingsRepository(db)
 	mediaRepo := repository.NewMediaAssetRepository(db)
+	momentRepo := repository.NewMomentRepository(db)
+
 	settingsSchemaCtx, cancelSettingsSchema := context.WithTimeout(context.Background(), 10*time.Second)
 	if err := ensureSettingsSchema(settingsSchemaCtx, settingsRepo); err != nil {
 		cancelSettingsSchema()
@@ -129,7 +131,6 @@ func main() {
 	cancelArticleSchema()
 
 	// 初始化 JWT 管理器
-
 	jwtManager := jwt.NewJWTManager(
 		cfg.JWTSecret(),
 		cfg.JWTAccessDuration(),
@@ -145,11 +146,12 @@ func main() {
 	ownerService := service.NewOwnerService(cfg)
 	githubService := service.NewGitHubService(cfg)
 	mediaService := service.NewMediaService(mediaRepo, cfg)
-	articleService := service.NewArticleService(articleRepo, categoryRepo, tagRepo)
+	articleService := service.NewArticleService(articleRepo, categoryRepo, tagRepo, momentRepo)
 	categoryService := service.NewCategoryService(categoryRepo)
 	tagService := service.NewTagService(tagRepo)
 	pageService := service.NewPageService(pageRepo)
 	settingsService := service.NewSettingsService(settingsRepo)
+	momentService := service.NewMomentService(momentRepo)
 
 	// 初始化处理器
 	authHandler := handler.NewAuthHandler(authService)
@@ -163,6 +165,7 @@ func main() {
 	pageHandler := handler.NewPageHandler(pageService, mediaService)
 	settingsHandler := handler.NewSettingsHandler(settingsService)
 	mediaHandler := handler.NewMediaHandler(mediaService)
+	momentHandler := handler.NewMomentHandler(momentService)
 	uploadHandler, err := handler.NewUploadHandler(cfg)
 	if err != nil {
 		logger.Fatal().Err(err).Msg("上传处理器初始化失败")
@@ -183,6 +186,7 @@ func main() {
 		uploadHandler,
 		settingsHandler,
 		mediaHandler,
+		momentHandler,
 	)
 	r, limiters := appRouter.Setup(cfg)
 

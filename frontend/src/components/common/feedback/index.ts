@@ -2,8 +2,8 @@
  * 反馈组件导出
  */
 
-export { LoadingState, InlineLoader, EmptyState } from "./LoadingState";
-export { ErrorDisplay, NotFoundDisplay, StatusDisplay } from "./ErrorDisplay";
+export { LoadingState, InlineLoader } from "./LoadingState";
+export { ErrorDisplay, NotFoundDisplay, EmptyState, StatusDisplay } from "./ErrorDisplay";
 export {
 	PostCardSkeleton,
 	PostCardSkeletonList,

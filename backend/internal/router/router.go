@@ -28,6 +28,7 @@ type Router struct {
 	uploadHandler   *handler.UploadHandler
 	settingsHandler *handler.SettingsHandler
 	mediaHandler    *handler.MediaHandler
+	momentHandler   *handler.MomentHandler
 	authService     service.AuthService
 }
 
@@ -46,6 +47,7 @@ func NewRouter(
 	uploadHandler *handler.UploadHandler,
 	settingsHandler *handler.SettingsHandler,
 	mediaHandler *handler.MediaHandler,
+	momentHandler *handler.MomentHandler,
 ) *Router {
 	return &Router{
 		authHandler:     authHandler,
@@ -61,6 +63,7 @@ func NewRouter(
 		uploadHandler:   uploadHandler,
 		settingsHandler: settingsHandler,
 		mediaHandler:    mediaHandler,
+		momentHandler:   momentHandler,
 	}
 }
 
@@ -117,6 +120,25 @@ func (r *Router) Setup(cfg *config.Config) (*gin.Engine, []*middleware.RateLimit
 		v1.GET("/pages/slug/:slug", r.pageHandler.GetBySlug)
 		v1.GET("/settings/images", r.settingsHandler.GetImageSettings)
 		v1.Static("/uploads/images", r.uploadHandler.ImageDir())
+
+		// 公开说说路由
+		moments := v1.Group("/moments")
+		{
+			moments.GET("", r.momentHandler.GetList)
+		}
+
+		// Moment 创建路由（支持 JWT 或 moment-secret 认证）
+		momentCreate := v1.Group("/moments")
+		if cfg.RateLimit() > 0 {
+			limiter := middleware.NewRateLimiter(cfg.RateLimit(), time.Minute)
+			limiters = append(limiters, limiter)
+			momentCreate.Use(middleware.RateLimit(limiter))
+		}
+		momentCreate.Use(middleware.MomentAuth(r.authService, cfg.MomentSecret()))
+		{
+			momentCreate.POST("", r.momentHandler.Create)
+		}
+
 		auth := v1.Group("/auth")
 		{
 			if cfg.RateLimit() > 0 {
@@ -210,6 +232,13 @@ func (r *Router) Setup(cfg *config.Config) (*gin.Engine, []*middleware.RateLimit
 			}
 			{
 				protectedUploads.POST("/images", r.uploadHandler.UploadImage)
+			}
+
+			// 受保护的说说路由
+			protectedMoments := protected.Group("/moments")
+			{
+				protectedMoments.GET("/:id", r.momentHandler.GetByID)
+				protectedMoments.DELETE("/:id", r.momentHandler.Delete)
 			}
 		}
 	}

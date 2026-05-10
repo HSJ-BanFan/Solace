@@ -14,6 +14,7 @@ import { Outlet, useLocation, Link } from "react-router-dom";
 import { Navbar, Footer } from "@/components/common";
 import { SafeIcon } from "@/components/common/ui";
 import { useAuthStore } from "@/stores";
+import { useMediaQuery } from "@/hooks";
 
 /** 侧边栏导航项 */
 const navItems = [
@@ -25,7 +26,12 @@ const navItems = [
 	{
 		name: "页面管理",
 		path: "/admin/pages",
-		icon: "material-symbols:web-outline-rounded",
+		icon: "material-symbols:dashboard-outline-rounded",
+	},
+	{
+		name: "瞬间管理",
+		path: "/admin/moments",
+		icon: "material-symbols:chat-bubble-outline-rounded",
 	},
 	{
 		name: "分类管理",
@@ -48,6 +54,10 @@ export function AdminLayout() {
 	const { user } = useAuthStore();
 	const location = useLocation();
 
+	// 计算 min-height 以补偿 zoom: 0.95
+	const isZoomed = useMediaQuery("(min-width: 1024px) and (max-width: 2560px)");
+	const minHeight = isZoomed ? "105.26vh" : "100vh";
+
 	/** 判断导航项是否激活 */
 	const isActive = (path: string) => {
 		if (path === "/admin") {
@@ -58,6 +68,9 @@ export function AdminLayout() {
 		}
 		if (path === "/admin/pages") {
 			return location.pathname.startsWith("/admin/pages");
+		}
+		if (path === "/admin/moments") {
+			return location.pathname.startsWith("/admin/moments");
 		}
 		if (path === "/admin/categories") {
 			return location.pathname.startsWith("/admin/categories");
@@ -72,7 +85,7 @@ export function AdminLayout() {
 	};
 
 	return (
-		<div className="min-h-screen flex flex-col">
+		<div className="flex flex-col" style={{ minHeight }}>
 			{/* 顶部导航栏 */}
 			<Navbar />
 
@@ -97,18 +110,18 @@ export function AdminLayout() {
 									<Link
 										key={item.path}
 										to={item.path}
-										className={`rounded-lg py-2 px-3 text-sm transition flex items-center ${
+										className={`rounded-lg py-2 px-3 text-sm transition flex items-center gap-2 ${
 											isActive(item.path)
 												? "bg-[var(--btn-regular-bg)] text-[var(--primary)] font-medium"
-												: "btn-plain"
+												: "text-75 hover:bg-[var(--btn-plain-bg-hover)]"
 										}`}
 									>
 										<SafeIcon
 											icon={item.icon}
 											size="1.125rem"
-											className="mr-2"
+											className="flex-shrink-0"
 										/>
-										{item.name}
+										<span className="whitespace-nowrap">{item.name}</span>
 									</Link>
 								))}
 							</nav>

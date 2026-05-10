@@ -18,7 +18,7 @@ function extractGitHubUsername(url: string | undefined | null): string | null {
 /**
  * 获取 GitHub 贡献数据
  */
-export function useGitHubContributions() {
+export function useGitHubContributions(enabled = true) {
 	const { data: owner } = useOwner();
 	const githubUsername = extractGitHubUsername(owner?.github_url);
 
@@ -32,7 +32,7 @@ export function useGitHubContributions() {
 				error?: { message?: string };
 			});
 		},
-		enabled: !!githubUsername,
+		enabled: !!githubUsername && enabled,
 		staleTime: 60 * 60 * 1000,
 		gcTime: 24 * 60 * 60 * 1000,
 		retry: 1,

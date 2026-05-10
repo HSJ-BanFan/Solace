@@ -17,4 +17,5 @@ export { TableOfContents, type TocHeading } from "./TableOfContents";
 export { ContributionCalendar } from "./ContributionCalendar";
 export { ProjectCard } from "./ProjectCard";
 export { FootprintCard } from "./FootprintCard";
+export { RecentMoments } from "./RecentMoments";
 // FootprintsMap 移除静态导出 - 使用懒加载防止 ECharts 打入首屏

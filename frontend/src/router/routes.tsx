@@ -28,6 +28,9 @@ const TagPage = lazy(() =>
 const PageDetailPage = lazy(() =>
 	import("@/pages/PageDetailPage").then((m) => ({ default: m.PageDetailPage })),
 );
+const MomentsPage = lazy(() =>
+	import("@/pages/MomentsPage").then((m) => ({ default: m.MomentsPage })),
+);
 const NotFoundPage = lazy(() =>
 	import("@/pages/NotFoundPage").then((m) => ({ default: m.NotFoundPage })),
 );
@@ -73,6 +76,16 @@ const ImageSettingsPage = lazy(() =>
 		default: m.ImageSettingsPage,
 	})),
 );
+const AdminMomentsPage = lazy(() =>
+	import("@/pages/admin/AdminMomentsPage").then((m) => ({
+		default: m.AdminMomentsPage,
+	})),
+);
+const MomentEditorPage = lazy(() =>
+	import("@/pages/admin/MomentEditorPage").then((m) => ({
+		default: m.MomentEditorPage,
+	})),
+);
 
 // ============ Fallback 组件 ============
 const skeletons = {
@@ -108,6 +121,7 @@ export const routes = {
 			Component: PageDetailPage,
 			fallback: skeletons.single,
 		},
+		{ path: "/moments", Component: MomentsPage, fallback: skeletons.list },
 	],
 
 	// 认证路由
@@ -152,6 +166,8 @@ export const routes = {
 			Component: ImageSettingsPage,
 			fallback: skeletons.center,
 		},
+		{ path: "/admin/moments", Component: AdminMomentsPage, fallback: skeletons.list },
+		{ path: "/admin/moments/new", Component: MomentEditorPage, fallback: skeletons.center },
 	],
 
 	// 404 页面

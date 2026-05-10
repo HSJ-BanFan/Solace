@@ -80,3 +80,12 @@ type MediaAssetRepository interface {
 	ListOrphanedAssets(ctx context.Context, olderThan time.Time, limit int) ([]*model.MediaAsset, error)
 	DeleteAssetByID(ctx context.Context, assetID uint) error
 }
+
+// MomentRepository 说说数据访问接口
+type MomentRepository interface {
+	FindByID(ctx context.Context, id uint) (*model.Moment, error)
+	FindAll(ctx context.Context, limit, offset int) ([]*model.Moment, int64, error)
+	GetContributions(ctx context.Context, from, to time.Time) ([]*model.Moment, error)
+	Create(ctx context.Context, moment *model.Moment) error
+	Delete(ctx context.Context, id uint) error
+}
