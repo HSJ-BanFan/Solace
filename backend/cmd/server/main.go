@@ -67,6 +67,13 @@ func ensureArticleSchema(ctx context.Context, articleRepo repository.ArticleRepo
 	return nil
 }
 
+func ensureMomentSchema(ctx context.Context, momentRepo repository.MomentRepository) error {
+	if err := momentRepo.EnsureTable(ctx); err != nil {
+		return fmt.Errorf("ensure moments schema: %w", err)
+	}
+	return nil
+}
+
 func main() {
 	// 加载配置
 	cfg := config.Load()
@@ -129,6 +136,13 @@ func main() {
 		logger.Fatal().Err(err).Msg("article search schema init failed")
 	}
 	cancelArticleSchema()
+
+	momentSchemaCtx, cancelMomentSchema := context.WithTimeout(context.Background(), 10*time.Second)
+	if err := ensureMomentSchema(momentSchemaCtx, momentRepo); err != nil {
+		cancelMomentSchema()
+		logger.Fatal().Err(err).Msg("moments schema init failed")
+	}
+	cancelMomentSchema()
 
 	// 初始化 JWT 管理器
 	jwtManager := jwt.NewJWTManager(

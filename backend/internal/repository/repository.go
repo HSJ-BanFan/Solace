@@ -83,6 +83,7 @@ type MediaAssetRepository interface {
 
 // MomentRepository 说说数据访问接口
 type MomentRepository interface {
+	EnsureTable(ctx context.Context) error
 	FindByID(ctx context.Context, id uint) (*model.Moment, error)
 	FindAll(ctx context.Context, limit, offset int) ([]*model.Moment, int64, error)
 	GetContributions(ctx context.Context, from, to time.Time) ([]*model.Moment, error)

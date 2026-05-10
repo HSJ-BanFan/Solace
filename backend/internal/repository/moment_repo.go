@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"gin-quickstart/internal/model"
@@ -17,6 +18,13 @@ type momentRepo struct {
 // NewMomentRepository 创建说说仓储
 func NewMomentRepository(db *gorm.DB) MomentRepository {
 	return &momentRepo{db: db}
+}
+
+func (r *momentRepo) EnsureTable(ctx context.Context) error {
+	if err := r.db.WithContext(ctx).AutoMigrate(&model.Moment{}); err != nil {
+		return fmt.Errorf("ensure moments table: %w", err)
+	}
+	return nil
 }
 
 func (r *momentRepo) FindByID(ctx context.Context, id uint) (*model.Moment, error) {
