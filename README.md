@@ -309,6 +309,7 @@ npm run lint
 [server]
 port = 8080
 mode = "debug"  # debug, release, test
+moment_secret = ""  # optional shared secret for POST /api/v1/moments via X-Moment-Secret
 
 [database]
 host = "localhost"
@@ -320,6 +321,12 @@ password = "your_password"
 [jwt]
 secret = "your_jwt_secret"
 expire = 24  # hours
+```
+
+Generate `moment_secret` with:
+
+```bash
+openssl rand -base64 32
 ```
 
 ### Frontend Environment

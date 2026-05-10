@@ -16,13 +16,13 @@ import { useEffect, useRef, useState, useMemo, useCallback } from "react";
 import { useCategories, useArchive } from "@/hooks";
 import { SafeIcon } from "@/components/common/ui";
 
-// ============ 类型定义 ============
+// ------------ 类型定义 ------------
 
 interface CategoryBarProps {
 	className?: string;
 }
 
-// ============ 常量 ============
+// ------------ 常量 ------------
 
 /** 按钮基础样式 */
 const PILL_BASE_CLASS =
@@ -36,7 +36,7 @@ const PILL_ACTIVE_CLASS =
 const PILL_INACTIVE_CLASS =
 	"border-[var(--line-divider)] text-[var(--btn-content)] hover:border-[var(--primary)] hover:text-[var(--primary)]";
 
-// ============ 子组件 ============
+// ------------ 子组件 ------------
 
 /** 滚动渐变遮罩 */
 function FadeMask({ side }: { side: "left" | "right" }) {
@@ -122,7 +122,7 @@ function NavPill({
 	);
 }
 
-// ============ 主组件 ============
+// ------------ 主组件 ------------
 
 export function CategoryBar({ className }: CategoryBarProps) {
 	const { data: categories, isLoading } = useCategories();

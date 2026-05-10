@@ -9,6 +9,7 @@ rate_limit = 0
 search_rate_limit = 0
 enable_swagger = true
 max_search_query_len = 100
+moment_secret = ""  # optional shared secret for POST /api/v1/moments; use X-Moment-Secret; generate: openssl rand -base64 32
 
 [database]
 host = "localhost"
@@ -19,7 +20,7 @@ name = "blog"
 sslmode = "disable"
 
 [jwt]
-secret = "your-secret-key-change-in-production"
+secret = ""  # required: set a real JWT secret before starting
 access_duration = 15      # 分钟
 refresh_duration = 10080  # 分钟 (7天)
 
@@ -38,7 +39,7 @@ path = "migrations"
 [admin]
 username = "admin"
 email = "admin@example.com"
-password = "admin123"
+password = ""  # required: set a strong admin password before starting
 nickname = "博主"
 avatar_url = ""
 bio = "欢迎来到我的博客"

@@ -747,6 +747,7 @@ const docTemplate = `{
                 "summary": "获取说说列表",
                 "parameters": [
                     {
+                        "minimum": 1,
                         "type": "integer",
                         "default": 1,
                         "description": "页码",
@@ -754,6 +755,8 @@ const docTemplate = `{
                         "in": "query"
                     },
                     {
+                        "maximum": 50,
+                        "minimum": 1,
                         "type": "integer",
                         "default": 5,
                         "description": "每页数量",

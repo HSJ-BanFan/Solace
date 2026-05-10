@@ -79,8 +79,8 @@ func (h *MomentHandler) GetByID(c *gin.Context) {
 // @Summary 获取说说列表
 // @Tags moment
 // @Produce json
-// @Param page query int false "页码" default(1)
-// @Param pageSize query int false "每页数量" default(5)
+// @Param page query int false "页码" minimum(1) default(1)
+// @Param pageSize query int false "每页数量" minimum(1) maximum(50) default(5)
 // @Success 200 {object} Response
 // @Router /moments [get]
 func (h *MomentHandler) GetList(c *gin.Context) {

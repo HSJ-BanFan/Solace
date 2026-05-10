@@ -3,7 +3,7 @@
  *
  * 提供统一的分页逻辑，减少重复代码
  */
-
+import { useState } from "react";
 import { useSearchParams } from "react-router-dom";
 
 interface UsePaginationOptions {
@@ -65,5 +65,3 @@ export function useSimplePagination(options: UsePaginationOptions = {}) {
 
 	return { page, pageSize, handlePageChange, setPage };
 }
-
-import { useState } from "react";

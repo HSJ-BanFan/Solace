@@ -86,18 +86,6 @@ export function AdminCategoriesPage() {
 		errorMessage: "加载分类列表失败",
 	});
 
-	if (stateComponent) {
-		return (
-			<AdminPageLayout
-				title="分类管理"
-				newButtonLabel="新建分类"
-				onNewClick={() => formState.setShowForm(true)}
-			>
-				{stateComponent}
-			</AdminPageLayout>
-		);
-	}
-
 	return (
 		<AdminPageLayout
 			title="分类管理"
@@ -142,23 +130,25 @@ export function AdminCategoriesPage() {
 				</AdminForm>
 			)}
 
-			<AdminListContainer>
-				{categories!.map((category) => (
-					<AdminListItem
-						key={category.id}
-						title={category.name}
-						subtitle={category.description ?? undefined}
-						badges={[
-							{ label: `Slug: ${category.slug}` },
-							{ label: `${category.article_count ?? 0} 篇文章` },
-							{ label: `排序: ${category.sort_order}` },
-						]}
-						editOnClick={() => formState.handleEdit(category, getCategoryFormValues)}
-						onDelete={() => handleDelete(category.id)}
-						deleteDisabled={deleteMutation.isPending}
-					/>
-				))}
-			</AdminListContainer>
+			{stateComponent ?? (
+				<AdminListContainer>
+					{categories!.map((category) => (
+						<AdminListItem
+							key={category.id}
+							title={category.name}
+							subtitle={category.description ?? undefined}
+							badges={[
+								{ label: `Slug: ${category.slug}` },
+								{ label: `${category.article_count ?? 0} 篇文章` },
+								{ label: `排序: ${category.sort_order}` },
+							]}
+							editOnClick={() => formState.handleEdit(category, getCategoryFormValues)}
+							onDelete={() => handleDelete(category.id)}
+							deleteDisabled={deleteMutation.isPending}
+						/>
+					))}
+				</AdminListContainer>
+			)}
 		</AdminPageLayout>
 	);
 }

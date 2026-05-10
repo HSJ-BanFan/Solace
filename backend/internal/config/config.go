@@ -40,6 +40,8 @@ type ServerConfig struct {
 	MomentSecret      string   `toml:"moment_secret"`        // moment接口密钥，用于简化认证
 }
 
+const recommendedMomentSecretLength = 32
+
 // DatabaseConfig 数据库配置
 type DatabaseConfig struct {
 	Host     string `toml:"host"`
@@ -180,6 +182,14 @@ func (c *Config) MaxSearchQueryLen() int {
 	return c.Server.MaxSearchQueryLen
 }
 func (c *Config) MomentSecret() string { return c.Server.MomentSecret }
+
+func (c *Config) MomentSecretWarning() string {
+	secret := strings.TrimSpace(c.Server.MomentSecret)
+	if secret == "" || len(secret) >= recommendedMomentSecretLength {
+		return ""
+	}
+	return fmt.Sprintf("server.moment_secret is shorter than recommended (%d < %d); generate one with: openssl rand -base64 32", len(secret), recommendedMomentSecretLength)
+}
 
 // Logging 配置访问器
 func (c *Config) LogLevel() string      { return c.Logging.Level }

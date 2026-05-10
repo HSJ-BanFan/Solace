@@ -758,11 +758,14 @@ paths:
       - default: 1
         description: 页码
         in: query
+        minimum: 1
         name: page
         type: integer
       - default: 5
         description: 每页数量
         in: query
+        maximum: 50
+        minimum: 1
         name: pageSize
         type: integer
       produces:

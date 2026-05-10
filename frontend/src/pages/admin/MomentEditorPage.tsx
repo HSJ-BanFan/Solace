@@ -20,6 +20,7 @@ export function MomentEditorPage() {
 		handleSubmit,
 		formState: { errors },
 		reset,
+		setValue,
 		watch,
 	} = useForm<MomentFormData>({
 		resolver: zodResolver(momentSchema),
@@ -60,7 +61,7 @@ export function MomentEditorPage() {
 						placeholder="写下你的想法..."
 						rows={6}
 						value={content}
-						onChange={(value) => reset({ content: value })}
+						onChange={(value) => setValue("content", value, { shouldValidate: true, shouldDirty: true })}
 						error={errors.content?.message}
 					/>
 				</div>

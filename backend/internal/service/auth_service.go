@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"strings"
 	"sync"
 	"time"
 
@@ -15,8 +16,9 @@ import (
 )
 
 const (
-	maxLoginAttempts = 5
-	lockoutDuration  = 15 * time.Minute
+	maxLoginAttempts    = 5
+	lockoutDuration     = 15 * time.Minute
+	attemptRetentionTTL = lockoutDuration
 )
 
 // 认证相关错误
@@ -36,8 +38,9 @@ type AuthService interface {
 
 // loginAttempt 登录尝试记录
 type loginAttempt struct {
-	count    int
-	lockedAt time.Time
+	count         int
+	lockedAt      time.Time
+	lastAttemptAt time.Time
 }
 
 // authService 认证服务实现
@@ -65,63 +68,105 @@ func NewAuthService(
 
 func (s *authService) Login(ctx context.Context, req *request.LoginRequest) (*response.AuthResponse, error) {
 	log := logger.WithContext(ctx)
+	log.Info().Msg("登录尝试")
 
-	log.Info().Str("email", req.Email).Msg("登录尝试")
+	now := time.Now()
+	email := normalizeLoginEmail(req.Email)
+	adminEmail := normalizeLoginEmail(s.cfg.AdminEmail())
 
-	if s.isAccountLocked(req.Email) {
-		log.Warn().Str("email", req.Email).Msg("账户已锁定")
+	s.mu.Lock()
+	s.cleanupExpiredAttempts(now)
+
+	if s.isAccountLockedLocked(email, now) {
+		s.mu.Unlock()
+		log.Warn().Msg("账户已锁定")
 		return nil, ErrAccountLocked
 	}
 
-	if req.Email != s.cfg.AdminEmail() {
-		log.Warn().Str("email", req.Email).Msg("邮箱不匹配")
-		s.recordFailedAttempt(req.Email)
+	if email != adminEmail {
+		s.recordFailedAttemptLocked(email, now)
+		s.mu.Unlock()
+		log.Warn().Msg("登录失败")
 		return nil, ErrInvalidCredentials
 	}
 
 	if !hash.CheckPassword(req.Password, s.cfg.AdminPasswordHash()) {
-		log.Warn().Str("email", req.Email).Msg("密码错误")
-		s.recordFailedAttempt(req.Email)
+		s.recordFailedAttemptLocked(email, now)
+		s.mu.Unlock()
+		log.Warn().Msg("登录失败")
 		return nil, ErrInvalidCredentials
 	}
 
-	s.resetAttempts(req.Email)
+	delete(s.attempts, email)
+	s.mu.Unlock()
 
-	log.Info().Str("email", req.Email).Msg("登录成功")
+	log.Info().Msg("登录成功")
 	return s.generateTokens()
 }
 
-func (s *authService) isAccountLocked(email string) bool {
-	s.mu.RLock()
-	defer s.mu.RUnlock()
+func normalizeLoginEmail(email string) string {
+	return strings.ToLower(strings.TrimSpace(email))
+}
 
+func (s *authService) isAccountLocked(email string) bool {
+	now := time.Now()
+	normalizedEmail := normalizeLoginEmail(email)
+
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	s.cleanupExpiredAttempts(now)
+	return s.isAccountLockedLocked(normalizedEmail, now)
+}
+
+func (s *authService) isAccountLockedLocked(email string, now time.Time) bool {
 	attempt, exists := s.attempts[email]
 	if !exists {
 		return false
 	}
 
-	if attempt.count >= maxLoginAttempts {
-		if time.Since(attempt.lockedAt) < lockoutDuration {
-			return true
-		}
+	if attempt.count < maxLoginAttempts {
+		return false
 	}
 
-	return false
+	if now.Sub(attempt.lockedAt) >= lockoutDuration {
+		delete(s.attempts, email)
+		return false
+	}
+
+	return true
 }
 
 func (s *authService) recordFailedAttempt(email string) {
+	now := time.Now()
+	normalizedEmail := normalizeLoginEmail(email)
+
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
+	s.cleanupExpiredAttempts(now)
+	s.recordFailedAttemptLocked(normalizedEmail, now)
+}
+
+func (s *authService) recordFailedAttemptLocked(email string, now time.Time) {
 	attempt, exists := s.attempts[email]
 	if !exists {
-		attempt = &loginAttempt{count: 0}
+		attempt = &loginAttempt{}
 		s.attempts[email] = attempt
 	}
 
 	attempt.count++
+	attempt.lastAttemptAt = now
 	if attempt.count >= maxLoginAttempts {
-		attempt.lockedAt = time.Now()
+		attempt.lockedAt = now
+	}
+}
+
+func (s *authService) cleanupExpiredAttempts(now time.Time) {
+	for email, attempt := range s.attempts {
+		if now.Sub(attempt.lastAttemptAt) >= attemptRetentionTTL {
+			delete(s.attempts, email)
+		}
 	}
 }
 

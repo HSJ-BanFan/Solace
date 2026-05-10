@@ -9,7 +9,7 @@ import { SearchModal } from "@/components/widget";
 import { getSiteName } from "@/config/runtime";
 import { useState, useRef, useMemo, useCallback } from "react";
 
-// ============ 常量定义 ============
+// ------------ 常量定义 ------------
 const staticNavLinks = [
 	{ name: "首页", path: "/", icon: "material-symbols:home-outline-rounded" },
 	{

@@ -18,7 +18,7 @@ import {
 } from "./EditorComponents";
 import type { Project } from "@/types";
 
-// ============ 常量 ============
+// ------------ 常量 ------------
 
 const EMPTY_PROJECT: Project = {
 	name: "",
@@ -45,7 +45,7 @@ const STATUS_OPTIONS = [
 	},
 ];
 
-// ============ 子组件 ============
+// ------------ 子组件 ------------
 
 /** 项目列表项 */
 function ProjectItem({
@@ -113,7 +113,7 @@ function ProjectItem({
 	);
 }
 
-// ============ 主组件 ============
+// ------------ 主组件 ------------
 
 interface ProjectsEditorProps {
 	projects: Project[];

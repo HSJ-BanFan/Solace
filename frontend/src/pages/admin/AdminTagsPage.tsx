@@ -75,18 +75,6 @@ export function AdminTagsPage() {
 		errorMessage: "加载标签列表失败",
 	});
 
-	if (stateComponent) {
-		return (
-			<AdminPageLayout
-				title="标签管理"
-				newButtonLabel="新建标签"
-				onNewClick={() => formState.setShowForm(true)}
-			>
-				{stateComponent}
-			</AdminPageLayout>
-		);
-	}
-
 	return (
 		<AdminPageLayout
 			title="标签管理"
@@ -117,21 +105,23 @@ export function AdminTagsPage() {
 				</AdminForm>
 			)}
 
-			<AdminListContainer>
-				{tags!.map((tag) => (
-					<AdminListItem
-						key={tag.id}
-						title={tag.name}
-						badges={[
-							{ label: `Slug: ${tag.slug}` },
-							{ label: `${tag.article_count ?? 0} 篇文章` },
-						]}
-						editOnClick={() => formState.handleEdit(tag, getTagFormValues)}
-						onDelete={() => handleDelete(tag.id)}
-						deleteDisabled={deleteMutation.isPending}
-					/>
-				))}
-			</AdminListContainer>
+			{stateComponent ?? (
+				<AdminListContainer>
+					{tags!.map((tag) => (
+						<AdminListItem
+							key={tag.id}
+							title={tag.name}
+							badges={[
+								{ label: `Slug: ${tag.slug}` },
+								{ label: `${tag.article_count ?? 0} 篇文章` },
+							]}
+							editOnClick={() => formState.handleEdit(tag, getTagFormValues)}
+							onDelete={() => handleDelete(tag.id)}
+							deleteDisabled={deleteMutation.isPending}
+						/>
+					))}
+				</AdminListContainer>
+			)}
 		</AdminPageLayout>
 	);
 }

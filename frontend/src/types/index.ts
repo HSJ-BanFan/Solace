@@ -4,7 +4,7 @@
  * 包含 API 响应、数据模型、组件属性等类型
  */
 
-// ============ API 响应类型 ============
+// ------------ API 响应类型 ------------
 
 /** 通用 API 响应 */
 export interface ApiResponse<T> {
@@ -26,7 +26,7 @@ export interface PagedResponse<T> {
 	totalPages: number;
 }
 
-// ============ 设置类型 ============
+// ------------ 设置类型 ------------
 
 export interface ImageSettings {
 	defaultWidth: number;
@@ -34,7 +34,7 @@ export interface ImageSettings {
 	appendWidthToPastedImages: boolean;
 }
 
-// ============ 用户类型 ============
+// ------------ 用户类型 ------------
 
 /** 用户信息 */
 export interface User {
@@ -63,7 +63,7 @@ export interface Owner {
 	sitemap_url?: string;
 }
 
-// ============ 分类类型 ============
+// ------------ 分类类型 ------------
 
 /** 分类 */
 export interface Category {
@@ -78,7 +78,7 @@ export interface Category {
 	updated_at: string;
 }
 
-// ============ 标签类型 ============
+// ------------ 标签类型 ------------
 
 /** 标签 */
 export interface Tag {
@@ -90,7 +90,7 @@ export interface Tag {
 	updated_at: string;
 }
 
-// ============ 文章类型 ============
+// ------------ 文章类型 ------------
 
 /** 文章详情 */
 export interface Article {
@@ -145,7 +145,7 @@ export interface ArchiveGroup {
 	posts: ArticleSummary[];
 }
 
-// ============ 组件属性类型 ============
+// ------------ 组件属性类型 ------------
 
 /** 分页组件属性 */
 export interface PaginationProps {
@@ -161,7 +161,7 @@ export interface SearchProps {
 	initialValue?: string;
 }
 
-// ============ 请求类型 ============
+// ------------ 请求类型 ------------
 
 /** 创建文章请求 */
 export interface CreateArticleRequest {
@@ -186,7 +186,7 @@ export interface UpdateArticleRequest {
 	version: number;
 }
 
-// ============ 展示类型 ============
+// ------------ 展示类型 ------------
 
 /** 文章卡片展示数据（精简字段） */
 export interface PostCardArticle {
@@ -204,7 +204,7 @@ export interface PostCardArticle {
 	updated_at: string;
 }
 
-// ============ 页面类型 ============
+// ------------ 页面类型 ------------
 
 /** 页面模板类型 */
 export type PageTemplate = "default" | "about" | "projects" | "footprints";
@@ -248,7 +248,7 @@ export interface NavPage {
 	order: number;
 }
 
-// ============ Frontmatter 类型 ============
+// ------------ Frontmatter 类型 ------------
 
 /** 关于我模板 frontmatter */
 export type AboutFrontmatter = Record<string, never>;

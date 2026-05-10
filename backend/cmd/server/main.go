@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 	"time"
 
@@ -88,6 +89,31 @@ func main() {
 		MaxAge:     cfg.LogMaxAge(),
 		Compress:   cfg.LogCompress(),
 	})
+
+	if warning := cfg.MomentSecretWarning(); warning != "" {
+		logger.Warn().Msg(warning)
+	}
+
+	jwtSecret := cfg.JWTSecret()
+	if jwtSecret == "" {
+		logger.Fatal().Msg("jwt.secret must not be empty")
+	}
+	if len(jwtSecret) < 32 {
+		logger.Fatal().Msg("jwt.secret must be at least 32 characters")
+	}
+
+	adminEmail := strings.TrimSpace(cfg.AdminEmail())
+	if adminEmail == "" {
+		logger.Fatal().Msg("admin.email must not be empty")
+	}
+
+	adminPassword := cfg.AdminPassword()
+	if adminPassword == "" {
+		logger.Fatal().Msg("admin.password must not be empty")
+	}
+	if len(adminPassword) < 12 {
+		logger.Fatal().Msg("admin.password must be at least 12 characters")
+	}
 
 	logger.Info().
 		Str("port", cfg.ServerPort()).
