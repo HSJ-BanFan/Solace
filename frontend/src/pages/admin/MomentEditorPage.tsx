@@ -7,7 +7,7 @@ import { LoadingButton, TextAreaField } from "@/components";
 import { showToast } from "@/components";
 
 const momentSchema = z.object({
-	content: z.string().min(1, "内容不能为空"),
+	content: z.string().min(1, { error: "内容不能为空" }),
 });
 
 type MomentFormData = z.infer<typeof momentSchema>;

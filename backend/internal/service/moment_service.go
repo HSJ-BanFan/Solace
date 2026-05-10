@@ -3,6 +3,8 @@ package service
 import (
 	"context"
 	stderrors "errors"
+	"html"
+	"strings"
 	"time"
 
 	"gorm.io/gorm"
@@ -47,8 +49,14 @@ func (s *momentService) Create(ctx context.Context, content string) (*response.M
 
 	log.Info().Str("content", content).Msg("创建说说开始")
 
+	trimmedContent := strings.TrimSpace(content)
+	if trimmedContent == "" {
+		log.Warn().Msg("说说内容为空")
+		return nil, errors.NewBadRequest("内容不能为空", nil)
+	}
+
 	moment := &model.Moment{
-		Content: content,
+		Content: html.EscapeString(trimmedContent),
 	}
 
 	if err := s.momentRepo.Create(ctx, moment); err != nil {

@@ -5,8 +5,7 @@
 import { memo } from "react";
 import { Link } from "react-router-dom";
 import { useRecentMoments } from "@/hooks";
-import { sidebarTitleStyle } from "@/utils";
-import { formatRelativeTime } from "@/utils";
+import { decodeHtmlEntities, formatRelativeTime, sidebarTitleStyle } from "@/utils";
 import type { Moment } from "@/hooks/api/moments";
 
 interface RecentMomentsProps {
@@ -63,7 +62,7 @@ export const RecentMoments = memo(function RecentMoments({
 							className="block group py-1.5 px-2 -mx-2 rounded-md hover:bg-[var(--btn-plain-bg-hover)] transition-all"
 						>
 							<p className="text-xs lg:text-sm text-75 line-clamp-2 leading-relaxed group-hover:text-[var(--primary)] transition mb-0.5">
-								{moment.content}
+								{decodeHtmlEntities(moment.content)}
 							</p>
 							<p className="text-[10px] lg:text-xs text-30 text-right">
 								{formatRelativeTime(moment.created_at)}

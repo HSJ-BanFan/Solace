@@ -162,9 +162,16 @@ const CalendarCellButton = memo(function CalendarCellButton({
 interface ModeSwitcherProps {
 	mode: CalendarMode;
 	onModeChange: (mode: CalendarMode) => void;
+	canUseGithub: boolean;
+	githubHint: string;
 }
 
-const ModeSwitcher = memo(function ModeSwitcher({ mode, onModeChange }: ModeSwitcherProps) {
+const ModeSwitcher = memo(function ModeSwitcher({
+	mode,
+	onModeChange,
+	canUseGithub,
+	githubHint,
+}: ModeSwitcherProps) {
 	return (
 		<div className="flex items-center gap-1 bg-neutral-100/80 dark:bg-neutral-800/60 p-0.5 rounded-md">
 			<button
@@ -177,7 +184,9 @@ const ModeSwitcher = memo(function ModeSwitcher({ mode, onModeChange }: ModeSwit
 			<button
 				type="button"
 				onClick={() => onModeChange("github")}
-				className={`px-2 py-0.5 text-[8px] lg:text-[9px] rounded transition-all duration-200 ${mode === "github" ? "bg-white dark:bg-neutral-700 text-slate-600 dark:text-slate-300 shadow-sm" : "text-neutral-500 dark:text-neutral-400 hover:text-[var(--primary)]"}`}
+				disabled={!canUseGithub}
+				title={!canUseGithub ? githubHint : undefined}
+				className={`px-2 py-0.5 text-[8px] lg:text-[9px] rounded transition-all duration-200 ${mode === "github" ? "bg-white dark:bg-neutral-700 text-slate-600 dark:text-slate-300 shadow-sm" : "text-neutral-500 dark:text-neutral-400 hover:text-[var(--primary)]"} ${!canUseGithub ? "cursor-not-allowed opacity-50 hover:text-neutral-500 dark:hover:text-neutral-400" : ""}`}
 			>
 				GitHub
 			</button>
@@ -200,6 +209,8 @@ export function ContributionCalendar({
 	);
 
 	const [mode, setMode] = useState<CalendarMode>("articles");
+	const hasGithubProfile = Boolean(githubUsername);
+	const githubHint = "未配置 GitHub 主页链接";
 
 	const { data: githubData, isLoading: githubLoading, error: githubError } = useGitHubContributions(mode === "github");
 	const { data: articleData, isLoading: articleLoading, error: articleError } = useArticleContributions(mode === "articles");
@@ -233,6 +244,12 @@ export function ContributionCalendar({
 
 		return () => observer.disconnect();
 	}, []);
+
+	useEffect(() => {
+		if (mode === "github" && !hasGithubProfile) {
+			setMode("articles");
+		}
+	}, [hasGithubProfile, mode]);
 
 	const maxCount = useMemo(
 		() => computeMaxCount(sparseData?.groups),
@@ -282,9 +299,15 @@ export function ContributionCalendar({
 		setCurrentMonth(today.getMonth());
 	}, []);
 
-	const handleModeChange = useCallback((newMode: CalendarMode) => {
-		setMode(newMode);
-	}, []);
+	const handleModeChange = useCallback(
+		(newMode: CalendarMode) => {
+			if (newMode === "github" && !hasGithubProfile) {
+				return;
+			}
+			setMode(newMode);
+		},
+		[hasGithubProfile],
+	);
 
 	if (ownerLoading) {
 		return (
@@ -292,10 +315,6 @@ export function ContributionCalendar({
 				<SkeletonCalendar />
 			</div>
 		);
-	}
-
-	if (mode === "github" && !githubUsername) {
-		return null;
 	}
 
 	if (isLoading) {
@@ -375,7 +394,12 @@ export function ContributionCalendar({
 				<span>
 					当月 <span className="font-medium text-[var(--primary)]">{monthTotal}</span> 次
 				</span>
-				<ModeSwitcher mode={mode} onModeChange={handleModeChange} />
+				<ModeSwitcher
+					mode={mode}
+					onModeChange={handleModeChange}
+					canUseGithub={hasGithubProfile}
+					githubHint={githubHint}
+				/>
 			</div>
 		</div>
 	);

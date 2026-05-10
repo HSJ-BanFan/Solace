@@ -10,8 +10,8 @@
  */
 
 import { useOwner } from "@/hooks";
-import { formatRelativeTime } from "@/utils";
 import type { PostCardArticle } from "@/types";
+import { decodeHtmlEntities, formatRelativeTime } from "@/utils";
 
 interface MomentCardProps {
 	article: PostCardArticle;
@@ -32,7 +32,7 @@ export function MomentCard({ article, className, style }: MomentCardProps) {
 	const relativeTime = formatRelativeTime(article.published_at || article.created_at);
 
 	// 内容：对于说说，summary字段包含实际内容
-	const content = article.summary || "暂无内容";
+	const content = decodeHtmlEntities(article.summary || "暂无内容");
 
 	return (
 		<article

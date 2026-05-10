@@ -10,7 +10,7 @@ import {
 	PageSEO,
 } from "@/components";
 import { useAuthStore } from "@/stores";
-import { formatDateTime } from "@/utils";
+import { decodeHtmlEntities, formatDateTime } from "@/utils";
 
 export function AdminMomentsPage() {
 	const [page, setPage] = useState(1);
@@ -73,7 +73,7 @@ export function AdminMomentsPage() {
 								<div className="flex items-start justify-between gap-4">
 									<div className="flex-1 min-w-0">
 										<p className="text-75 text-sm leading-relaxed line-clamp-3 mb-2">
-											{moment.content}
+											{decodeHtmlEntities(moment.content)}
 										</p>
 										<div className="flex items-center gap-2 text-50 text-xs">
 											<span>{formatDateTime(moment.created_at)}</span>
